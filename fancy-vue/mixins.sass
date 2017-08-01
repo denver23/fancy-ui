@@ -1,0 +1,220 @@
+$legacy-support-for-ie: false !default
+
+@mixin clearfix
+  @if $legacy-support-for-ie
+    *zoom: 1
+  &:before,
+  &:after
+    content: ""
+    display: table
+  &:after
+    clear: both
+    overflow: hidden
+
+// 表单禁用样式disabled
+@mixin disabled($bgColor: #e6e6e6,$textColor: #ababab)
+  background-color: $bgColor !important
+  color: $textColor !important
+  cursor: not-allowed !important
+
+// multiple line
+@mixin text-ellipsis($line: 2)
+  text-overflow: ellipsis
+  overflow: hidden
+  display: -webkit-box
+  -webkit-line-clamp: $line
+  -webkit-box-orient: vertical
+  word-break: break-all
+
+// single line
+@mixin ellipsis($substract: 0%)
+  overflow: hidden
+  text-overflow: ellipsis
+  white-space: nowrap
+  width: 100% - $substract
+
+@mixin mixin-mask()
+  position: fixed
+  top: 0
+  bottom: 0
+  left: 0
+  right: 0
+  z-index: $zIndex
+  background: rgba(#000,0.5)
+
+@mixin mixin-button()
+  background: $colorTheme
+  color: #fff
+  border: none
+  cursor: pointer
+  border-radius: 3px
+  padding: $space $space * 4
+  &:hover,
+  &:focus
+    opacity: 0.8
+    color: #eee
+    border: none
+    outline: none
+  &:disabled
+    background: $colorDisable
+
+// close
+@mixin mixin-close($size: 2.5rem, $bgcolor: '', $hoverBgcolor: #ce2230, $color: #fff, $hoverColor: #fff)
+  width: $size
+  height: $size
+  cursor: pointer
+  position: relative
+  @if $bgcolor
+    background: $bgcolor
+  &::before,
+  &::after
+    content: ""
+    position: absolute
+    width: 70%
+    left: 15%
+    height: 3px
+    top: 50%
+    border-top: 3px solid $color
+    transform: translate3d(-1px,-1px,0) rotateZ(45deg)
+  &::after
+    transform: translate3d(1px,-1px,0) rotateZ(-45deg)
+
+  @if $hoverBgcolor
+    &:hover
+      background: $hoverBgcolor
+      @if $hoverColor
+        &::before,
+        &::after
+          border-color: $hoverColor
+
+// loading
+// example <div class="loading"><span></span></div>
+@mixin mixin-loading( $color: #35b5eb, $size: 1.5rem, $align: center )
+  text-align: $align
+  span,
+  &::before,
+  &::after
+    content: ""
+    width: $size
+    height: $size
+    margin: 0 $size / 10
+    display: inline-block
+    border-radius: 100%
+    background-color: $color
+    animation: loadingBounce 1.4s infinite ease-in-out
+    animation-fill-mode: both
+    animation-delay: -0.16s
+  &::before
+    animation-delay: -0.32s
+  &::after
+    animation-delay: 0s
+  @keyframes loadingBounce
+    0%, 80%, 100%
+      transform: scale(0.0)
+    40%
+      transform: scale(1.0)
+
+
+@mixin mixin-loading2( $color: #35b5eb, $size: 1.5rem, $align: center )
+  width: 40px
+  height: 40px
+  overflow: hidden
+  border-radius: 200%
+  background: #9a9a9a
+  background: linear-gradient(to right, #9a9a9a 10%, rgba(154,154,154, 0) 42%)
+  position: absolute
+  top: 50%
+  left: 50%
+  animation: loading2 1.4s infinite linear
+  transform: translate3d( -50%, -50%, 0)
+
+  &:before
+    width: 50%
+    height: 50%
+    background: #9a9a9a
+    border-radius: 100% 0 0 0
+    position: absolute
+    top: 0
+    left: 0
+    content: ''
+
+  &:after
+    background: $bgColor
+    width: 75%
+    height: 75%
+    border-radius: 50%
+    content: ''
+    margin: auto
+    position: absolute
+    top: 0
+    left: 0
+    bottom: 0
+    right: 0
+
+  @keyframes loading2
+    0%
+      transform: translate3d( -50%, -50%, 0) rotate(0deg)
+    100%
+      transform: translate3d( -50%, -50%, 0) rotate(360deg)
+
+
+// @mixin mixin-arrow-down( $color: #ccc, $size: 0.12rem )
+//   width: 0
+//   height: 0
+//   border-left: $size * 3 solid transparent
+//   border-right: $size * 3 solid transparent
+//   border-top: $size * 4 solid $color
+
+// @mixin mixin-rotate( $size: 30px, $turn: left)
+//   display: inline-block
+//   width: $size
+//   height: $size
+//   border: $size / 10 solid #ccc
+//   border-right-color: transparent
+//   border-radius: 100%
+//   position: relative
+//   // transform: rotatez(-50deg)
+//   &::after
+//     content: ""
+//     position: absolute
+//     top: 0
+//     right: 0
+//     width: 0
+//     height: 0
+//     border-bottom: $size/2.5 solid #ccc
+//     border-left: $size/2.5  solid transparent
+//     transform: translate3d(0px, -$size / 10 / 5 * 6 , 0) rotatez(10deg)
+
+
+
+
+
+// 简单的饼图
+// http://www.w3cfuns.com/notes/20002/f95b34fa5fad0264485e0ffded7e753a.html
+// @mixin pie( $height: 300px)
+//     .pie {
+//         width: 100px; height: 100px;
+//         border-radius: 50%;
+//         background: yellowgreen;
+//         background-image: linear-gradient(to right, transparent 50%, currentColor 0);
+//         color: #655;
+//     }
+
+//     .pie::before {
+//         content: '';
+//         display: block;
+//         margin-left: 50%;
+//         height: 100%;
+//         border-radius: 0 100% 100% 0 / 50%;
+//         background-color: inherit;
+//         transform-origin: left;
+//         animation: spin 3s linear infinite, bg 6s step-end infinite;
+//     }
+
+//     @keyframes spin {
+//         to { transform: rotate(.5turn); }
+//     }
+//     @keyframes bg {
+//         50% { background: currentColor; }
+//     }
+//  <div class="pie"></div>
