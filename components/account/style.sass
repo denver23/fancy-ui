@@ -1,0 +1,115 @@
+@import "~fancy_style"
+.fancy-account
+  $_height: 3rem
+  dl
+    margin: 0
+    dt
+      line-height: $row-height
+      padding-left: $space
+    dd
+      position: relative
+      margin-bottom: $space * 2
+      display: flex
+      align-items: center
+      &:last-child
+        margin-bottom: 0
+      input
+        display: block
+        flex: 1
+        border: 1px solid $borderColor
+        height: $_height
+        width: 100%
+        box-sizing: border-box
+        line-height: normal
+        padding: 0 $space
+        background-color: #fff
+        outline: none
+        &:focus
+          border-color: $colorTheme
+        // fixed autofill yellow background
+        &:-webkit-autofill
+          -webkit-box-shadow: 0 0 100px 100px white inset
+        &.fc-submit
+          @include mixin-button()
+      button
+        height: $_height
+        @include mixin-button()
+        padding: 0
+
+      &.fc-account,
+      &.fc-password,
+      &.fc-passwordRe
+        &::after
+          content: ""
+          position: absolute
+          right: 0
+          top: 0
+          height: $_height
+          width: $_height
+          background: url(images/person.svg?fill=#{$borderColor}) no-repeat center
+          background-size: auto 60%
+      &.fc-password,
+      &.fc-passwordRe
+        &::after
+          background-image: url(images/lock.svg?fill=#{$borderColor})
+      &.fc-captcha
+        > div
+          &:first-child
+            flex: 2
+          &:last-child:not(:first-child)
+            flex: 1
+            margin-left: $space / 2
+        img
+          cursor: pointer
+          display: block
+          width: 100%
+          height: $_height
+          border: 1px solid $borderColor
+        // &[type="number"]
+        //   -moz-appearance: textfield
+        //   &::-webkit-inner-spin-button,
+        //   &::-webkit-outer-spin-button
+        //       -webkit-appearance: none
+        //       margin: 0
+      &.fc-tip
+        margin: -$space 0 $space
+        display: block
+        text-align: center
+        border: 1px solid rgba($colorAlerm, 0.5)
+        background: rgba($colorAlerm, 0.2)
+        span
+          display: block
+          line-height: $row_height
+          color: $colorAlerm
+          animation: fancy-account .3s ease 2
+          @keyframes fancy-account
+            0%, 100%
+              transform: translateX(0)
+            25%
+              transform: translateX(-$space)
+            75%
+              transform: translateX($space)
+  @media #{$device-mobile}
+    dl
+      dd.fc-tip
+        position: fixed
+        top: 0
+        left: 0
+        right: 0
+        z-index: $zIndex
+        margin: 0
+        border: none
+        opacity: 0
+        background: rgba(#000, 0.7)
+        transform: translate3d(0, -100%, 0)
+        animation: fancy-account-top 3s 1 ease-in-out alternate
+        @keyframes fancy-account-top
+          0%,100%
+            opacity: 0.5
+            transform: translate3d(0, -100%, 0)
+          25%,50%,75%
+            opacity: 1
+            transform: translate3d(0, 0, 0)
+        span
+          animation: none
+          color: #fff
