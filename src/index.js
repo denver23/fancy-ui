@@ -17,9 +17,10 @@ new Vue({
     'codemessage': resolve => require(['./views/codemessage'], resolve),
     'confirm': resolve => require(['./views/confirm'], resolve),
     'datetimepicker': resolve => require(['./views/datetimepicker'], resolve),
+    'tree': resolve => require(['./views/tree'], resolve),
   },
   mounted() {
     let router = window.location.pathname.split('/').slice(1, 3).filter(v => !!v).join('/');
-    this.appview = router || 'datetimepicker';
+    this.appview = router || 'tree';
   },
 })

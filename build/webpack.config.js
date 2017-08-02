@@ -64,8 +64,8 @@ module.exports = {
   // alias
   alias: {
     lib: `${root}/lib/`,
-    fancy: `${root}/fancy-vue/components/`,
-    fancy_config: `${root}/fancy-vue/fancy.config.sass`,
+    fancy: `${root}/components/`,
+    fancy_style: `${root}/components/fancy.style.sass`,
     // node
     vue$: 'vue/dist/vue.js',
     zepto$: 'zepto/dist/zepto.min.js',

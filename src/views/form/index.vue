@@ -1,17 +1,17 @@
 <style lang="sass">
   @import "../../config.sass"
-  .test-tree
+  .test-form
     margin: 50px auto
 </style>
 
 <template lang="jade">
-  .test-tree
-    component(is="tree", :cfg="tree" v-if="tree")
+  .test-form
+    component(is="form", :cfg="form" v-if="form")
 </template>
 
 <script>
 
-  var treedata = [
+  var formdata = [
     {
       name: 'level 1',
       data: [
@@ -52,15 +52,15 @@
     }
   ]
   
-  import tree from 'fancy/tree';
+  import form from 'fancy/form';
   export default {
     components: {
-      tree
+      form
     },
     data() {
       return {
-        tree: {
-          data: treedata,
+        form: {
+          data: formdata,
           field: 'name',
           maxLevel: 10,
           editBtn: true,
