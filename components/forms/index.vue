@@ -70,16 +70,16 @@
             background-size: 1.5rem auto
         &[type="radio"]
           + span
-            background-image: url(images/ios-circle-outline.svg?fill=#{$colorFont})
+            background-image: url(images/android-radio-button-off.svg?fill=#{$colorFont})
           &:checked
             + span
-              background-image: url(images/ios-checkmark-outline.svg?fill=#{$colorFont})
+              background-image: url(images/android-radio-button-on.svg?fill=#{$colorFont})
         &[type="checkbox"]
           + span
-            background-image: url(images/android-checkbox-blank.svg?fill=#{$colorFont})
+            background-image: url(images/android-checkbox-outline-blank.svg?fill=#{$colorFont})
           &:checked
             + span
-              background-image: url(images/android-checkbox.svg?fill=#{$colorFont})
+              background-image: url(images/android-checkbox-outline.svg?fill=#{$colorFont})
     > dl
       padding: $space
       display: flex
@@ -293,14 +293,25 @@
                 )
                 span(v-html="vv.label")
 
-              label(v-else-if="v.type === 'checkbox'" v-for="(vv,k) of v.data")
-                input(
-                  type="checkbox"
-                  v-bind:name="v.name"
-                  v-bind:value="vv.value"
-                  v-model="cfg.value[v.name]"
-                )
-                span(v-html="vv.label")
+              template(v-else-if="v.type === 'checkbox'")
+                label(v-if="v.checkAll")
+                  input(
+                    type="checkbox",
+                    v-bind:name="v.name",
+                    v-bind:value="v.checkAll.value"
+                    v-model="checkAll[v.name]"
+                    @click="_onChkAll(v)"
+                  )
+                  span(v-html="v.checkAll.label")
+                label(v-for="(vv,k) of v.data")
+                  input(
+                    type="checkbox"
+                    v-bind:name="v.name"
+                    v-bind:value="vv.value"
+                    v-model="cfg.value[v.name]"
+                    @click="_onChk(v, vv)"
+                  )
+                  span(v-html="vv.label")
 
               component(:is="v.name" v-bind:cfg="v.value" v-else-if="v.type === 'component' && v.value" )
               //- others
@@ -340,6 +351,7 @@
         tips: {},
         sending: false,
         submitName: '_submit_',
+        checkAll: {},
       }
     },
     created() {
@@ -391,6 +403,18 @@
       },
     },
     methods: {
+      _onChkAll(v) {
+        let arr = this.cfg.value[v.name];
+        arr.splice(0);
+        this.checkAll[v.name] && v.data.forEach(v => arr.push(v.value));
+      },
+      _onChk(v, vv) {
+        this.checkAll[v.name]
+        = this.cfg.value[v.name]
+        && this.cfg.value[v.name].includes(vv.value)
+        && this.cfg.value[v.name].length === v.data.length
+        ;
+      },
       _submit: async function() {
         let cfg = this.cfg;
         if (cfg.validator) {
