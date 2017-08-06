@@ -9,7 +9,6 @@
       padding: 0 $space
       > dt
         text-align: start
-        padding: 0 $space
         color: $colorFont
       > dd
         > input,
@@ -19,7 +18,7 @@
           width: 100%
           min-width: 0
           max-width: 100%
-          margin-bottom: $space
+          margin-bottom: $space * 2
         > label
           padding-right: $space * 2
         > input
@@ -56,7 +55,6 @@
     label
       display: inline-block
       line-height: $form-height
-      padding: 0 $space
       margin: 0
       > input
         &[type="radio"],
@@ -90,10 +88,14 @@
         min-width: 8rem
         text-align: right
         color: $colorFont
+        > label 
+          padding: 0 $space
       > dd
         position: relative
         &:first-of-type:last-of-type
           flex: 1 1 0
+        > label
+          padding-right: $space * 2
         > cite
           $_tip: $space * 2
           display: block
@@ -409,11 +411,12 @@
         this.checkAll[v.name] && v.data.forEach(v => arr.push(v.value));
       },
       _onChk(v, vv) {
-        this.checkAll[v.name]
-        = this.cfg.value[v.name]
-        && this.cfg.value[v.name].includes(vv.value)
-        && this.cfg.value[v.name].length === v.data.length
-        ;
+        if (v.checkAll) {
+          this.checkAll[v.name] = this.cfg.value[v.name]
+          && this.cfg.value[v.name].includes(vv.value)
+          && this.cfg.value[v.name].length === v.data.length
+          ;
+        }
       },
       _submit: async function() {
         let cfg = this.cfg;
