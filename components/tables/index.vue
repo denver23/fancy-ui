@@ -170,7 +170,7 @@
       ul.fc-header
         template(v-for="(v, index) of cfg.columns")
           li(
-            v-if="pickerData.includes(index) || v.label === 'checkbox'"
+            v-if="v.field && pickerData.includes(index) || v.label === 'checkbox'"
             v-bind:class="[v.field, {'fc-noflex': v.style && v.style.width}]"
             v-bind:style="v.style"
           )
@@ -181,7 +181,7 @@
       ul(v-if="cfg.data && cfg.data.length" v-for="value of cfg.data" transition="fc-fade")
         template(v-for="(v, index) of cfg.columns")
           li(
-            v-if="pickerData.includes(index) || v.label === 'checkbox'"
+            v-if="v.field && pickerData.includes(index) || v.label === 'checkbox'"
             v-bind:class="[v.field, {'fc-noflex': v.style && v.style.width}]"
             v-bind:style="v.style"
           )
