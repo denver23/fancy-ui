@@ -325,124 +325,145 @@
 
 <script>
 
-  function getQueryAll() {
-    let res = {};
-    let str = window.location.search.substr(1);
-    str != null && str.replace(/([^=&]+)=([^&]*)/g, (all, key, value) => {
-      value && (res[key] = decodeURIComponent(value));
+function getQueryAll() {
+  let res = {};
+  let str = window.location.search.substr(1);
+  str != null && str.replace(/([^=&]+)=([^&]*)/g, (all, key, value) => {
+    value && (res[key] = decodeURIComponent(value));
+  });
+  return res;
+}
+
+const Options = {
+  data: false,
+  type: '', // search column forms
+  value: {},
+  pushstate: false, // object
+  onReset(form, data) { },
+  onReady(form, data) { },
+  onSubmit(form, data) { },
+  onPopstate(form, data) { },
+  validator: false,
+};
+
+export default {
+  props: ['cfg'],
+  data() {
+    return {
+      tips: {},
+      sending: false,
+      submitName: '_submit_',
+      checkAll: {},
+    }
+  },
+  created() {
+    Object.keys(Options).forEach(i => {
+      (i in this.cfg) || this.$set(this.cfg, i, Options[i]);
     });
-    return res;
-  }
 
-  const Options = {
-    data: false,
-    type: '', // search column forms
-    value: {},
-    pushstate: false, // object
-    onReset(form, data) {},
-    onReady(form, data) {},
-    onSubmit(form, data) {},
-    onPopstate(form, data) {},
-    validator: false,
-  };
-
-  export default {
-    props: ['cfg'],
-    data() {
-      return {
-        tips: {},
-        sending: false,
-        submitName: '_submit_',
-        checkAll: {},
-      }
-    },
-    created() {
-      Object.keys(Options).forEach(i => {
-        (i in this.cfg) || this.$set(this.cfg, i, Options[i]);
+    let cfg = this.cfg;
+    if (cfg.type === 'search') {
+      Object.assign(cfg.value, getQueryAll());
+      typeof cfg.onPopstate === 'function' && window.addEventListener("popstate", e => {
+        cfg.value = getQueryAll();
+        cfg.onPopstate(this.$refs.form, cfg.value);
       });
-
-      let cfg = this.cfg;
-      if (cfg.type === 'search') {
-        Object.assign(cfg.value, getQueryAll());
-        typeof cfg.onPopstate === 'function' && window.addEventListener("popstate", e => {
-          cfg.value = getQueryAll();
-          cfg.onPopstate(this.$refs.form, cfg.value);
-        });
-      }
-      // validator and submit
-      cfg.data && cfg.data.forEach(val => (val.children || val).forEach(v => {
-        if (v.type === 'submit') {
-          this.submitName = v.name || '_submit_';
-          this.$set(this.tips, this.submitName, '');
-          this.$set(v, 'name', this.submitName);
-        } else if (v.name && !['reset','button','component'].includes(v.type)) {
-         this.$set(this.tips, v.name, '');
-         this.$set(cfg.value, v.name, (v.name in cfg.value) ? cfg.value[v.name] : (v.value || ''));
-        }
-      }));
-    },
-    mounted() {
-      requestAnimationFrame(() => {
-        let cfg = this.cfg;
-        if (typeof cfg.onReady === 'function') {
-          cfg.onReady(this.$refs.form, cfg.value);
-        }
-        if (typeof cfg.onReset === 'function') {
-          let inp = this.$el.querySelector('input[type="reset"]');
-          inp && inp.addEventListener('click', cfg.onReset);
-        }
-      });
-    },
-    watch: {
-      'cfg.pushstate' (val) {
-        if (typeof val === 'object') {
-          let url = window.location.href.split('?')[0];
-          let param = Object.entries(val).map(v => v[1] && v.join('=')).filter(v => v).join('&');
-          window.history.pushState({
-            'title': ''
-          }, '', `${url}?${param}`);
-        }
-      },
-    },
-    methods: {
-      _onChkAll(v) {
-        let arr = this.cfg.value[v.name];
-        arr.splice(0);
-        this.checkAll[v.name] && v.data.forEach(v => arr.push(v.value));
-      },
-      _onChk(v, vv) {
-        if (v.checkAll) {
-          this.checkAll[v.name] = this.cfg.value[v.name]
-          && this.cfg.value[v.name].includes(vv.value)
-          && this.cfg.value[v.name].length === v.data.length
-          ;
-        }
-      },
-      _submit: async function() {
-        let cfg = this.cfg;
-        if (cfg.validator) {
-          for (let [key, _func] of Object.entries(cfg.validator)) {
-            let res = _func(cfg.value[key], cfg.value);
-            if (res !== true) {
-              this.tips[key] = false;
-              this.$el.querySelector(`[name="${key}"]`).focus();
-              requestAnimationFrame(() => this.tips[key] = res);
-              return;
+    }
+    // validator and submit
+    cfg.data && cfg.data.forEach(val => (val.children || val).forEach(v => {
+      if (v.type === 'submit') {
+        this.submitName = v.name || '_submit_';
+        this.$set(this.tips, this.submitName, '');
+        this.$set(v, 'name', this.submitName);
+      } else if (v.name && !['reset', 'button', 'component'].includes(v.type)) {
+        this.$set(this.tips, v.name, '');
+        this.$set(cfg.value, v.name, (v.name in cfg.value) ? cfg.value[v.name] : (v.value || ''));
+        // set checkAll
+        if (v.type === 'checkbox' && v.checkAll) {
+          let _chked = true;
+          for (let _chk of v.data) {
+            if (!cfg.value[v.name].includes(_chk.value)) {
+              _chked = false;
+              break;
             }
           }
+          this.checkAll[v.name] = _chked;
         }
-
-        this.tips[this.submitName] = '';
-        if (this.sending) return;
-        this.sending = true;
-        try {
-          cfg.onSubmit && await cfg.onSubmit(this.$refs.form, cfg.value);;
-        } catch (err) {
-          this.tips[this.submitName] = err;
-        }
-        this.sending = false;
-      },
+      }
+    }));
+  },
+  mounted() {
+    requestAnimationFrame(() => {
+      let cfg = this.cfg;
+      if (typeof cfg.onReady === 'function') {
+        cfg.onReady(this.$refs.form, cfg.value);
+      }
+      if (typeof cfg.onReset === 'function') {
+        let inp = this.$el.querySelector('input[type="reset"]');
+        inp && inp.addEventListener('click', cfg.onReset);
+      }
+    });
+  },
+  watch: {
+    'cfg.pushstate'(val) {
+      if (typeof val === 'object') {
+        let url = window.location.href.split('?')[0];
+        let param = Object.entries(val).map(v => v[1] && v.join('=')).filter(v => v).join('&');
+        window.history.pushState({
+          'title': ''
+        }, '', `${url}?${param}`);
+      }
     },
-  }
+  },
+  methods: {
+    _onChkAll(v) {
+      let arr = this.cfg.value[v.name];
+      arr.splice(0);
+      if (this.checkAll[v.name]) {
+        v.data.forEach(v => arr.push(v.value));
+        if (typeof v.checkAll.value != 'undefined') arr.push(v.checkAll.value)
+      }
+    },
+    _onChk(v, vv) {
+      if (v.checkAll) {
+        let _val = this.cfg.value[v.name];
+        if (_val && _val.includes(vv.value)) {
+          if (_val.length == v.data.length) {
+            this.checkAll[v.name] = v.checkAll.value || true;
+            if (typeof v.checkAll.value != 'undefined') _val.push(v.checkAll.value);
+          }
+        } else {
+          this.checkAll[v.name] = false;
+          let _i = _val.findIndex(n => n === v.checkAll.value);
+          if (_i >= 0) _val.splice(_i, 1)
+        }
+      }
+    },
+    _submit: async function () {
+      let cfg = this.cfg;
+      if (cfg.validator) {
+        for (let [key, _func] of Object.entries(cfg.validator)) {
+          let res = _func(cfg.value[key], cfg.value);
+          if (res !== true) {
+            this.tips[key] = false;
+            this.$el.querySelector(`[name="${key}"]`).focus();
+            requestAnimationFrame(() => this.tips[key] = res);
+            return;
+          }
+        }
+      }
+
+      this.tips[this.submitName] = '';
+      if (this.sending) return;
+      this.sending = true;
+      try {
+        cfg.onSubmit && await cfg.onSubmit(this.$refs.form, cfg.value);;
+      } catch (err) {
+        this.tips[this.submitName] = err;
+      }
+      this.sending = false;
+    },
+  },
+}
 
 </script>
