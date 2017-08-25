@@ -77,8 +77,6 @@
         width: $max-width + 2   // to hide scrollbar
         overflow-x: hidden
         overflow-y: scroll
-      h3
-        padding-left: $size
       dl
         &.fc-fold
           dt
@@ -161,10 +159,9 @@
     .fc-switch(@click="_setState()")
     .fc-wrap
       div
-        h3(v-if="cfg.title" v-html="cfg.title")
-        dl(v-for="(item, k) in cfg.data" v-bind:class="{'fc-fold': folded[k]}")
-          dt(:class="'fc-'+ item.icon" @click="_setFold(k,item)") {{item.name}}
-          dd(v-for="v of item.children" v-bind:class="{'fc-active': v.id == cfg.active}")
+        dl(v-for="(v, k) in cfg.data" v-bind:class="{'fc-fold': folded[k]}")
+          dt(:class="'fc-'+ v.icon" @click="_setFold(k,v)") {{v.name}}
+          dd(v-for="v of v.children" v-bind:class="{'fc-active': v.id == cfg.active}")
             a(
               v-bind="{href: v.url || 'javascript:', target: v.target || '_self', title: v.name}"
               @click="v.callback ? v.callback(v) : ''"
@@ -175,7 +172,6 @@
 
   const Options = {
     data: null,
-    title: '',
     active: '',
     target: '.main',
     targetClass: 'full',

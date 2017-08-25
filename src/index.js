@@ -3,13 +3,16 @@ require('babel-polyfill')
 // node modules
 require('script!zepto')
 import Vue from 'vue';
+import sidebar from 'fancy/sidebar';
 
 new Vue({
   el: '.viewport',
   data: {
     appview: '',
+    sidebar: null
   },
   components: {
+    sidebar,
     'account': resolve => require(['./views/account/'], resolve),
     'account/join': resolve => require(['./views/account/join'], resolve),
     'alert': resolve => require(['./views/alert'], resolve),
@@ -20,7 +23,50 @@ new Vue({
     'tree': resolve => require(['./views/tree'], resolve),
   },
   mounted() {
-    let router = window.location.pathname.split('/').slice(1, 3).filter(v => !!v).join('/');
-    this.appview = router || 'tree';
+    let self = this;
+    function _getRouter() {
+      return window.location.pathname.split('/').slice(1, 3).filter(v => !!v).join('/');
+    }
+    function _toggle(name) {
+      self.appview = name || 'tree';
+      window.history.pushState({'title': ''}, '', `/${name}`);
+    }
+    window.addEventListener("popstate", e => this.appview = _getRouter() || 'tree');
+
+    this.appview = _getRouter() || 'tree';
+    this.sidebar = {
+      data: [
+        {
+          name: 'basic',
+          children: [
+            {
+              name: 'tree',
+              callback:() => _toggle('tree'),
+            },
+            {
+              name: 'confirm',
+              callback:() => _toggle('confirm'),
+            },
+            {
+              name: 'datetimepicker',
+              callback:() => _toggle('datetimepicker'),
+            },
+            {
+              name: 'citypicker',
+              callback:() => _toggle('citypicker'),
+            },
+            {
+              name: 'codemessage',
+              callback:() => _toggle('codemessage'),
+            },
+            {
+              name: 'alert',
+              callback:() => _toggle('alert'),
+            }
+          ]
+        }
+      ]
+
+    }
   },
 })

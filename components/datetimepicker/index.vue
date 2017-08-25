@@ -258,9 +258,10 @@
 <script>
   // let str = '2012.12-23 23:01:59';
   // let res = str.match(/^(\d{4,4})\D*(\d{1,2})\D+(\d{1,2})\D*(\d{1,2}):(\d{1,2}):(\d{1,2}).*/);
+  // function buildCalendar(year = new Date().getFullYear(), month = new Date().getMonth(), validBegin = '', validEnd) {
   function buildCalendar(year, month, validBegin = '', validEnd) {
-    year = parseInt(year || new Date().getFullYear());
-    month = parseInt(month || new Date().getMonth());
+    year = parseInt(year);
+    month = parseInt(month);
 
     let firstWeekOfMonth   = new Date(year, month, 1).getDay();
     let lastDayOfMonth     = new Date(year, month + 1, 0).getDate();
