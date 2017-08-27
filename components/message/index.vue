@@ -4,7 +4,7 @@
   .fancy-message
     padding: $space * 4
     .fc-status
-      height: $space * 30
+      height: $space * 24
       background: url(images/checkmark-circled.svg?fill=#{$colorGreen}) no-repeat center center
       background-size: auto 100%
       &.fc-error
@@ -60,6 +60,7 @@
         time = parseInt(time);
         if (time >= 0 && url) {
           setTimeout(() => {
+            if (typeof url === 'function') return url();
             if (url === 'back') return window.history.back();
             url === 'close' ? window.close() : (window.location = url);
           }, time);

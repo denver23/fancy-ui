@@ -16,3 +16,5 @@ html
       component(is="sidebar" v-if="sidebar", :cfg="sidebar")
       .main 
         component(:is="appview")
+        component(:is="message" v-if="message", :cfg="message")
+        component(:is="modalbox" v-if="modalbox", :cfg="modalbox")
