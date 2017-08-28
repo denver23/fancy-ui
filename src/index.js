@@ -1,5 +1,5 @@
 require('./css.sass');
-require('babel-polyfill')
+// require('babel-polyfill')
 // node modules
 require('script!zepto')
 import Vue from 'vue';
@@ -9,7 +9,8 @@ new Vue({
   el: '.viewport',
   data: {
     appview: '',
-    sidebar: null
+    sidebar: null,
+    sideStatus: ''
   },
   components: {
     sidebar,
@@ -65,7 +66,10 @@ new Vue({
             }
           ]
         }
-      ]
+      ],
+      onSlide(v) {
+        self.sideStatus = v ? 'full' : ''
+      }
 
     }
   },
