@@ -202,7 +202,7 @@ const Options = {
   picker: '',
   values: {},
   state: 'loading',
-};
+}
 export default {
   props: ['cfg'],
   data() {
@@ -210,44 +210,44 @@ export default {
       pickerState: false,
       pickerData: [],
       modelAll: {},
-    };
+    }
   },
   created() {
     let cfg = this.cfg
     Object.keys(Options).forEach(i => {
-      (i in cfg) || this.$set(cfg, i, Options[i]);
-    });
+      (i in cfg) || this.$set(cfg, i, Options[i])
+    })
     cfg.columns && cfg.columns.forEach((v, k) => {
-      this.pickerData.push(k);
-      v.label === 'checkbox' && this.$set(this.modelAll, v.field, false);
-    });
+      this.pickerData.push(k)
+      v.label === 'checkbox' && this.$set(this.modelAll, v.field, false)
+    })
   },
   mounted() {
-    document.addEventListener('click', this._onPicker, false);
+    document.addEventListener('click', this._onPicker, false)
   },
   destroyed() {
-    document.removeEventListener('click', this._onPicker, false);
+    document.removeEventListener('click', this._onPicker, false)
   },
   watch: {
     'cfg.data'(val) {
       for (let i in this.modelAll) {
-        this.modelAll[i] = false;
-        this.cfg.values[i] = [];
+        this.modelAll[i] = false
+        this.cfg.values[i] = []
       }
     }
   },
   methods: {
     _onPicker() {
-      this.pickerState = false;
+      this.pickerState = false
     },
     _onChkAll(column) {
-      let key = column.field;
-      let arr = this.cfg.values[key] || [];
-      arr.splice(0);
-      this.modelAll[key] && this.cfg.data.forEach(v => arr.push(v[key]));
+      let key = column.field
+      let arr = this.cfg.values[key] || []
+      arr.splice(0)
+      this.modelAll[key] && this.cfg.data.forEach(v => arr.push(v[key]))
     },
     _onChk(key, item) {
-      this.modelAll[key] = this.cfg.values[key] && this.cfg.values[key].includes(item[key]) && this.cfg.values[key].length === this.cfg.data.length;
+      this.modelAll[key] = this.cfg.values[key] && this.cfg.values[key].includes(item[key]) && this.cfg.values[key].length === this.cfg.data.length
     },
   }
 }

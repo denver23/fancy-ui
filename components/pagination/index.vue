@@ -72,79 +72,79 @@
 
 <script>
 
-  const Options = {
-    total    : 0,
-    page     : 1,
-    perpage  : 10,
-    linknum  : 5,
-    prevPage : '<',
-    nextPage : '>',
-    firstPage: '',
-    lastPage : '',
-    callback(page) {},
-  }
-  export default {
-    props: ['cfg'],
-    created() {
-      Object.keys(Options).forEach(i => {
-        (i in this.cfg) || this.$set(this.cfg, i, Options[i]);
-      });
+const Options = {
+  total: 0,
+  page: 1,
+  perpage: 10,
+  linknum: 5,
+  prevPage: '<',
+  nextPage: '>',
+  firstPage: '',
+  lastPage: '',
+  callback(page) { },
+}
+export default {
+  props: ['cfg'],
+  created() {
+    Object.keys(Options).forEach(i => {
+      (i in this.cfg) || this.$set(this.cfg, i, Options[i])
+    })
+  },
+  computed: {
+    maxPage() {
+      return Math.ceil(this.cfg.total / this.cfg.perpage)
     },
-    computed: {
-      maxPage() {
-        return Math.ceil(this.cfg.total / this.cfg.perpage);
-      },
-      forData() {
-        let self = this;
-        let res = [];
-        let maxPage = this.maxPage;
-        let page = Math.min(self.cfg.page, maxPage);
-        let step = Math.ceil(self.cfg.linknum / 2);
+    forData() {
+      let self = this
+      let res = []
+      let maxPage = this.maxPage
+      let page = Math.min(self.cfg.page, maxPage)
+      let step = Math.ceil(self.cfg.linknum / 2)
 
-        if (self.cfg.linknum > 2) {
-          let begin = 0;
-          let end = 0;
-          begin = page - step + 1;
-          end = page + step - 1;
+      if (self.cfg.linknum > 2) {
+        let begin = 0
+        let end = 0
+        begin = page - step + 1
+        end = page + step - 1
 
-          if (end >= maxPage) {
-            begin = maxPage - self.cfg.linknum + 1;
-            end = maxPage;
-          }
-          if (begin <= 0) {
-            begin = 1;
-            end = Math.min(self.cfg.linknum, maxPage);
-          }
-          for (let i = begin; i <= end; i++) {
-            res.push({
-              num: i,
-              text: i
-            });
-          }
-        };
-        res.unshift({
-          num: page - 1,
-          text: self.cfg.prevPage
-        });
-        if (self.cfg.firstPage && page > step) {
-          res.unshift({
-            num: 1,
-            text: self.cfg.firstPage,
-          });
+        if (end >= maxPage) {
+          begin = maxPage - self.cfg.linknum + 1
+          end = maxPage
         }
-        res.push({
-          num: page + 1,
-          text: self.cfg.nextPage,
-        });
-        return res;
+        if (begin <= 0) {
+          begin = 1
+          end = Math.min(self.cfg.linknum, maxPage)
+        }
+        for (let i = begin; i <= end; i++) {
+          res.push({
+            num: i,
+            text: i
+          })
+        }
       }
-    },
-    methods: {
-      _goto(page) {
-        if (page < 1 || page > this.maxPage) return;
-        this.cfg.page = page;
-        typeof this.cfg.callback == 'function' && this.cfg.callback(page);
+      res.unshift({
+        num: page - 1,
+        text: self.cfg.prevPage
+      })
+      if (self.cfg.firstPage && page > step) {
+        res.unshift({
+          num: 1,
+          text: self.cfg.firstPage,
+        })
       }
+      res.push({
+        num: page + 1,
+        text: self.cfg.nextPage,
+      })
+      return res
+    }
+  },
+  methods: {
+    _goto(page) {
+      if (page < 1 || page > this.maxPage) return
+      this.cfg.page = page
+      typeof this.cfg.callback == 'function' && this.cfg.callback(page)
     }
   }
+}
 </script>

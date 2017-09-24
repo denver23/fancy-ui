@@ -36,12 +36,12 @@
     data() {
       return {
         error: false,
-      };
+      }
     },
     created() {
       Object.keys(Options).forEach(i => {
-        (i in this.cfg) || this.$set(this.cfg, i, Options[i]);
-      });
+        (i in this.cfg) || this.$set(this.cfg, i, Options[i])
+      })
     },
   }
 </script>

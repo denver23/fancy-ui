@@ -54,7 +54,7 @@
       name: 'Sign In',
     },
     onSubmit(data, refs){}
-  };
+  }
   export default {
     props: ['cfg'],
     data() {
@@ -65,47 +65,47 @@
         account: '',
         password: '',
         captcha: '',
-      };
+      }
     },
     created() {
       Object.keys(Options).forEach(i => {
-        (i in this.cfg) || this.$set(this.cfg, i, Options[i]);
-      });
+        (i in this.cfg) || this.$set(this.cfg, i, Options[i])
+      })
     },
     computed: {
       codeimg() {
-        let v = this.cfg.captcha;
-        return v.url + (v.url.indexOf('?') < 0 ? '?' : '&') + 'tt=' + this.tt;
+        let v = this.cfg.captcha
+        return v.url + (v.url.indexOf('?') < 0 ? '?' : '&') + 'tt=' + this.tt
       }
     },
     methods: {
       _showtip(str) {
-        requestAnimationFrame(() => this.message = str);
+        requestAnimationFrame(() => this.message = str)
       },
       _captcha() {
-        this.tt = Date.now();
+        this.tt = Date.now()
         if (this.$refs.captcha) {
-          this.$refs.captcha.value = '';
+          this.$refs.captcha.value = ''
         }
       },
       _submit: async function() {
-        let data = {};
-        let cfg = this.cfg;
-        data[cfg.account.name] = this.account.trim();
-        data[cfg.password.name] = this.password.trim();
-        data[cfg.captcha.name] = this.captcha.trim();
+        let data = {}
+        let cfg = this.cfg
+        data[cfg.account.name] = this.account.trim()
+        data[cfg.password.name] = this.password.trim()
+        data[cfg.captcha.name] = this.captcha.trim()
 
-        this.message = '';
-        if (this.locked) return;
+        this.message = ''
+        if (this.locked) return
         try {
-          this.locked = true;
+          this.locked = true
           await cfg.onSubmit(data, this.$refs)
         } catch (err) {
-          this.locked = false;
+          this.locked = false
           this._captcha()
           this._showtip(err)
         }
-        this.locked = false;
+        this.locked = false
       },
     },
   }

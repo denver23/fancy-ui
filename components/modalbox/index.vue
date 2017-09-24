@@ -127,71 +127,71 @@
 
 <script>
 
-  import Drag from 'lib/drag';
+import Drag from 'lib/drag'
 
-  const Options = {
-    title: '',
-    content: '',
-    confirm: 'confirm',
-    cancel: 'cancel',
-    component: '', // component组件
+const Options = {
+  title: '',
+  content: '',
+  confirm: 'confirm',
+  cancel: 'cancel',
+  component: '', // component组件
 
-    overlay: true,
-    draggable: true,
-    onComplete() {},
-    onConfirm() {},
-    onCancel() {},
-    __name: 'modalbox',
-  };
+  overlay: true,
+  draggable: true,
+  onComplete(el) { },
+  onConfirm(el) { },
+  onCancel() { },
+  __name: 'modalbox',
+}
 
-  export default {
-    props: ['cfg'],
-    data() {
-      return {
-        sending: false,
-      }
-    },
-    created() {
-      Object.keys(Options).forEach(i => {
-        (i in this.cfg) || this.$set(this.cfg, i, Options[i]);
-      });
-    },
-    mounted() {
-      this.cfg.content !== 'loading' && this.cfg.onComplete && this.cfg.onComplete(this.$el);
-      this.cfg.draggable && Drag.init(this.$refs.title || this.$refs.box, this.$refs.box);
-      document.addEventListener('keydown', this._kdown, false);
-    },
-    destroyed() {
-      document.removeEventListener('keydown', this._kdown, false);
-    },
-    watch: {
-      'cfg.content' (val) {
-        requestAnimationFrame(() => val !== 'loading' && this.cfg.onComplete && this.cfg.onComplete(this.$el));
-      }
-    },
-    methods: {
-      _kdown(e) {
-        if (this.cfg.content) {
-          // enter space
-          if (this.cfg.confirm && [13, 100, 32].includes(e.keyCode)) {
-            e.preventDefault();
-            e.stopPropagation();
-            return this._done(1);
-          }
-          // esc
-          if (e.keyCode == 27) this._done(0);
+export default {
+  props: ['cfg'],
+  data() {
+    return {
+      sending: false,
+    }
+  },
+  created() {
+    Object.keys(Options).forEach(i => {
+      (i in this.cfg) || this.$set(this.cfg, i, Options[i])
+    })
+  },
+  mounted() {
+    this.cfg.content !== 'loading' && this.cfg.onComplete && this.cfg.onComplete(this.$el)
+    this.cfg.draggable && Drag.init(this.$refs.title || this.$refs.box, this.$refs.box)
+    document.addEventListener('keydown', this._kdown, false)
+  },
+  destroyed() {
+    document.removeEventListener('keydown', this._kdown, false)
+  },
+  watch: {
+    'cfg.content'(val) {
+      requestAnimationFrame(() => val !== 'loading' && this.cfg.onComplete && this.cfg.onComplete(this.$el))
+    }
+  },
+  methods: {
+    _kdown(e) {
+      if (this.cfg.content) {
+        // enter space
+        if (this.cfg.confirm && [13, 100, 32].includes(e.keyCode)) {
+          e.preventDefault()
+          e.stopPropagation()
+          return this._done(1)
         }
-      },
-      _done: async function(type) {
-        if (this.sending) return;
-        this.sending = type;
-        try {
-          type ? await this.cfg.onConfirm() : await this.cfg.onCancel();
-        } catch (e) {}
-        this.sending = false;
-        this.cfg.__name && (this.$parent[this.cfg.__name] = false);
-      },
+        // esc
+        if (e.keyCode == 27) this._done(0)
+      }
     },
-  }
+    _done: async function(type) {
+      if (this.sending) return
+      this.sending = type
+      try {
+        type ? await this.cfg.onConfirm(this.$el) : await this.cfg.onCancel()
+      } catch (e) { }
+      this.sending = false
+      this.cfg.__name && (this.$parent[this.cfg.__name] = false)
+    },
+  },
+}
 </script>
 

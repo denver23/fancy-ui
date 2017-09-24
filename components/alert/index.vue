@@ -55,34 +55,34 @@
     ismask: true,
     onConfirm() {},
     __name: 'alert',
-  };
+  }
   export default {
     props: ['cfg'],
     created() {
       Object.keys(Options).forEach(i => {
-        (i in this.cfg) || this.$set(this.cfg, i, Options[i]);
-      });
-      document.addEventListener('keydown', this._kdown, false);
+        (i in this.cfg) || this.$set(this.cfg, i, Options[i])
+      })
+      document.addEventListener('keydown', this._kdown, false)
     },
     mounted() {
-      this.$el.focus();
+      this.$el.focus()
     },
     destroyed() {
-      document.removeEventListener('keydown', this._kdown, false);
+      document.removeEventListener('keydown', this._kdown, false)
     },
     methods: {
       _kdown(e) {
         // enter space center esc
         if ([13, 32, 100, 27].includes(e.keyCode)) {
-          e.preventDefault();
-          e.stopPropagation();
-          return this._done();
+          e.preventDefault()
+          e.stopPropagation()
+          return this._done()
         }
       },
       _done: async function() {
         try{
-          this.cfg.onConfirm && await this.cfg.onConfirm();
-          this.cfg.__name && (this.$parent[this.cfg.__name] = false);
+          this.cfg.onConfirm && await this.cfg.onConfirm()
+          this.cfg.__name && (this.$parent[this.cfg.__name] = false)
         } catch(e) {}
       },
     },

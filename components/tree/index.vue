@@ -141,116 +141,116 @@
 
 <script>
 
-  const Options = {
-    data: null,
-    field: 'name',
-    maxLevel: 1000,
-    editBtn: true,
-    insertBtn: true,
-    removeBtn: true,
-    placeholder: '',
-    onClick: (item, parent) => true,
-    onCreate: (item, parent, isCreate) => true,
-    onEdit: (item, parent, isCreate) => true,
-    onSubmit(value, item, parent) {
-      return new Promise((resolve) => {
-        setTimeout(() => resolve(), 1000)
-      });
-    },
-    onRemove(item, parent) {
-      return new Promise((resolve) => {
-        setTimeout(() => resolve(), 1000)
-      });
-    },
-  };
+const Options = {
+  data: null,
+  field: 'name',
+  maxLevel: 1000,
+  editBtn: true,
+  insertBtn: true,
+  removeBtn: true,
+  placeholder: '',
+  onClick: (item, parent) => true,
+  onCreate: (item, parent, isCreate) => true,
+  onEdit: (item, parent, isCreate) => true,
+  onSubmit(value, item, parent) {
+    return new Promise((resolve) => {
+      setTimeout(() => resolve(), 1000)
+    })
+  },
+  onRemove(item, parent) {
+    return new Promise((resolve) => {
+      setTimeout(() => resolve(), 1000)
+    })
+  },
+}
 
-  export default {
-    name: 'treeview',
-    props: ['cfg', 'tree', 'treelevel', 'treeMaxLevel'],
-    data() {
-      return {
-        data: '',
-        maxLevel: 0,
-        editIndex: false,
+export default {
+  name: 'treeview',
+  props: ['cfg', 'tree', 'treelevel', 'treeMaxLevel'],
+  data() {
+    return {
+      data: '',
+      maxLevel: 0,
+      editIndex: false,
+    }
+  },
+  created() {
+    typeof this.treelevel === 'undefined' && Object.keys(Options).forEach(i => {
+      (i in this.cfg) || this.$set(this.cfg, i, Options[i])
+    })
+
+    this.data = (this.tree && this.tree.data) || this.cfg.data
+    this.maxLevel = this.treeMaxLevel || this.cfg.maxLevel
+    this.data.forEach(v => this.$set(v, 'folded', typeof v.folded === 'undefined' ? false : v.folded))
+  },
+  methods: {
+    _toggle: item => item.folded = !!!item.folded,
+    _toggleName(event, index, item) {
+      let elem = event.target.parentNode.parentNode
+      let res = this.cfg.onClick(item, this.tree || this.cfg)
+      res ? this._edit(event, index, item, elem) : this._toggle(item)
+    },
+
+    _add(event, index, parent) {
+      // parent folded
+      this.$set(this.data[index], 'folded', false)
+      parent.data || this.$set(this.data[index], 'data', [])
+
+      // default data
+      let newItem = {}
+      newItem[this.cfg.field] = ''
+      newItem['__disabled'] = true
+      newItem.data = []
+
+      parent.data.push(newItem)
+      let ispure = this.cfg.onCreate(newItem, parent, true)
+      if (ispure) {
+        newItem['__disabled'] = false
+        requestAnimationFrame(() => {
+          let inp = event.target.parentNode.parentNode.nextElementSibling.querySelector(':scope > ul > li:last-child').querySelector('input[type="text"]')
+          inp && inp.focus()
+        })
       }
     },
-    created() {
-      typeof this.treelevel === 'undefined' && Object.keys(Options).forEach(i => {
-        (i in this.cfg) || this.$set(this.cfg, i, Options[i]);
-      });
-
-      this.data = (this.tree && this.tree.data) || this.cfg.data;
-      this.maxLevel = this.treeMaxLevel || this.cfg.maxLevel;
-      this.data.forEach(v => this.$set(v, 'folded', typeof v.folded === 'undefined' ? false : v.folded));
+    _edit(event, index, item, element) {
+      let elem = element || event.target
+      let parent = this.tree || this.cfg
+      let ispure = this.cfg.onEdit(item, parent, false)
+      if (ispure) {
+        this.editIndex = index
+        requestAnimationFrame(() => {
+          let inp = elem.parentNode.parentNode.querySelector('.fc-name > input[type="text"]')
+          if (inp) {
+            inp.value = inp.value
+            inp.focus()
+          }
+        })
+      }
     },
-    methods: {
-      _toggle: item => item.folded = !!!item.folded,
-      _toggleName(event, index, item) {
-        let elem = event.target.parentNode.parentNode;
-        let res = this.cfg.onClick(item, this.tree || this.cfg);
-        res ? this._edit(event, index, item, elem) : this._toggle(item);
-      },
+    _submit: async function(event, index, item) {
+      let parent = this.tree || this.cfg
+      let newVal = event.target.value
+      let oldVal = item[this.cfg.field]
 
-      _add(event, index, parent) {
-        // parent folded
-        this.$set(this.data[index], 'folded', false);
-        parent.data || this.$set(this.data[index], 'data', []);
-
-        // default data
-        let newItem = {};
-        newItem[this.cfg.field] = '';
-        newItem['__disabled'] = true;
-        newItem.data = [];
-
-        parent.data.push(newItem);
-        let ispure = this.cfg.onCreate(newItem, parent, true);
-        if (ispure) {
-          newItem['__disabled'] = false;
-          requestAnimationFrame(() => {
-            let inp = event.target.parentNode.parentNode.nextElementSibling.querySelector(':scope > ul > li:last-child').querySelector('input[type="text"]');
-            inp && inp.focus();
-          });
-        }
-      },
-      _edit(event, index, item, element) {
-        let elem = element || event.target;
-        let parent = this.tree || this.cfg;
-        let ispure = this.cfg.onEdit(item, parent, false);
-        if (ispure) {
-          this.editIndex = index;
-          requestAnimationFrame(() => {
-            let inp = elem.parentNode.parentNode.querySelector('.fc-name > input[type="text"]');
-            if (inp) {
-              inp.value = inp.value;
-              inp.focus();
-            }
-          });
-        }
-      },
-      _submit: async function(event, index, item) {
-        let parent = this.tree || this.cfg;
-        let newVal = event.target.value;
-        let oldVal = item[this.cfg.field];
-
-        if (!newVal || newVal === oldVal) {
-          oldVal || this.data.splice(index, 1);
-          this.editIndex = false;
-          return;
-        }
-        try {
-          await this.cfg.onSubmit(newVal, item, parent);
-          item[this.cfg.field] = newVal;
-        } catch (e) {
-          oldVal || this.data.splice(index, 1);
-        }
-        this.editIndex = false;
-      },
-      _remove: async function(index, item) {
-        try {
-          await this.cfg.onRemove(item, this.tree || this.cfg);
-          this.data.splice(index, 1);
-        } catch (e) {}
-      },
+      if (!newVal || newVal === oldVal) {
+        oldVal || this.data.splice(index, 1)
+        this.editIndex = false
+        return
+      }
+      try {
+        await this.cfg.onSubmit(newVal, item, parent)
+        item[this.cfg.field] = newVal
+      } catch (e) {
+        oldVal || this.data.splice(index, 1)
+      }
+      this.editIndex = false
     },
-  }
+    _remove: async function(index, item) {
+      try {
+        await this.cfg.onRemove(item, this.tree || this.cfg)
+        this.data.splice(index, 1)
+      } catch (e) { }
+    },
+  },
+}
 </script>

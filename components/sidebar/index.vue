@@ -185,34 +185,34 @@ export default {
   },
   created() {
     Object.keys(Options).forEach(i => {
-      (i in this.cfg) || this.$set(this.cfg, i, Options[i]);
-    });
-    let storage = this.cfg.callback() || {};
-    this.state = storage.state || false;
-    this.folded = storage.folded || {};
+      (i in this.cfg) || this.$set(this.cfg, i, Options[i])
+    })
+    let storage = this.cfg.callback() || {}
+    this.state = storage.state || false
+    this.folded = storage.folded || {}
 
-    this._updateFold(this.cfg.data);
+    this._updateFold(this.cfg.data)
   },
   watch: {
     state(val) {
       this.cfg.onSlide(val)
     },
     'cfg.data'(val) {
-      this._updateFold(val);
+      this._updateFold(val)
     },
   },
   methods: {
     _setState() {
-      this.state = !this.state;
-      this.cfg.callback(this.state, this.folded);
+      this.state = !this.state
+      this.cfg.callback(this.state, this.folded)
     },
     _setFold(name, item) {
-      this.folded[name] = !this.folded[name];
-      this.cfg.callback(this.state, this.folded);
+      this.folded[name] = !this.folded[name]
+      this.cfg.callback(this.state, this.folded)
     },
     _updateFold(val) {
       for (let i in val) {
-        this.$set(this.folded, i, this.folded[i] || false);
+        this.$set(this.folded, i, this.folded[i] || false)
       }
     },
   },

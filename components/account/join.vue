@@ -33,7 +33,7 @@
 
 <script>
 
-  import codemessage from '../codemessage/';
+  import codemessage from '../codemessage/'
 
   const Options = {
     account: {
@@ -65,7 +65,7 @@
     },
     onSubmit(data, refs) {
     }
-  };
+  }
 
   export default {
     components: {
@@ -81,35 +81,35 @@
         password: '',
         passwordRe: '',
         captcha: '',
-      };
+      }
     },
     created() {
       Object.keys(Options).forEach(i => {
-        (i in this.cfg) || this.$set(this.cfg, i, Options[i]);
-      });
+        (i in this.cfg) || this.$set(this.cfg, i, Options[i])
+      })
     },
     methods: {
       _showtip(str) {
-        requestAnimationFrame(() => this.message = str);
+        requestAnimationFrame(() => this.message = str)
       },
       _submit: async function() {
-        let cfg = this.cfg;
-        let data = {};
-        data[cfg.account.name] = this.account.trim();
-        data[cfg.password.name] = this.password.trim();
-        data[cfg.passwordRe.name] = this.passwordRe.trim();
-        data[cfg.captcha.name] = this.captcha.trim();
+        let cfg = this.cfg
+        let data = {}
+        data[cfg.account.name] = this.account.trim()
+        data[cfg.password.name] = this.password.trim()
+        data[cfg.passwordRe.name] = this.passwordRe.trim()
+        data[cfg.captcha.name] = this.captcha.trim()
 
-        this.message = '';
-        if (this.locked) return;
+        this.message = ''
+        if (this.locked) return
         try {
-          this.locked = true;
+          this.locked = true
           await cfg.onSubmit(data, this.$refs)
         } catch (err) {
-          this.locked = false;
+          this.locked = false
           return this._showtip(err)
         }
-        this.locked = false;
+        this.locked = false
       },
     },
   }

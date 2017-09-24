@@ -11,7 +11,7 @@
     z-index: $zIndex + 100
     padding: $space * 4 0
     text-align: center
-    color: #fff;
+    color: #fff
     background: rgba($colorTheme, 0.7)
     transform: translate3d(-50%, -100%, 0)
     animation: anim-notice 3s 1 ease-in-out alternate
@@ -52,23 +52,21 @@
 </template>
 
 <script>
-  const Options = {
-    message: '',
-    duration: '3s',
-    delay: '0s',
-    onComplete() {}
-  }
-  export default {
-    props: ['cfg'],
-    mounted() {
-      Object.keys(Options).forEach(i => {
-         (i in this.cfg) || this.$set(this.cfg, i, Options[i])
-      })
-      this.cfg.message
-      && this.cfg.onComplete
-      && setTimeout(() => {
-        this.cfg.onComplete();
-      }, parseInt(this.cfg.duration) * 1000);
-    },
-  }
+const Options = {
+  message: '',
+  duration: '3s',
+  delay: '0s',
+  onComplete() { }
+}
+export default {
+  props: ['cfg'],
+  mounted() {
+    Object.keys(Options).forEach(i => {
+      (i in this.cfg) || this.$set(this.cfg, i, Options[i])
+    })
+    this.cfg.message && this.cfg.onComplete && setTimeout(() => {
+      this.cfg.onComplete()
+    }, parseInt(this.cfg.duration) * 1000)
+  },
+}
 </script>

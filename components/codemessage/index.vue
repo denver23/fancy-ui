@@ -31,49 +31,49 @@
     history: 0,     // second
     auto: false,
     onSubmit() {},
-  };
+  }
 
   export default {
     props: ['cfg'],
     data() {
       return {
         downtime: false,
-      };
+      }
     },
     created() {
-      this.timer = null;
+      this.timer = null
       Object.keys(Options).forEach(i => {
-        (i in this.cfg) || this.$set(this.cfg, i, Options[i]);
-      });
-      this.cfg.history > 0 && this._countdown();
-      this.cfg.auto && this._click();
+        (i in this.cfg) || this.$set(this.cfg, i, Options[i])
+      })
+      this.cfg.history > 0 && this._countdown()
+      this.cfg.auto && this._click()
     },
     computed: {
       _txt() {
-        if (this.downtime === false) return this.cfg.text;
-        return this.cfg.repeat + (this.downtime > 0 ? `(${this.downtime})` : '');
+        if (this.downtime === false) return this.cfg.text
+        return this.cfg.repeat + (this.downtime > 0 ? `(${this.downtime})` : '')
       }
     },
     methods: {
       _click: async function(e) {
-        e && e.preventDefault();
-        if (this.downtime > 0) return;
+        e && e.preventDefault()
+        if (this.downtime > 0) return
         try {
-          this.cfg.onSubmit && await this.cfg.onSubmit.call(this);
-          this._countdown();
+          this.cfg.onSubmit && await this.cfg.onSubmit.call(this)
+          this._countdown()
         } catch (e) {}
       },
       _countdown() {
-        this.downtime = parseInt(this.cfg.history || this.cfg.duration) + 1;
-        clearTimeout(this.timer);
+        this.downtime = parseInt(this.cfg.history || this.cfg.duration) + 1
+        clearTimeout(this.timer)
         let run = () => {
-          this.downtime--;
-          this.timer = setTimeout(run, 1000);
+          this.downtime--
+          this.timer = setTimeout(run, 1000)
           if (this.downtime < 0) {
-            clearTimeout(this.timer);
+            clearTimeout(this.timer)
           }
-        };
-        run();
+        }
+        run()
       }
     },
   }

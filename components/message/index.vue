@@ -39,33 +39,33 @@
 
 <script>
 
-  const Options = {
-    status: 'success', // error | success | question | info | alert
-    content: '',
-    url: 'back',
-    time: -1, // millisecond <0: no jump
-  };
-  export default {
-    props: ['cfg'],
-    created() {
-      Object.keys(Options).forEach(i => {
-        (i in this.cfg) || this.$set(this.cfg, i, Options[i]);
-      });
-    },
-    mounted() {
-      this.jump(this.cfg.time, this.cfg.url);
-    },
-    methods: {
-      jump(time, url) {
-        time = parseInt(time);
-        if (time >= 0 && url) {
-          setTimeout(() => {
-            if (typeof url === 'function') return url();
-            if (url === 'back') return window.history.back();
-            url === 'close' ? window.close() : (window.location = url);
-          }, time);
-        }
+const Options = {
+  status: 'success', // error | success | question | info | alert
+  content: '',
+  url: 'back',
+  time: -1, // millisecond <0: no jump
+}
+export default {
+  props: ['cfg'],
+  created() {
+    Object.keys(Options).forEach(i => {
+      (i in this.cfg) || this.$set(this.cfg, i, Options[i])
+    })
+  },
+  mounted() {
+    this.jump(this.cfg.time, this.cfg.url)
+  },
+  methods: {
+    jump(time, url) {
+      time = parseInt(time)
+      if (time >= 0 && url) {
+        setTimeout(() => {
+          if (typeof url === 'function') return url()
+          if (url === 'back') return window.history.back()
+          url === 'close' ? window.close() : (window.location = url)
+        }, time)
       }
-    },
-  }
+    }
+  },
+}
 </script>

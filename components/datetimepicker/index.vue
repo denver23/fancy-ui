@@ -256,265 +256,265 @@
 </template>
 
 <script>
-  // let str = '2012.12-23 23:01:59';
-  // let res = str.match(/^(\d{4,4})\D*(\d{1,2})\D+(\d{1,2})\D*(\d{1,2}):(\d{1,2}):(\d{1,2}).*/);
-  // function buildCalendar(year = new Date().getFullYear(), month = new Date().getMonth(), validBegin = '', validEnd) {
-  function buildCalendar(year, month, validBegin = '', validEnd) {
-    year = parseInt(year);
-    month = parseInt(month);
+// let str = '2012.12-23 23:01:59'
+// let res = str.match(/^(\d{4,4})\D*(\d{1,2})\D+(\d{1,2})\D*(\d{1,2}):(\d{1,2}):(\d{1,2}).*/)
+// function buildCalendar(year = new Date().getFullYear(), month = new Date().getMonth(), validBegin = '', validEnd) {
+function buildCalendar(year, month, validBegin = '', validEnd) {
+  year = parseInt(year)
+  month = parseInt(month)
 
-    let firstWeekOfMonth   = new Date(year, month, 1).getDay();
-    let lastDayOfMonth     = new Date(year, month + 1, 0).getDate();
-    let lastDayOfLastMonth = new Date(year, month, 0).getDate();
+  let firstWeekOfMonth = new Date(year, month, 1).getDay()
+  let lastDayOfMonth = new Date(year, month + 1, 0).getDate()
+  let lastDayOfLastMonth = new Date(year, month, 0).getDate()
 
-    let beginTime = Date.parse(validBegin) || 0;
-    let endTime = Date.parse(validEnd) || Date.parse('2100.12.30');
-    [beginTime, endTime] = [beginTime, endTime].sort();
+  let beginTime = Date.parse(validBegin) || 0
+  let endTime = Date.parse(validEnd) || Date.parse('2100.12.30');
+  [beginTime, endTime] = [beginTime, endTime].sort()
 
-    let row = 0;
-    let res = [];
+  let row = 0
+  let res = []
 
-    for (let i = 1; i <= lastDayOfMonth; i++) {
+  for (let i = 1; i <= lastDayOfMonth; i++) {
 
-      let date = new Date(year, month, i);
-      let week = date.getDay();
-      let time = Date.parse(date);
-      let disabled = false;
+    let date = new Date(year, month, i)
+    let week = date.getDay()
+    let time = Date.parse(date)
+    let disabled = false
 
-      if (beginTime > 0) {
-        disabled = beginTime > time;
-      }
-      if (!disabled && endTime > 0) {
-        disabled = endTime < time;
-      }
+    if (beginTime > 0) {
+      disabled = beginTime > time
+    }
+    if (!disabled && endTime > 0) {
+      disabled = endTime < time
+    }
 
-      // first week
-      if (week == 0) {
-        res[row] = [];
-      } else if (i == 1) {
-        res[row] = [];
-        // last month
-        let k = lastDayOfLastMonth - firstWeekOfMonth + 1;
-        for (let j = 0; j < firstWeekOfMonth; j++) {
-          res[row].push({
-            year: month > 0 ? year : (year - 1),
-            month: month > 0 ? (month - 1) : 11,
-            day: k,
-            prevnext: true,
-            disabled: disabled,
-          });
-          k++;
-        }
-      }
-      // current month
-      res[row].push({
-        year: year,
-        month: month,
-        day: i,
-        prevnext: false,
-        disabled: disabled,
-      });
-      // last week
-      if (week == 6) {
-        row++;
-      } else if (i == lastDayOfMonth) {
-        // next month
-        let k = 1;
-        for (week; week < 6; week++) {
-          res[row].push({
-            year: month >= 11 ? (year + 1) : year,
-            month: month >= 11 ? 0 : (month + 1),
-            day: k,
-            prevnext: true,
-            disabled: disabled,
-          });
-          k++;
-        }
+    // first week
+    if (week == 0) {
+      res[row] = []
+    } else if (i == 1) {
+      res[row] = []
+      // last month
+      let k = lastDayOfLastMonth - firstWeekOfMonth + 1
+      for (let j = 0; j < firstWeekOfMonth; j++) {
+        res[row].push({
+          year: month > 0 ? year : (year - 1),
+          month: month > 0 ? (month - 1) : 11,
+          day: k,
+          prevnext: true,
+          disabled: disabled,
+        })
+        k++
       }
     }
-    return res;
-  }
-
-  const Options = {
-    target: '',
-    value: Date.now(),
-    beginDate: '',
-    endDate: '',
-    minYear: 1970,
-    maxYear: 2100,
-    today: 'Today',
-    weeks: ['Sun', 'Mon', 'Tue', 'Wen', 'Thu', 'Fri', 'Sat'],
-    times: ['h', 'm', 's'],
-    confirm: 'Confirm',
-    cancel: 'Cancel',
-    onSelect: str => console.log(str),
-    __name: 'datetimepicker',
-  };
-
-  export default {
-    props: ['cfg'],
-    data() {
-      return {
-        year: 0,
-        month: 0,
-        day: 0,
-        hour: 0,
-        minute: 0,
-        second: 0,
-        type: '', // date|datetime
-        position: '',
-      };
-    },
-    created() {
-      Object.keys(Options).forEach(i => {
-        (i in this.cfg) || this.$set(this.cfg, i, Options[i]);
-      });
-      this.type = this.cfg.type || (String(this.cfg.value).indexOf(":") > 0 ? 'datetime' : 'date');
-      this._getTime(this.cfg.value);
-    },
-    mounted() {
-      requestAnimationFrame(() => {
-        document.addEventListener('click', this._close, false);
-        document.addEventListener('keydown', this._kdown, false);
-        this._getPosition()
-      });
-    },
-    destroyed() {
-      document.removeEventListener('click', this._close, false);
-      document.removeEventListener('keydown', this._kdown, false);
-    },
-    computed: {
-      days() {
-        return buildCalendar(this.year, this.month, this.cfg.beginDate, this.cfg.endDate);
-      },
-    },
-    watch: {
-      year(v) {
-        // last day of month
-        let lastday = new Date(v, this.month + 1, 0).getDate();
-        this.day = Math.min(this.day, lastday);
-      },
-      month(v) {
-        // last day of month
-        let lastday = new Date(this.year, v + 1, 0).getDate();
-        this.day = Math.min(this.day, lastday);
-      },
-    },
-    methods: {
-      _getPosition() {
-        if (!this.cfg.target) return false;
-        let elem = document.querySelector(this.cfg.target);
-        let rect = elem ? elem.getBoundingClientRect() : false;
-        this.position = rect ? {
-          top: (window.scrollY || window.pageYOffset) + rect.bottom + 'px',
-          left: (window.scrollX || window.pageXOffset) + rect.left + 'px',
-        } : false;
-      },
-      _getTime(value) {
-        let date = Date.parse(value) ? new Date(Date.parse(value)) : new Date();
-        this.year = date.getFullYear();
-        this.month = date.getMonth();
-        this.day = date.getDate();
-        this.hour = date.getHours();
-        this.minute = date.getMinutes();
-        this.second = date.getSeconds();
-      },
-      _close(e) {
-        e && e.stopPropagation && e.stopPropagation();
-        this.cfg.__name && (this.$parent[this.cfg.__name] = false);
-      },
-      _kdown(e) {
-        if ([8, 27, 13, 32, 37, 38, 39, 40].includes(e.keyCode)) {
-          e.preventDefault();
-          e.stopPropagation();
-        }
-        // back Esc
-        if ([8, 27].includes(e.keyCode)) return this._close();
-        // enter space
-        if ([13, 32].includes(e.keyCode)) return this._submit();
-        // up down
-        if (e.keyCode == 38) this._dayChange(-7);
-        if (e.keyCode == 40) this._dayChange(7);
-        // left right
-        if (e.keyCode == 37) this._dayChange(-1);
-        if (e.keyCode == 39) this._dayChange(1);
-      },
-      _kdownInp(e){
-        e.stopPropagation();
-        // return enter
-        if (e.keyCode == 13) return this._submit();
-      },
-      _goToday() {
-        let t = new Date();
-        this.year = t.getFullYear();
-        this.month = t.getMonth();
-        this.day = t.getDate();
-      },
-      _yearChange(n) {
-        this.year = Math.min(Math.max(this.year + n, this.cfg.minYear), this.cfg.maxYear);
-      },
-      _monthChange(n) {
-        let newmonth = this.month + n;
-        if (newmonth > 11) {
-          if (this.year >= this.cfg.maxYear) return;
-          this.year++;
-          this.month = 0;
-          return;
-        }
-        if (newmonth < 0) {
-          if (this.year <= this.cfg.minYear) return;
-          this.year--;
-          this.month = 11;
-          return;
-        }
-        this.month = newmonth;
-      },
-      _dayChange(n) {
-        // last day of last month
-        let prelastday = new Date(this.year, this.month, 0).getDate();
-        // last day of month
-        let lastday = new Date(this.year, this.month + 1, 0).getDate();
-        let newday = this.day + n;
-
-        if (newday > lastday) {
-          if (this.month == 11) {
-            if (this.year >= this.cfg.maxYear) return;
-            this.year++;
-            this.month = 0;
-          } else {
-            this.month++;
-          }
-          this.day = newday - lastday;
-          return;
-        }
-        if (newday < 1) {
-          if (this.month == 0) {
-            if (this.year <= this.cfg.minYear) return;
-            this.year--;
-            this.month = 11;
-          } else {
-            this.month--;
-          }
-          this.day = prelastday + newday;
-          return;
-        }
-        this.day = newday;
-        // this.day = Math.min( Math.max(this.day + n, 1), lastday );
-      },
-      _choose(item) {
-        this.year = item.year;
-        this.month = item.month;
-        this.day = item.day;
-        this._submit();
-      },
-      _submit() {
-        let res = new Date([this.year, this.month + 1, this.day].join('/') + ' ' + [this.hour, this.minute, this.second].join(':'));
-        if (!isNaN(res)){
-          this._close();
-          this.cfg.onSelect(res);
-        }
-      },
+    // current month
+    res[row].push({
+      year: year,
+      month: month,
+      day: i,
+      prevnext: false,
+      disabled: disabled,
+    })
+    // last week
+    if (week == 6) {
+      row++
+    } else if (i == lastDayOfMonth) {
+      // next month
+      let k = 1
+      for (week; week < 6; week++) {
+        res[row].push({
+          year: month >= 11 ? (year + 1) : year,
+          month: month >= 11 ? 0 : (month + 1),
+          day: k,
+          prevnext: true,
+          disabled: disabled,
+        })
+        k++
+      }
     }
   }
+  return res
+}
+
+const Options = {
+  target: '',
+  value: Date.now(),
+  beginDate: '',
+  endDate: '',
+  minYear: 1970,
+  maxYear: 2100,
+  today: 'Today',
+  weeks: ['Sun', 'Mon', 'Tue', 'Wen', 'Thu', 'Fri', 'Sat'],
+  times: ['h', 'm', 's'],
+  confirm: 'Confirm',
+  cancel: 'Cancel',
+  onSelect: str => console.log(str),
+  __name: 'datetimepicker',
+}
+
+export default {
+  props: ['cfg'],
+  data() {
+    return {
+      year: 0,
+      month: 0,
+      day: 0,
+      hour: 0,
+      minute: 0,
+      second: 0,
+      type: '', // date|datetime
+      position: '',
+    }
+  },
+  created() {
+    Object.keys(Options).forEach(i => {
+      (i in this.cfg) || this.$set(this.cfg, i, Options[i])
+    })
+    this.type = this.cfg.type || (String(this.cfg.value).indexOf(":") > 0 ? 'datetime' : 'date')
+    this._getTime(this.cfg.value)
+  },
+  mounted() {
+    requestAnimationFrame(() => {
+      document.addEventListener('click', this._close, false)
+      document.addEventListener('keydown', this._kdown, false)
+      this._getPosition()
+    })
+  },
+  destroyed() {
+    document.removeEventListener('click', this._close, false)
+    document.removeEventListener('keydown', this._kdown, false)
+  },
+  computed: {
+    days() {
+      return buildCalendar(this.year, this.month, this.cfg.beginDate, this.cfg.endDate)
+    },
+  },
+  watch: {
+    year(v) {
+      // last day of month
+      let lastday = new Date(v, this.month + 1, 0).getDate()
+      this.day = Math.min(this.day, lastday)
+    },
+    month(v) {
+      // last day of month
+      let lastday = new Date(this.year, v + 1, 0).getDate()
+      this.day = Math.min(this.day, lastday)
+    },
+  },
+  methods: {
+    _getPosition() {
+      if (!this.cfg.target) return false
+      let elem = document.querySelector(this.cfg.target)
+      let rect = elem ? elem.getBoundingClientRect() : false
+      this.position = rect ? {
+        top: (window.scrollY || window.pageYOffset) + rect.bottom + 'px',
+        left: (window.scrollX || window.pageXOffset) + rect.left + 'px',
+      } : false
+    },
+    _getTime(value) {
+      let date = Date.parse(value) ? new Date(Date.parse(value)) : new Date()
+      this.year = date.getFullYear()
+      this.month = date.getMonth()
+      this.day = date.getDate()
+      this.hour = date.getHours()
+      this.minute = date.getMinutes()
+      this.second = date.getSeconds()
+    },
+    _close(e) {
+      e && e.stopPropagation && e.stopPropagation()
+      this.cfg.__name && (this.$parent[this.cfg.__name] = false)
+    },
+    _kdown(e) {
+      if ([8, 27, 13, 32, 37, 38, 39, 40].includes(e.keyCode)) {
+        e.preventDefault()
+        e.stopPropagation()
+      }
+      // back Esc
+      if ([8, 27].includes(e.keyCode)) return this._close()
+      // enter space
+      if ([13, 32].includes(e.keyCode)) return this._submit()
+      // up down
+      if (e.keyCode == 38) this._dayChange(-7)
+      if (e.keyCode == 40) this._dayChange(7)
+      // left right
+      if (e.keyCode == 37) this._dayChange(-1)
+      if (e.keyCode == 39) this._dayChange(1)
+    },
+    _kdownInp(e) {
+      e.stopPropagation()
+      // return enter
+      if (e.keyCode == 13) return this._submit()
+    },
+    _goToday() {
+      let t = new Date()
+      this.year = t.getFullYear()
+      this.month = t.getMonth()
+      this.day = t.getDate()
+    },
+    _yearChange(n) {
+      this.year = Math.min(Math.max(this.year + n, this.cfg.minYear), this.cfg.maxYear)
+    },
+    _monthChange(n) {
+      let newmonth = this.month + n
+      if (newmonth > 11) {
+        if (this.year >= this.cfg.maxYear) return
+        this.year++
+        this.month = 0
+        return
+      }
+      if (newmonth < 0) {
+        if (this.year <= this.cfg.minYear) return
+        this.year--
+        this.month = 11
+        return
+      }
+      this.month = newmonth
+    },
+    _dayChange(n) {
+      // last day of last month
+      let prelastday = new Date(this.year, this.month, 0).getDate()
+      // last day of month
+      let lastday = new Date(this.year, this.month + 1, 0).getDate()
+      let newday = this.day + n
+
+      if (newday > lastday) {
+        if (this.month == 11) {
+          if (this.year >= this.cfg.maxYear) return
+          this.year++
+          this.month = 0
+        } else {
+          this.month++
+        }
+        this.day = newday - lastday
+        return
+      }
+      if (newday < 1) {
+        if (this.month == 0) {
+          if (this.year <= this.cfg.minYear) return
+          this.year--
+          this.month = 11
+        } else {
+          this.month--
+        }
+        this.day = prelastday + newday
+        return
+      }
+      this.day = newday
+      // this.day = Math.min( Math.max(this.day + n, 1), lastday )
+    },
+    _choose(item) {
+      this.year = item.year
+      this.month = item.month
+      this.day = item.day
+      this._submit()
+    },
+    _submit() {
+      let res = new Date([this.year, this.month + 1, this.day].join('/') + ' ' + [this.hour, this.minute, this.second].join(':'))
+      if (!isNaN(res)) {
+        this._close()
+        this.cfg.onSelect(res)
+      }
+    },
+  }
+}
 </script>
 
