@@ -4,7 +4,7 @@ const webpack = require('webpack')
 const multi = require("multi-loader")
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
-  // https://github.com/DustinJackson/html-webpack-inline-source-plugin
+// https://github.com/DustinJackson/html-webpack-inline-source-plugin
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin')
 
@@ -114,9 +114,9 @@ module.exports = {
   plugins: (() => {
     let res = [
       new webpack.DefinePlugin({
-        DEBUG: process.env.NODE_ENV === 'development',
+        DEBUG: JSON.stringify(process.env.NODE_ENV === 'development'),
         PREFIX: JSON.stringify(config.prefixName),
-        NETROOT: config.networkRoot,
+        NETROOT: JSON.stringify(config.networkRoot),
       }),
       cssExtractTextPlugin,
       // new webpack.ProvidePlugin({
@@ -137,7 +137,7 @@ module.exports = {
     ];
     // html
     res = res.concat(config.htmlWebpack)
-      // server
+    // server
     if (process.env.NODE_ENV === 'development') {
       res.push(
         new webpack.HotModuleReplacementPlugin(),
