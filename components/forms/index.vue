@@ -317,7 +317,7 @@
 
               component(:is="v.name" v-bind:cfg="v.value" v-else-if="v.type === 'component' && v.value" )
               //- others
-              span(v-else v-html="cfg.value[v.name]" v-bind="attr")
+              span(v-else v-html="v.value" v-bind="v.attr")
 
             //- tips
             cite(v-if="tips[v.name] || (sending && v.type === 'submit')" v-text="tips[v.name]")
