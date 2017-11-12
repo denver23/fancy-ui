@@ -160,19 +160,19 @@
 <template lang="jade">
   .fancy-tables
     .fc-tool
-      .fc-picker(ref="picker" v-if="cfg.picker")
-        button(@click.stop="pickerState = !pickerState") {{cfg.picker}}
+      .fc-picker(ref="picker" v-if="cfg.picker && cfg.picker.list && cfg.picker.list.length")
+        button(@click.stop="pickerState = !pickerState") {{cfg.picker.name}}
         div(v-show="pickerState" @click.stop="")
-          label(v-for="(v, k) in cfg.columns" v-show="v.label")
-            input(type="checkbox" v-bind:value="k" v-model="pickerData")
+          label(v-for="(v, k) in cfg.columns" v-if="v.label && !v.nopick")
+            input(type="checkbox",:value="v.field" v-model="cfg.picker.list")
             span {{v.label}}
     ol
       ul.fc-header
         template(v-for="(v, index) of cfg.columns")
           li(
-            v-if="v.field && pickerData.includes(index) || v.label === 'checkbox'"
-            v-bind:class="[v.field, {'fc-noflex': v.style && v.style.width}]"
-            v-bind:style="v.style"
+            v-if="v.field && (!cfg.picker || cfg.picker.list.includes(v.field)) || v.label === 'checkbox'"
+            ,:class="[v.field, {'fc-noflex': v.style && v.style.width}]"
+            ,:style="v.style"
           )
             label(v-if="v.label === 'checkbox'" )
               input(type="checkbox" @click="_onChkAll(v)" v-model="modelAll[v.field]")
@@ -181,12 +181,12 @@
       ul(v-if="cfg.data && cfg.data.length" v-for="value of cfg.data" transition="fc-fade")
         template(v-for="(v, index) of cfg.columns")
           li(
-            v-if="v.field && pickerData.includes(index) || v.label === 'checkbox'"
-            v-bind:class="[v.field, {'fc-noflex': v.style && v.style.width}]"
-            v-bind:style="v.style"
+            v-if="v.field && (!cfg.picker || cfg.picker.list.includes(v.field)) || v.label === 'checkbox'"
+            ,:class="[v.field, {'fc-noflex': v.style && v.style.width}]"
+            ,:style="v.style"
           )
             label(v-if="v.label === 'checkbox'")
-              input(type="checkbox" v-bind:value="value[v.field]" v-model="cfg.values[v.field]" @click="_onChk(v.field,value)")
+              input(type="checkbox",:value="value[v.field]" v-model="cfg.values[v.field]" @click="_onChk(v.field,value)")
             div(v-else v-bind:ps="v.label" v-html="(typeof v.callback == 'function' ? v.callback(value) : value[v.field])")
 
     .fc-loading(v-if="cfg.state === 'loading'")
@@ -199,16 +199,18 @@
 const Options = {
   data: '',
   columns: '',
-  picker: '',
   values: {},
   state: 'loading',
+  picker: {
+    name: '',
+    list: [],
+  },
 }
 export default {
   props: ['cfg'],
   data() {
     return {
       pickerState: false,
-      pickerData: [],
       modelAll: {},
     }
   },
@@ -217,8 +219,8 @@ export default {
     Object.keys(Options).forEach(i => {
       (i in cfg) || this.$set(cfg, i, Options[i])
     })
+    console.log(this.cfg)
     cfg.columns && cfg.columns.forEach((v, k) => {
-      this.pickerData.push(k)
       v.label === 'checkbox' && this.$set(this.modelAll, v.field, false)
     })
   },
