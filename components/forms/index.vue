@@ -241,7 +241,7 @@
   )
     template(v-for="row of cfg.data")
       dl(v-bind="row.attr")
-        template(v-if="v" v-for="v in (row.children || row)")
+        template(v-if="v" v-for="v of (row.children || row)")
           dt(v-if="typeof v.label !== 'undefined'")
             label(:for="v.id || v.name" v-html="v.label" v-if="v.label")
           dd
@@ -260,7 +260,7 @@
                 v-else-if="v.type === 'submit'"
                 type="submit"
                 v-bind="[{name: v.name, value: v.value}, v.attr]"
-                v-bind:disabled="sending"
+                ,:disabled="sending"
               )
 
               input(
@@ -282,15 +282,15 @@
               )
                 option(
                   v-for="vv of v.data"
-                  v-bind:value="typeof vv === 'string' ? vv : vv.value"
+                  ,:value="typeof vv === 'string' ? vv : vv.value"
                   v-html="vv.label || vv.value || vv"
                 )
 
               label(v-else-if="v.type === 'radio'" v-for="(vv,k) of v.data")
                 input(
                   type="radio"
-                  v-bind:name="v.name"
-                  v-bind:value="vv.value"
+                  ,:name="v.name"
+                  ,:value="vv.value"
                   v-model="cfg.value[v.name]"
                 )
                 span(v-html="vv.label")
@@ -299,8 +299,8 @@
                 label(v-if="v.checkAll")
                   input(
                     type="checkbox",
-                    v-bind:name="v.name",
-                    v-bind:value="v.checkAll.value"
+                    ,:name="v.name",
+                    ,:value="v.checkAll.value"
                     v-model="checkAll[v.name]"
                     @click="_onChkAll(v)"
                   )
@@ -308,14 +308,14 @@
                 label(v-for="(vv,k) of v.data")
                   input(
                     type="checkbox"
-                    v-bind:name="v.name"
-                    v-bind:value="vv.value"
+                    ,:name="v.name"
+                    ,:value="vv.value"
                     v-model="cfg.value[v.name]"
                     @click="_onChk(v, vv)"
                   )
                   span(v-html="vv.label")
 
-              component(:is="v.name" v-bind:cfg="v.value" v-else-if="v.type === 'component' && v.value" )
+              component(:is="v.name",:cfg="v.value" v-else-if="v.type === 'component' && v.value" )
               //- others
               span(v-else v-html="v.value" v-bind="v.attr")
 
@@ -357,11 +357,10 @@ export default {
     }
   },
   created() {
-    Object.keys(Options).forEach(i => {
-      (i in this.cfg) || this.$set(this.cfg, i, Options[i])
-    })
-
     let cfg = this.cfg
+    Object.keys(Options).forEach(i =>
+      cfg.hasOwnProperty(i) || this.$set(cfg, i, Options[i])
+    )
     if (cfg.type === 'search') {
       Object.assign(cfg.value, getQueryAll())
       typeof cfg.onPopstate === 'function' && window.addEventListener("popstate", e => {

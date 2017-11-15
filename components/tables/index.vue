@@ -160,17 +160,17 @@
 <template lang="jade">
   .fancy-tables
     .fc-tool
-      .fc-picker(ref="picker" v-if="cfg.picker && cfg.picker.list && cfg.picker.list.length")
+      .fc-picker(ref="picker" v-if="cfg.picker")
         button(@click.stop="pickerState = !pickerState") {{cfg.picker.name}}
         div(v-show="pickerState" @click.stop="")
-          label(v-for="(v, k) in cfg.columns" v-if="v.label && !v.nopick")
-            input(type="checkbox",:value="v.field" v-model="cfg.picker.list")
+          label(v-for="v of cfg.columns" v-if="v.label && !cfg.picker.filter.includes(v.label)")
+            input(type="checkbox",:value="v.label" v-model="cfg.picker.value")
             span {{v.label}}
     ol
       ul.fc-header
         template(v-for="(v, index) of cfg.columns")
           li(
-            v-if="v.field && (!cfg.picker || cfg.picker.list.includes(v.field)) || v.label === 'checkbox'"
+            v-if="v.label && (!cfg.picker || cfg.picker.value.includes(v.label)) || v.label === 'checkbox'"
             ,:class="[v.field, {'fc-noflex': v.style && v.style.width}]"
             ,:style="v.style"
           )
@@ -181,7 +181,7 @@
       ul(v-if="cfg.data && cfg.data.length" v-for="value of cfg.data" transition="fc-fade")
         template(v-for="(v, index) of cfg.columns")
           li(
-            v-if="v.field && (!cfg.picker || cfg.picker.list.includes(v.field)) || v.label === 'checkbox'"
+            v-if="v.label && (!cfg.picker || cfg.picker.value.includes(v.label)) || v.label === 'checkbox'"
             ,:class="[v.field, {'fc-noflex': v.style && v.style.width}]"
             ,:style="v.style"
           )
@@ -203,7 +203,8 @@ const Options = {
   state: 'loading',
   picker: {
     name: '',
-    list: [],
+    value: [],
+    filter: null,
   },
 }
 export default {
@@ -216,11 +217,11 @@ export default {
   },
   created() {
     let cfg = this.cfg
-    Object.keys(Options).forEach(i => {
-      (i in cfg) || this.$set(cfg, i, Options[i])
-    })
-    console.log(this.cfg)
+    Object.keys(Options).forEach(i =>
+      cfg.hasOwnProperty(i) || this.$set(cfg, i, Options[i])
+    )
     cfg.columns && cfg.columns.forEach((v, k) => {
+      this.cfg.picker.value.push(v.label)
       v.label === 'checkbox' && this.$set(this.modelAll, v.field, false)
     })
   },
