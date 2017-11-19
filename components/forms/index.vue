@@ -240,8 +240,8 @@
     onSubmit="return false"
   )
     template(v-for="row of cfg.data")
-      dl(v-bind="row.attr")
-        template(v-if="v" v-for="v of (row.children || row)")
+      dl(v-bind="row.attr" v-if="row")
+        template(v-if="v" v-for="v of (Array.isArray(row) ? (row.children || row) : [row])")
           dt(v-if="typeof v.label !== 'undefined'")
             label(:for="v.id || v.name" v-html="v.label" v-if="v.label")
           dd
@@ -358,9 +358,8 @@ export default {
   },
   created() {
     let cfg = this.cfg
-    Object.keys(Options).forEach(i =>
-      cfg.hasOwnProperty(i) || this.$set(cfg, i, Options[i])
-    )
+    Object.keys(Options).forEach(i => cfg.hasOwnProperty(i) || this.$set(cfg, i, Options[i]))
+
     if (cfg.type === 'search') {
       Object.assign(cfg.value, getQueryAll())
       typeof cfg.onPopstate === 'function' && window.addEventListener("popstate", e => {
@@ -369,12 +368,13 @@ export default {
       })
     }
     // validator and submit
-    cfg.data && cfg.data.forEach(val => (val.children || val).forEach(v => {
+    cfg.data && cfg.data.forEach(val => (Array.isArray(val) ? (val.children || val) : [val]).forEach(v => {
       if (v.type === 'submit') {
         this.submitName = v.name || '_submit_'
         this.$set(this.tips, this.submitName, '')
         this.$set(v, 'name', this.submitName)
-      } else if (v.name && !['reset', 'button', 'component'].includes(v.type)) {
+      }
+      else if (v.name && !['reset', 'button', 'component'].includes(v.type)) {
         this.$set(this.tips, v.name, '')
         this.$set(cfg.value, v.name, (v.name in cfg.value) ? cfg.value[v.name] : (v.value || ''))
         // set checkAll
