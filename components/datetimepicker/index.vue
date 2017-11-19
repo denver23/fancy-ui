@@ -219,7 +219,6 @@
       template(v-if="type === 'datetime' || type === 'time'")
         .fc-time
           input(
-            :value="hour"
             type="number"
             v-model="hour"
             min="0"
@@ -230,7 +229,6 @@
           )
           | {{cfg.times[0]}}
           input(
-            :value="minute"
             type="number"
             v-model="minute"
             min="0"
@@ -240,7 +238,6 @@
           )
           | {{cfg.times[1]}}
           input(
-            :value="second"
             type="number"
             v-model="second"
             min="0"
