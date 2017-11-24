@@ -241,7 +241,8 @@
   )
     template(v-for="row of cfg.data")
       dl(v-bind="row.attr" v-if="row")
-        template(v-if="v" v-for="v of (Array.isArray(row) ? (row.children || row) : [row])")
+        span {{Array.isArray(row)}}
+        template(v-if="v" v-for="v of (Array.isArray(row) ? row : [row])")
           dt(v-if="typeof v.label !== 'undefined'")
             label(:for="v.id || v.name" v-html="v.label" v-if="v.label")
           dd
@@ -368,7 +369,7 @@ export default {
       })
     }
     // validator and submit
-    cfg.data && cfg.data.forEach(val => (Array.isArray(val) ? (val.children || val) : [val]).forEach(v => {
+    cfg.data && cfg.data.forEach(val => (Array.isArray(val) ? val : [val]).forEach(v => {
       if (v.type === 'submit') {
         this.submitName = v.name || '_submit_'
         this.$set(this.tips, this.submitName, '')

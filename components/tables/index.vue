@@ -163,7 +163,7 @@
       .fc-picker(ref="picker" v-if="cfg.picker")
         button(@click.stop="pickerState = !pickerState") {{cfg.picker.name}}
         div(v-show="pickerState" @click.stop="")
-          label(v-for="v of cfg.columns" v-if="v.label && !cfg.picker.filter.includes(v.label)")
+          label(v-for="v of cfg.columns" v-if="v.label && cfg.picker && false == cfg.picker.filter.includes(v.label)")
             input(type="checkbox",:value="v.label" v-model="cfg.picker.value")
             span {{v.label}}
     ol
@@ -204,8 +204,9 @@ const Options = {
   picker: {
     name: '',
     value: [],
-    filter: null,
+    filter: [],
   },
+  onCreated() {},
 }
 export default {
   props: ['cfg'],
@@ -217,13 +218,13 @@ export default {
   },
   created() {
     let cfg = this.cfg
-    Object.keys(Options).forEach(i =>
-      cfg.hasOwnProperty(i) || this.$set(cfg, i, Options[i])
+    Object.keys(Options).forEach(
+      i => cfg.hasOwnProperty(i) || this.$set(cfg, i, Options[i]),
     )
     cfg.columns && cfg.columns.forEach((v, k) => {
-      this.cfg.picker.value.push(v.label)
-      v.label === 'checkbox' && this.$set(this.modelAll, v.field, false)
-    })
+        v.label === 'checkbox' && this.$set(this.modelAll, v.field, false)
+      })
+    cfg.onCreated && cfg.onCreated.call(this)
   },
   mounted() {
     document.addEventListener('click', this._onPicker, false)
@@ -237,7 +238,7 @@ export default {
         this.modelAll[i] = false
         this.cfg.values[i] = []
       }
-    }
+    },
   },
   methods: {
     _onPicker() {
@@ -250,9 +251,11 @@ export default {
       this.modelAll[key] && this.cfg.data.forEach(v => arr.push(v[key]))
     },
     _onChk(key, item) {
-      this.modelAll[key] = this.cfg.values[key] && this.cfg.values[key].includes(item[key]) && this.cfg.values[key].length === this.cfg.data.length
+      this.modelAll[key] =
+        this.cfg.values[key] &&
+        this.cfg.values[key].includes(item[key]) &&
+        this.cfg.values[key].length === this.cfg.data.length
     },
-  }
+  },
 }
-
 </script>

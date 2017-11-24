@@ -71,7 +71,6 @@
 </template>
 
 <script>
-
 const Options = {
   total: 0,
   page: 1,
@@ -81,14 +80,14 @@ const Options = {
   nextPage: '>',
   firstPage: '',
   lastPage: '',
-  callback(page) { },
+  callback(page) {},
 }
 export default {
   props: ['cfg'],
   created() {
-    Object.keys(Options).forEach(i => {
-      (i in this.cfg) || this.$set(this.cfg, i, Options[i])
-    })
+    Object.keys(Options).forEach(
+      i => this.cfg.hasOwnProperty(i) || this.$set(this.cfg, i, Options[i]),
+    )
   },
   computed: {
     maxPage() {
@@ -118,13 +117,13 @@ export default {
         for (let i = begin; i <= end; i++) {
           res.push({
             num: i,
-            text: i
+            text: i,
           })
         }
       }
       res.unshift({
         num: page - 1,
-        text: self.cfg.prevPage
+        text: self.cfg.prevPage,
       })
       if (self.cfg.firstPage && page > step) {
         res.unshift({
@@ -137,14 +136,14 @@ export default {
         text: self.cfg.nextPage,
       })
       return res
-    }
+    },
   },
   methods: {
     _goto(page) {
       if (page < 1 || page > this.maxPage) return
       this.cfg.page = page
       typeof this.cfg.callback == 'function' && this.cfg.callback(page)
-    }
-  }
+    },
+  },
 }
 </script>
