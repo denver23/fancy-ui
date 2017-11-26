@@ -363,11 +363,10 @@ export default {
     }
   },
   created() {
-    Object.keys(Options).forEach(i => {
-      (i in this.cfg) || this.$set(this.cfg, i, Options[i])
-    })
-    this.type = this.cfg.type || (String(this.cfg.value).indexOf(":") > 0 ? 'datetime' : 'date')
-    this._getTime(this.cfg.value)
+    let cfg = this.cfg
+    Object.keys(Options).forEach(i => cfg.hasOwnProperty(i) || this.$set(cfg, i, Options[i]))
+    this.type = cfg.type || (String(cfg.value).indexOf(":") > 0 ? 'datetime' : 'date')
+    this._getTime(cfg.value)
   },
   mounted() {
     requestAnimationFrame(() => {

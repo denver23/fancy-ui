@@ -241,7 +241,6 @@
   )
     template(v-for="row of cfg.data")
       dl(v-bind="row.attr" v-if="row")
-        span {{Array.isArray(row)}}
         template(v-if="v" v-for="v of (Array.isArray(row) ? row : [row])")
           dt(v-if="typeof v.label !== 'undefined'")
             label(:for="v.id || v.name" v-html="v.label" v-if="v.label")
@@ -364,7 +363,7 @@ export default {
     if (cfg.type === 'search') {
       Object.assign(cfg.value, getQueryAll())
       typeof cfg.onPopstate === 'function' && window.addEventListener("popstate", e => {
-        cfg.value = getQueryAll()
+        Object.assign(cfg.value, getQueryAll())
         cfg.onPopstate(this.$refs.form, cfg.value)
       })
     }
