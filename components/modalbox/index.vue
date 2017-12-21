@@ -32,7 +32,7 @@
         flex-direction: column
         & > div
           overflow: auto
-      h5
+      .fc-title
         line-height: $row-height
         min-height: $row-height
         padding: 0 0 0 0.5rem
@@ -109,7 +109,7 @@
 <template lang="jade">
   .fancy-modalbox(:class="cfg.overlay ? 'fc-mask' : 'fc-nomask'" v-if="cfg.content")
     div(:style="cfg.style" ref="box")
-      h5(v-if="cfg.title" ref="title")
+      .fc-title(v-if="cfg.title" ref="title")
         strong(v-html="cfg.title")
         label(@click="_done(0)")
 
