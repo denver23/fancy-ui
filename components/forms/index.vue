@@ -230,7 +230,7 @@
       @include in-mobile()
   </style>
 
-<template lang="jade">
+<template lang="pug">
   form.fancy-forms(
     :class="'fc-'+ (cfg.type || 'forms')"
     ref="form"

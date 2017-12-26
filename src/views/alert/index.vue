@@ -9,7 +9,7 @@
 
 </style>
 
-<template lang="jade">
+<template lang="pug">
   .test-alert
     component(is="alert", :cfg="alert" v-if="alert")
     button(@click="test") Alert

@@ -12,7 +12,7 @@
 
 </style>
 
-<template lang="jade">
+<template lang="pug">
   .test-citypicker
     component(is="citypicker", :cfg="citypicker" v-if="citypicker")
     button(@click="test") citypicker

@@ -192,7 +192,7 @@
               transform: translate3d(0, 0, 0)
 </style>
 
-<template lang="jade">
+<template lang="pug">
   .fancy-datetimepicker(:style="position" @click="_close")
     div(@click.stop="")
       .fc-tool(v-if="type !== 'time'")

@@ -29,7 +29,7 @@
       height: 2rem
 </style>
 
-<template lang="jade">
+<template lang="pug">
   div(v-if="cfg" class="fancy-tools")
     div(v-for="value in cfg")
       legend {{value.legend}}

@@ -9,7 +9,7 @@
       z-index: $zIndex - 10
 </style>
 
-<template lang="jade">
+<template lang="pug">
   .fancy-tinymce
     textarea(:name="cfg.name" ref="textarea") {{cfg.value}}
 </template>

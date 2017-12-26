@@ -111,7 +111,7 @@
             display: none
 </style>
 
-<template lang="jade">
+<template lang="pug">
   .fancy-tree(:class="'fc-'+ (treelevel || 0) " v-if="data && data.length")
     ul(v-if="data.length")
       li(:class="{'fc-folded': v.folded}" v-for="(v,index) in data")

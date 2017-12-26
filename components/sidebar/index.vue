@@ -154,7 +154,7 @@
         overflow: hidden
 </style>
 
-<template lang="jade">
+<template lang="pug">
   .fancy-sidebar(:class="{'fc-state': state}")
     .fc-switch(@click="_setState()")
     .fc-wrap

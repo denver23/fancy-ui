@@ -1,7 +1,7 @@
 <style lang="sass" src="./style.sass">
 </style>
 
-<template lang="jade">
+<template lang="pug">
   .fancy-account
     form(method="post" @submit="_submit" onsubmit="return false" autocomplete="off")
       dl

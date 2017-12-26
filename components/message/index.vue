@@ -31,7 +31,7 @@
         color: $colorAlerm
 </style>
 
-<template lang="jade">
+<template lang="pug">
   .fancy-message(v-if="cfg.content && cfg.time != 0")
     .fc-status(:class="'fc-'+ cfg.status")
     .fc-content(:class="'fc-'+ cfg.status" v-html="cfg.content || cfg.status")

@@ -4,7 +4,7 @@
     margin: 50px auto
 </style>
 
-<template lang="jade">
+<template lang="pug">
   .test-tree
     component(is="tree", :cfg="tree" v-if="tree")
 </template>

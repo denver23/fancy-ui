@@ -12,7 +12,7 @@
 
 </style>
 
-<template lang="jade">
+<template lang="pug">
   .test-confirm
     component(is="confirm", :cfg="confirm" v-if="confirm")
     button(@click="test") confirm

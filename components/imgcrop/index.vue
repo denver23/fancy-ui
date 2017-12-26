@@ -112,7 +112,7 @@
           opacity: 0.6
 </style>
 
-<template lang="jade">
+<template lang="pug">
   .fancy-imgcrop(v-show="state" tabindex="1" v-bind:class="{'fc-mask': mask}" @keydown="kdown($event)")
     div
       .fc-choose

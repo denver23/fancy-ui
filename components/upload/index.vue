@@ -136,7 +136,7 @@
 
 </style>
 
-<template lang="jade">
+<template lang="pug">
   .fancy-upload(:class="'fc-'+ cfg.dock" v-show="cfg.data.length || cfg.button")
     ul(ref="workbench")
       li(:class="'fc-'+ v.type" v-for="(v,key) in cfg.data" v-bind:index="key + 1")

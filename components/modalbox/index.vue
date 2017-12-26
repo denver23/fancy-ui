@@ -17,7 +17,7 @@
       position: absolute
       top: 50%
       left: 50%
-      max-width: 100%
+      max-width: 96%
       border: 1px solid $borderColor
       border-radius: $borderRadius
       overflow: hidden
@@ -106,7 +106,7 @@
 
 </style>
 
-<template lang="jade">
+<template lang="pug">
   .fancy-modalbox(:class="cfg.overlay ? 'fc-mask' : 'fc-nomask'" v-if="cfg.content")
     div(:style="cfg.style" ref="box")
       .fc-title(v-if="cfg.title" ref="title")

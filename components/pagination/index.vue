@@ -59,7 +59,7 @@
 
 </style>
 
-<template lang="jade">
+<template lang="pug">
   .fancy-pagination(v-if="cfg.total > 0")
     ul
       li(

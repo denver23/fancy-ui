@@ -12,7 +12,7 @@
 
 </style>
 
-<template lang="jade">
+<template lang="pug">
   .fancy-marquee(v-if="cfg.data.length")
     ul
       li(v-for="(v,k) of cfg.data" v-html="cfg.dataFormat(v)")

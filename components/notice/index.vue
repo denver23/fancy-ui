@@ -43,7 +43,7 @@
 
 </style>
 
-<template lang="jade">
+<template lang="pug">
   .fancy-notice(
     :style="{'animation-duration': cfg.duration,'animation-delay': cfg.delay}"
     v-if="cfg.message"

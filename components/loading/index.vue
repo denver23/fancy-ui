@@ -21,7 +21,7 @@
 
 </style>
 
-<template lang="jade">
+<template lang="pug">
   .fancy-loading
     em
     div(v-if="cfg.content" v-html="cfg.content")

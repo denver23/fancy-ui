@@ -9,7 +9,7 @@
 
 </style>
 
-<template lang="jade">
+<template lang="pug">
   .test-datetimepicker
     component(is="datetimepicker", :cfg="datetimepicker" v-if="datetimepicker")
     button.btn(@click="test") datetimepicker

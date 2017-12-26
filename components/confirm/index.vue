@@ -67,7 +67,7 @@
 
 </style>
 
-<template lang="jade">
+<template lang="pug">
   .fancy-confirm(tabindex="1")
     div
       .fc-msg(v-html="cfg.message")

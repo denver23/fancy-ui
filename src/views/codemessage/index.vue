@@ -8,7 +8,7 @@
 
 </style>
 
-<template lang="jade">
+<template lang="pug">
   .test-codemessage
     component(is="codemessage", :cfg="codemessage" v-if="codemessage")
 </template>

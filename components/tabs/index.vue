@@ -47,7 +47,7 @@
             display: none
 </style>
 
-<template lang="jade">
+<template lang="pug">
   .fancy-tabs(v-if="cfg.data")
     ul
       li(:class="{'fc-active': cfg.active === k}" v-for="(v, k) in cfg.data")

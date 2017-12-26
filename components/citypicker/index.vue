@@ -74,7 +74,7 @@
 
 </style>
 
-<template lang="jade">
+<template lang="pug">
   .fancy-citypicker(@click="_close")
     div(@click.stop="")
       h4

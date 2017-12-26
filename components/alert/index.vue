@@ -41,7 +41,7 @@
 
 </style>
 
-<template lang="jade">
+<template lang="pug">
   .fancy-alert(tabindex="1",:class="{'fc-mask':cfg.ismask}")
     div
       .fc-msg(v-html="cfg.message")

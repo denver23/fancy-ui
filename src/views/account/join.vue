@@ -27,7 +27,7 @@
 
 </style>
 
-<template lang="jade">
+<template lang="pug">
   .test-account
     component(is="join", :cfg="join" v-if="join")
     .signin

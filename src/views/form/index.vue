@@ -4,7 +4,7 @@
     margin: 50px auto
 </style>
 
-<template lang="jade">
+<template lang="pug">
   .test-form
     component(is="form", :cfg="form" v-if="form")
 </template>

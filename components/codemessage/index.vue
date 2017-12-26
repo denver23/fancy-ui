@@ -11,7 +11,7 @@
         color: $colorFont
 </style>
 
-<template lang="jade">
+<template lang="pug">
   .fancy-codemessage(v-if="cfg.show")
     button(
       v-bind="{disabled: downtime > 0}"

@@ -157,7 +157,7 @@
         margin: 0 0.5rem 0 0
 </style>
 
-<template lang="jade">
+<template lang="pug">
   .fancy-tables
     .fc-tool
       .fc-picker(ref="picker" v-if="cfg.picker")

@@ -59,7 +59,7 @@
         width: 100%
 </style>
 
-<template lang="jade">
+<template lang="pug">
   div(v-if="cfg" class="fancy-searchview" @click.stop="")
     input(
       type="text"
