@@ -240,7 +240,7 @@
     onSubmit="return false"
   )
     template(v-for="row of cfg.data")
-      dl(v-bind="row.attr" v-if="row")
+      dl(v-if="row")
         template(v-if="v" v-for="v of (Array.isArray(row) ? row : [row])")
           dt(v-if="typeof v.label !== 'undefined'")
             label(:for="v.id || v.name" v-html="v.label" v-if="v.label")
@@ -362,7 +362,7 @@ export default {
 
     if (cfg.type === 'search') {
       Object.assign(cfg.value, getQueryAll())
-      typeof cfg.onPopstate === 'function' && window.addEventListener("popstate", e => {
+      typeof cfg.onPopstate === 'function' && window.addEventListener('popstate', e => {
         Object.assign(cfg.value, getQueryAll())
         cfg.onPopstate(this.$refs.form, cfg.value)
       })
@@ -373,8 +373,7 @@ export default {
         this.submitName = v.name || '_submit_'
         this.$set(this.tips, this.submitName, '')
         this.$set(v, 'name', this.submitName)
-      }
-      else if (v.name && !['reset', 'button', 'component'].includes(v.type)) {
+      } else if (v.name && !['reset', 'button', 'component'].includes(v.type)) {
         this.$set(this.tips, v.name, '')
         this.$set(cfg.value, v.name, (v.name in cfg.value) ? cfg.value[v.name] : (v.value || ''))
         // set checkAll
@@ -395,11 +394,11 @@ export default {
     requestAnimationFrame(() => {
       let cfg = this.cfg
       if (typeof cfg.onReady === 'function') {
-        cfg.onReady(this.$refs.form, cfg.value)
+        cfg.onReady.call(this, this.$refs.form, cfg.value)
       }
       if (typeof cfg.onReset === 'function') {
         let inp = this.$el.querySelector('input[type="reset"]')
-        inp && inp.addEventListener('click', cfg.onReset)
+        inp && inp.addEventListener('click', cfg.onReset.bind(this))
       }
     })
   },
@@ -438,7 +437,7 @@ export default {
         }
       }
     },
-    _submit: async function () {
+    _submit: async function() {
       let cfg = this.cfg
       if (cfg.validator) {
         for (let [key, _func] of Object.entries(cfg.validator)) {
@@ -446,7 +445,9 @@ export default {
           if (res !== true) {
             this.tips[key] = false
             this.$el.querySelector(`[name="${key}"]`).focus()
-            requestAnimationFrame(() => this.tips[key] = res)
+            requestAnimationFrame(() => {
+              this.tips[key] = res
+            })
             return
           }
         }
@@ -456,7 +457,7 @@ export default {
       if (this.sending) return
       this.sending = true
       try {
-        cfg.onSubmit && await cfg.onSubmit(this.$refs.form, cfg.value)
+        cfg.onSubmit && await cfg.onSubmit.call(this, this.$refs.form, cfg.value)
       } catch (err) {
         this.tips[this.submitName] = err
       }
@@ -464,5 +465,4 @@ export default {
     },
   },
 }
-
 </script>

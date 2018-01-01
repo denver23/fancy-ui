@@ -126,7 +126,6 @@
 </template>
 
 <script>
-
 import Drag from 'lib/drag'
 
 const Options = {
@@ -138,9 +137,9 @@ const Options = {
 
   overlay: true,
   draggable: true,
-  onComplete(el) { },
-  onConfirm(el) { },
-  onCancel() { },
+  onComplete(el) {},
+  onConfirm(el) {},
+  onCancel() {},
   __name: 'modalbox',
 }
 
@@ -152,9 +151,7 @@ export default {
     }
   },
   created() {
-    Object.keys(Options).forEach(i => {
-      (i in this.cfg) || this.$set(this.cfg, i, Options[i])
-    })
+    Object.keys(Options).forEach(i => this.cfg.hasOwnProperty(i) || this.$set(this.cfg, i, Options[i]))
   },
   mounted() {
     this.cfg.content !== 'loading' && this.cfg.onComplete && this.cfg.onComplete(this.$el)
@@ -167,7 +164,7 @@ export default {
   watch: {
     'cfg.content'(val) {
       requestAnimationFrame(() => val !== 'loading' && this.cfg.onComplete && this.cfg.onComplete(this.$el))
-    }
+    },
   },
   methods: {
     _kdown(e) {
@@ -187,7 +184,7 @@ export default {
       this.sending = type
       try {
         type ? await this.cfg.onConfirm(this.$el) : await this.cfg.onCancel()
-      } catch (e) { }
+      } catch (e) {}
       this.sending = false
       this.cfg.__name && (this.$parent[this.cfg.__name] = false)
     },
