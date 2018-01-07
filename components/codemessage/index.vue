@@ -43,7 +43,7 @@ export default {
     this.timer = null
     Object.keys(Options).forEach(i => this.cfg.hasOwnProperty(i) || this.$set(this.cfg, i, Options[i]))
     this.cfg.history > 0 && this._countdown()
-    this.cfg.auto && this._click()
+    this.cfg.show && this.cfg.auto && this._click()
   },
   watch: {
     'cfg.show'(v) {

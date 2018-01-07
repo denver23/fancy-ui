@@ -228,7 +228,7 @@
       @include in-mobile()
     @media #{$device-mobile}
       @include in-mobile()
-  </style>
+</style>
 
 <template lang="pug">
   form.fancy-forms(
