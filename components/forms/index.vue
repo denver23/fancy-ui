@@ -334,6 +334,7 @@ function getQueryAll() {
   return res
 }
 
+let timer = {}
 const Options = {
   data: false,
   type: '', // search column forms
@@ -447,6 +448,8 @@ export default {
             this.$el.querySelector(`[name="${key}"]`).focus()
             requestAnimationFrame(() => {
               this.tips[key] = res
+              clearTimeout(timer[key])
+              timer[key] = setTimeout(() => this.tips[key] = false, 3000)
             })
             return
           }
@@ -459,6 +462,7 @@ export default {
       try {
         cfg.onSubmit && await cfg.onSubmit.call(this, this.$refs.form, cfg.value)
       } catch (err) {
+        console.log(this.submitName)
         this.tips[this.submitName] = err
       }
       this.sending = false
