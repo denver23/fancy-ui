@@ -1,9 +1,9 @@
-require('./css.sass');
+import Vue from 'vue'
+import sidebar from 'fancy/sidebar'
+require('./css.sass')
 // require('babel-polyfill')
 // node modules
 require('script!zepto')
-import Vue from 'vue';
-import sidebar from 'fancy/sidebar';
 
 new Vue({
   el: '.viewport',
@@ -24,17 +24,19 @@ new Vue({
     'tree': resolve => require(['./views/tree'], resolve),
   },
   mounted() {
-    let self = this;
+    let self = this
     function _getRouter() {
-      return window.location.pathname.split('/').slice(1, 3).filter(v => !!v).join('/');
+      return window.location.pathname.split('/').slice(1, 3).filter(v => !!v).join('/')
     }
     function _toggle(name) {
-      self.appview = name || 'tree';
-      window.history.pushState({'title': ''}, '', `/${name}`);
+      self.appview = name || 'tree'
+      window.history.pushState({ 'title': '' }, '', `/${name}`)
     }
-    window.addEventListener("popstate", e => this.appview = _getRouter() || 'tree');
+    window.addEventListener('popstate', e => {
+      this.appview = _getRouter() || 'tree'
+    })
 
-    this.appview = _getRouter() || 'tree';
+    this.appview = _getRouter() || 'tree'
     this.sidebar = {
       data: [
         {
@@ -42,33 +44,38 @@ new Vue({
           children: [
             {
               name: 'tree',
-              callback:() => _toggle('tree'),
+              callback: () => _toggle('tree'),
             },
             {
               name: 'confirm',
-              callback:() => _toggle('confirm'),
+              callback: () => _toggle('confirm'),
             },
             {
               name: 'datetimepicker',
-              callback:() => _toggle('datetimepicker'),
+              callback: () => _toggle('datetimepicker'),
             },
             {
               name: 'citypicker',
-              callback:() => _toggle('citypicker'),
+              callback: () => _toggle('citypicker'),
             },
             {
               name: 'codemessage',
-              callback:() => _toggle('codemessage'),
+              callback: () => _toggle('codemessage'),
             },
             {
               name: 'alert',
-              callback:() => _toggle('alert'),
+              callback: () => _toggle('alert'),
             }
           ]
         }
       ],
       onSlide(v) {
         self.sideStatus = v ? 'full' : ''
+      },
+      callback() {
+        return {
+          state: true
+        }
       }
 
     }

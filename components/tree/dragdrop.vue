@@ -20,6 +20,10 @@
     li
       padding-left: $space * 4
       position: relative
+      &.fc-dragover
+        > div
+          &:first-child
+            background: rgba(red, 0.2)
       input
         height: $form-height
         &[type="text"]
@@ -114,7 +118,16 @@
 <template lang="pug">
   .fancy-tree(:class="'fc-'+ (treelevel || 0) " v-if="data && data.length")
     ul(v-if="data.length")
-      li(:class="{'fc-folded': v.folded}" v-for="(v,index) in data")
+      li(
+        :class="{'fc-folded': v.folded, 'fc-dragover': v.__path === dragState.enter.__path}"
+        v-for="(v,index) in data"
+        draggable="true"
+        @dragstart="_dragStart($event, v, data)"
+        @dragenter="_dragEnter($event, v, data)"
+        @dragleave="_dragLeave($event, v, data)"
+        @dragend="_dragEnd($event, v, data)"
+        @drop="_drop($event, v, data)"
+      )
         div.fc-item
           .fc-arrow(@click="_toggle(v)")
           .fc-name
@@ -131,11 +144,12 @@
             em.fc-plus(v-if="cfg.insertBtn && v[cfg.field] && cfg.maxLevel > (treelevel || 0)" @click="_add($event, index, v)")
             em.fc-trash(v-if="cfg.removeBtn && (!v.data || !v.data.length)" @click="_remove(index, v)")
         treeview(
-          v-if="v.data && v.data.length && (treelevel || 0) < cfg.maxLevel"
-          v-bind:tree="v"
-          v-bind:treelevel="(treelevel || 0) + 1"
-          v-bind:treeMaxLevel="maxLevel - 1"
-          v-bind:cfg="cfg"
+          v-if="v.data && v.data.length && (treelevel || 0) < cfg.maxLevel",
+          :tree="v",
+          :treePath="v.__path",
+          :treelevel="(treelevel || 0) + 1",
+          :treeMaxLevel="maxLevel - 1",
+          :cfg="cfg"
         )
 </template>
 
@@ -163,14 +177,25 @@ const Options = {
   },
 }
 
+let startPath = ''
+let enterPath = ''
+let startItem = null
+let startParent = null
+let enterItem = null
+let lastIndex = 0
+let dragState = {
+  enter: '',
+}
+
 export default {
   name: 'treeview',
-  props: ['cfg', 'tree', 'treelevel', 'treeMaxLevel'],
+  props: ['cfg', 'tree', 'treelevel', 'treeMaxLevel', 'treePath'],
   data() {
     return {
       data: '',
       maxLevel: 0,
       editIndex: false,
+      dragState,
     }
   },
   created() {
@@ -181,7 +206,18 @@ export default {
 
     this.data = (this.tree && this.tree.data) || this.cfg.data
     this.maxLevel = this.treeMaxLevel || this.cfg.maxLevel
-    this.data.forEach(v => this.$set(v, 'folded', typeof v.folded === 'undefined' ? false : v.folded))
+    // this.data.forEach((v, i) => {
+    //   this.$set(v, 'folded', typeof v.folded === 'undefined' ? false : v.folded)
+    //   v.__path = (this.treePath || 'path') + '_' + i
+    // })
+  },
+  watch: {
+    data(val) {
+      val.forEach((v, i) => {
+        this.$set(v, 'folded', typeof v.folded === 'undefined' ? false : v.folded)
+        this.$set(v, '__path', (this.treePath || 'path') + '_' + i)
+      })
+    },
   },
   methods: {
     _toggle: item => (item.folded = !item.folded),
@@ -190,7 +226,6 @@ export default {
       let res = this.cfg.onClick(item, this.tree || this.cfg)
       res ? this._edit(event, index, item, elem) : this._toggle(item)
     },
-
     _add(event, index, parent) {
       // parent folded
       this.$set(this.data[index], 'folded', false)
@@ -250,6 +285,35 @@ export default {
         await this.cfg.onRemove(item, this.tree || this.cfg)
         this.data.splice(index, 1)
       } catch (e) {}
+    },
+    _dragStart(event, item, parent) {
+      event.stopPropagation()
+      startItem = item
+    },
+    _dragEnter(event, item, parent) {
+      event.preventDefault()
+      event.stopPropagation()
+      dragState.enter = item
+    },
+    _dragLeave(event, item, parent) {},
+    _dragEnd(event, item, parent) {
+      event.stopPropagation()
+      let toItem = dragState.enter
+      let startpath = item.__path
+      let enterpath = toItem.__path
+      if (startpath === enterpath) return
+      console.log('end', startpath, enterpath)
+      if (enterpath.includes(startpath)) {
+        return
+      }
+      // delete
+      let index = parent.findIndex(v => v.__path === item.__path)
+      let arr = parent.splice(index, 1)
+      // insert
+      requestAnimationFrame(() => {
+        this.$set(toItem, 'data', toItem.data || [])
+        toItem.data.splice(lastIndex, 0, arr[0])
+      })
     },
   },
 }

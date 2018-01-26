@@ -10,6 +10,7 @@
 </template>
 
 <script>
+  import tree from 'fancy/tree/dragdrop'
 
   var treedata = [
     {
@@ -51,8 +52,7 @@
       ]
     }
   ]
-  
-  import tree from 'fancy/tree';
+
   export default {
     components: {
       tree
@@ -63,9 +63,9 @@
           data: treedata,
           field: 'name',
           maxLevel: 10,
-          editBtn: true,
-          insertBtn: true,
-          removeBtn: true,
+          editBtn: false,
+          insertBtn: false,
+          removeBtn: false,
           placeholder: '',
           onClick: (item, parent) => true,
           onCreate: (item, parent, isCreate) => true,
@@ -73,17 +73,17 @@
           onSubmit(value, item, parent) {
             return new Promise((resolve) => {
               setTimeout(() => resolve(), 100)
-            });
+            })
           },
           onRemove(item, parent) {
             return new Promise((resolve) => {
               setTimeout(() => resolve(), 100)
-            });
+            })
           },
         }
       }
     },
     mounted() {
     },
-  };
+  }
 </script>
