@@ -20,10 +20,13 @@
     li
       padding-left: $space * 4
       position: relative
+      // margin: $space/2 0
       &.fc-dragover
         > div
           &:first-child
             background: rgba(red, 0.2)
+            &:hover
+              background: rgba(red, 0.2)
       input
         height: $form-height
         &[type="text"]
@@ -119,7 +122,7 @@
   .fancy-tree(:class="'fc-'+ (treelevel || 0) " v-if="data && data.length")
     ul(v-if="data.length")
       li(
-        :class="{'fc-folded': v.folded, 'fc-dragover': v.__path === dragState.enter.__path}"
+        :class="{'fc-folded': v.folded, 'fc-dragover': v.__path === dragState.path}"
         v-for="(v,index) in data"
         draggable="true"
         @dragstart="_dragStart($event, v, data)"
@@ -177,14 +180,11 @@ const Options = {
   },
 }
 
-let startPath = ''
-let enterPath = ''
-let startItem = null
-let startParent = null
-let enterItem = null
-let lastIndex = 0
 let dragState = {
-  enter: '',
+  path: '',
+  start: null,
+  enter: null,
+  level: null,
 }
 
 export default {
@@ -206,10 +206,6 @@ export default {
 
     this.data = (this.tree && this.tree.data) || this.cfg.data
     this.maxLevel = this.treeMaxLevel || this.cfg.maxLevel
-    // this.data.forEach((v, i) => {
-    //   this.$set(v, 'folded', typeof v.folded === 'undefined' ? false : v.folded)
-    //   v.__path = (this.treePath || 'path') + '_' + i
-    // })
   },
   watch: {
     data(val) {
@@ -288,31 +284,37 @@ export default {
     },
     _dragStart(event, item, parent) {
       event.stopPropagation()
-      startItem = item
+      dragState.start = item
     },
     _dragEnter(event, item, parent) {
       event.preventDefault()
       event.stopPropagation()
+      item.folded = false
+      dragState.path = item.__path
       dragState.enter = item
     },
-    _dragLeave(event, item, parent) {},
+    _dragLeave(event, item, parent) {
+      event.preventDefault()
+      event.stopPropagation()
+      dragState.leave = item
+    },
     _dragEnd(event, item, parent) {
       event.stopPropagation()
       let toItem = dragState.enter
       let startpath = item.__path
       let enterpath = toItem.__path
-      if (startpath === enterpath) return
-      console.log('end', startpath, enterpath)
       if (enterpath.includes(startpath)) {
         return
       }
       // delete
       let index = parent.findIndex(v => v.__path === item.__path)
       let arr = parent.splice(index, 1)
+      dragState.path = ''
       // insert
       requestAnimationFrame(() => {
         this.$set(toItem, 'data', toItem.data || [])
-        toItem.data.splice(lastIndex, 0, arr[0])
+        toItem.data.splice(0, 0, arr[0])
+        toItem.folded = false
       })
     },
   },
