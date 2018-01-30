@@ -340,10 +340,10 @@ const Options = {
   type: '', // search column forms
   value: {},
   pushstate: false, // object
-  onReset(form, data) { },
-  onReady(form, data) { },
-  onSubmit(form, data) { },
-  onPopstate(form, data) { },
+  onReset() { },
+  onReady(data, form) { },
+  onSubmit(data, form) { },
+  onPopstate(data, form) { },
   validator: false,
 }
 
@@ -365,7 +365,7 @@ export default {
       Object.assign(cfg.value, getQueryAll())
       typeof cfg.onPopstate === 'function' && window.addEventListener('popstate', e => {
         Object.assign(cfg.value, getQueryAll())
-        cfg.onPopstate(this.$refs.form, cfg.value)
+        cfg.onPopstate(cfg.value, this.$refs.form)
       })
     }
     // validator and submit
@@ -395,7 +395,7 @@ export default {
     requestAnimationFrame(() => {
       let cfg = this.cfg
       if (typeof cfg.onReady === 'function') {
-        cfg.onReady.call(this, this.$refs.form, cfg.value)
+        cfg.onReady.call(this, cfg.value,this.$refs.form)
       }
       if (typeof cfg.onReset === 'function') {
         let inp = this.$el.querySelector('input[type="reset"]')
@@ -460,7 +460,7 @@ export default {
       if (this.sending) return
       this.sending = true
       try {
-        cfg.onSubmit && await cfg.onSubmit.call(this, this.$refs.form, cfg.value)
+        cfg.onSubmit && await cfg.onSubmit.call(this, cfg.value, this.$refs.form )
       } catch (err) {
         console.log(this.submitName)
         this.tips[this.submitName] = err
