@@ -16,7 +16,13 @@
     {
       name: 'level 1',
       data: [
-        {name: 'level 1-1'},
+        {
+          name: 'level 1-1',
+          data: [
+              {name: 'level 1-1-1'},
+              {name: 'level 1-1-2'},
+          ]
+        },
         {
           name: 'level 1-2',
           data: [
@@ -25,6 +31,9 @@
             {name: 'level 1-2-3'},
             {name: 'level 1-2-4'},
             {name: 'level 1-2-5'},
+            {name: 'level 1-2-6'},
+            {name: 'level 1-2-7'},
+            {name: 'level 1-2-8'},
           ]
         },
         {

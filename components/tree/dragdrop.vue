@@ -63,7 +63,9 @@
           > .fc-name
             flex: 1
             span
+              display: inline-block
               cursor: pointer
+              line-height: $lineHeight
           &:hover
             background: #eee
           // if has children, show arrow
@@ -122,25 +124,26 @@
   .fancy-tree(:class="'fc-'+ (treelevel || 0) " v-if="data && data.length")
     ul(v-if="data.length")
       li(
-        :class="{'fc-folded': v.folded, 'fc-dragover': v.__path === dragState.path}"
+        :class="{'fc-folded': v.folded, 'fc-dragover': dnd.target && v.__path === dnd.target.__path}"
         v-for="(v,index) in data"
         draggable="true"
         @dragstart="_dragStart($event, v, data)"
         @dragenter="_dragEnter($event, v, data)"
         @dragleave="_dragLeave($event, v, data)"
+        @dragover="_dragOver($event, v, data)"
         @dragend="_dragEnd($event, v, data)"
-        @drop="_drop($event, v, data)"
       )
         div.fc-item
           .fc-arrow(@click="_toggle(v)")
           .fc-name
-            input(
-              v-if="!v[cfg.field] || editIndex === index"
-              type="text"
-              v-bind="{value: v[cfg.field], placeholder: cfg.placeholder, disabled: v.__disabled}"
-              @keydown.enter.stop="_submit($event, index, v)"
-            )
-            span(v-else @click="_toggleName($event, index, v)") {{v[cfg.field]}}
+            span
+              input(
+                v-if="!v[cfg.field] || editIndex === index"
+                type="text"
+                v-bind="{value: v[cfg.field], placeholder: cfg.placeholder, disabled: v.__disabled}"
+                @keydown.enter.stop="_submit($event, index, v)"
+              )
+              span(v-else @click="_toggleName($event, index, v)") {{v[cfg.field]}}
 
           .fc-tool
             em.fc-pencil(v-if="cfg.editBtn && v.editBtn !== false" @click="_edit($event, index, v)")
@@ -157,6 +160,7 @@
 </template>
 
 <script>
+// import Vue from 'vue'
 const Options = {
   data: null,
   field: 'name',
@@ -180,11 +184,10 @@ const Options = {
   },
 }
 
-let dragState = {
+let dnd = {
   path: '',
-  start: null,
-  enter: null,
-  level: null,
+  source: null,
+  target: null,
 }
 
 export default {
@@ -195,7 +198,7 @@ export default {
       data: '',
       maxLevel: 0,
       editIndex: false,
-      dragState,
+      dnd,
     }
   },
   created() {
@@ -209,10 +212,11 @@ export default {
   },
   watch: {
     data(val) {
-      val.forEach((v, i) => {
-        this.$set(v, 'folded', typeof v.folded === 'undefined' ? false : v.folded)
-        this.$set(v, '__path', (this.treePath || 'path') + '_' + i)
-      })
+      val &&
+        val.forEach((v, i) => {
+          this.$set(v, 'folded', typeof v.folded === 'undefined' ? false : v.folded)
+          this.$set(v, '__path', (this.treePath || 'path') + '_' + i)
+        })
     },
   },
   methods: {
@@ -284,37 +288,51 @@ export default {
     },
     _dragStart(event, item, parent) {
       event.stopPropagation()
-      dragState.start = item
+      dnd.source = item
+    },
+    _dragOver(event, item, parent) {
+      event.preventDefault()
+      event.stopPropagation()
+      console.log(event.target)
     },
     _dragEnter(event, item, parent) {
       event.preventDefault()
       event.stopPropagation()
       item.folded = false
-      dragState.path = item.__path
-      dragState.enter = item
+      dnd.target = item
     },
     _dragLeave(event, item, parent) {
       event.preventDefault()
       event.stopPropagation()
-      dragState.leave = item
+      dnd.leave = item
     },
     _dragEnd(event, item, parent) {
+      event.preventDefault()
       event.stopPropagation()
-      let toItem = dragState.enter
+
+      let target = dnd.target
       let startpath = item.__path
-      let enterpath = toItem.__path
+      let enterpath = target.__path
       if (enterpath.includes(startpath)) {
         return
       }
       // delete
       let index = parent.findIndex(v => v.__path === item.__path)
-      let arr = parent.splice(index, 1)
-      dragState.path = ''
+      this.data = false
       // insert
+      let newdata = target.data || []
+      target.data && delete target.data
+
       requestAnimationFrame(() => {
-        this.$set(toItem, 'data', toItem.data || [])
-        toItem.data.splice(0, 0, arr[0])
-        toItem.folded = false
+        parent.splice(index, 1)
+        newdata.splice(0, 0, item)
+
+        this.data = parent
+        this.$set(target, 'data', newdata)
+        target.folded = false
+        // clear
+        dnd.source = null
+        dnd.target = null
       })
     },
   },
