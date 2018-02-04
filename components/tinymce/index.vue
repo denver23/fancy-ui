@@ -1,6 +1,5 @@
 <style lang="sass">
   @import "~fancy_style"
-
   .fancy-tinymce
     textarea
       min-width: 10rem
@@ -15,7 +14,6 @@
 </template>
 
 <script>
-
 // import tinymce from 'tinymce/tinymce'
 // import 'tinymce/themes/modern/theme'
 // import 'tinymce/plugins/paste'
@@ -33,25 +31,31 @@ const Options = {
   name: 'content',
   value: '',
   btnImage: false,
-  getContent() { },
-  onPaste(val) { },
-  onInsert(str) { },
-  onReplaceImage(rid, url) { },
-  fullscreenStateChanged(obj) { },
+  getContent() {},
+  onPaste(val) {},
+  onInsert(str) {},
+  onReplaceImage(rid, url) {},
+  fullscreenStateChanged(obj) {},
 }
 export default {
   props: ['cfg'],
   data() {
-    return {
-    }
+    return {}
   },
   created() {
-    Object.keys(Options).forEach(i => {
-      (i in this.cfg) || this.$set(this.cfg, i, Options[i])
-    })
+    let cfg = this.cfg
+    Object.keys(Options).forEach(i => cfg.hasOwnProperty(i) || this.$set(cfg, i, Options[i]))
   },
   mounted() {
     let self = this
+    let toolbar = [
+      'undo redo',
+      'styleselect',
+      'bold italic',
+      'alignleft aligncenter alignright alignjustify',
+      'link unlink table imageUpload imagePick',
+      'code fullscreen'
+    ].join(' | ')
 
     tinymce.init({
       // selector: 'textarea#'+ self.id,
@@ -59,36 +63,35 @@ export default {
       height: 600,
       plugins: ['autolink link table paste code fullscreen'],
       // force_p_newlines: true,
-      toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | link unlink table imageUpload imagePick | code fullscreen ',
-      // toolbar: 'code',
+      toolbar,
       menubar: false,
       statusbar: false,
       language: 'zh_CN',
       content_style: `
-            p,div {
-              font-size: 14px
-            }
-            p {
-              text-indent: 2em
-            }
-            p img {
-              max-width: 90%
-              border: 1px solid #ddd
-              min-width: 100px
-              min-height: 100px
-              display: block
-              margin: 0 auto
-            }
-            table.tb {
-              width: 90%
-              border: 1px solid #ddd
-              margin: 0 auto
-              border-collapse: collapse
-            }
-            table.tb td {
-              border: 1px solid #ddd
-            }
-        `,
+        p,div {
+          font-size: 14px
+        }
+        p {
+          text-indent: 2em
+        }
+        p img {
+          max-width: 90%
+          border: 1px solid #ddd
+          min-width: 100px
+          min-height: 100px
+          display: block
+          margin: 0 auto
+        }
+        table.tb {
+          width: 90%
+          border: 1px solid #ddd
+          margin: 0 auto
+          border-collapse: collapse
+        }
+        table.tb td {
+          border: 1px solid #ddd
+        }
+      `,
       add_form_submit_trigger: false,
       force_p_newlines: true,
       paste_data_images: true,
@@ -107,19 +110,25 @@ export default {
         this.$set(this.cfg, 'onReplaceImage', (rid, url) => {
           if (rid && url) {
             let content = ed.getContent()
-            new RegExp(`id="${rid}"`).test(content) && ed.setContent(content.replace(new RegExp('<img(.*?)id="' + rid + '"(.*?)>'), img => img.replace(/src="(.*?)"/, src => `src="${url}"`)))
+            if (new RegExp(`id="${rid}"`).test(content)) {
+              let reg = new RegExp('<img(.*?)id="' + rid + '"(.*?)>')
+              let str = content.replace(reg, img => img.replace(/src="(.*?)"/, v => `src="${url}"`))
+              ed.setContent(str)
+            }
           }
         })
-        this.cfg.btnImage && ed.addButton('imageUpload', {
-          text: '',
-          icon: 'image',
-          onclick: this.cfg.btnImage,
-        })
-        this.cfg.btnImagePick && ed.addButton('imagePick', {
-          text: 'pick',
-          icon: '',
-          onclick: () => this.cfg.btnImagePick(Editor.getImage(ed.getContent())),
-        })
+        this.cfg.btnImage &&
+          ed.addButton('imageUpload', {
+            text: '',
+            icon: 'image',
+            onclick: this.cfg.btnImage,
+          })
+        this.cfg.btnImagePick &&
+          ed.addButton('imagePick', {
+            text: 'pick',
+            icon: '',
+            onclick: () => this.cfg.btnImagePick(Editor.getImage(ed.getContent())),
+          })
         // ed.addShortcut('alt+l', 'wfewef', cmdFunc:String, scope:Object):Boolean
         // let pasteTime = null
         // ed.on('paste', function(){
@@ -134,7 +143,7 @@ export default {
         // for( let v of html.getElementsByTagName('img')){
         //     let src = v.getAttribute('src')
         // }
-      }
+      },
     })
   },
 }
