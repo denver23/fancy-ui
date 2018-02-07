@@ -195,7 +195,6 @@ export default {
       // parent folded
       this.$set(this.data[index], 'folded', false)
       parent.data || this.$set(this.data[index], 'data', [])
-
       // default data
       let newItem = {}
       newItem[this.cfg.field] = ''
