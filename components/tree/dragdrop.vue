@@ -153,10 +153,10 @@
         :class="{'fc-open': v.open, 'fc-enter': v.__path === dnd.path, 'fc-prev': v.__path === dnd.path && dnd.prev, 'fc-next': v.__path === dnd.path && dnd.next }"
         v-for="(v,index) in data"
         draggable="true"
-        @dragstart="_dragStart($event, v, data)"
-        @dragenter="_dragEnter($event, v, data)"
-        @dragover="_dragOver($event, v, data)"
         @dragend="_dragEnd($event)"
+        @dragover="_dragOver($event, v, ___tree)"
+        @dragstart="_dragStart($event, v, ___tree)"
+        @dragenter="_dragEnter($event, v, ___tree)"
       )
         div.fc-item
           .fc-arrow(@click="_toggle(v)")
@@ -227,7 +227,8 @@ let dnd = {
   path: '',
   source: null,
   target: null,
-  targetParent: null,
+  sourceTree: null,
+  targetTree: null,
   prev: false,
   next: false,
 }
@@ -241,6 +242,7 @@ export default {
       maxLevel: 0,
       editIndex: false,
       dnd,
+      ___tree: null,
     }
   },
   created() {
@@ -251,6 +253,7 @@ export default {
 
     this.data = (this.tree && this.tree.data) || this.cfg.data
     this.maxLevel = this.treeMaxLevel || this.cfg.maxLevel
+    this.___tree = this
   },
   watch: {
     data(val) {
@@ -328,13 +331,14 @@ export default {
         this.data.splice(index, 1)
       } catch (e) {}
     },
-    _dragStart(event, item, parent) {
+    _dragStart(event, item, instance) {
       event.stopPropagation()
       if (dnding) return
       dnding = true
       dnd.source = item
+      dnd.sourceTree = instance
     },
-    _dragOver(event, item, parent) {
+    _dragOver(event, item) {
       event.preventDefault()
       event.stopPropagation()
       if (item.__path.includes(dnd.source.__path)) {
@@ -375,7 +379,7 @@ export default {
       dnd.prev = false
       dnd.next = false
     },
-    _dragEnter(event, item, parent) {
+    _dragEnter(event, item, instance) {
       event.preventDefault()
       event.stopPropagation()
       if (item.__path.includes(dnd.source.__path)) {
@@ -386,47 +390,88 @@ export default {
       item.open = true
       dnd.path = item.__path
       dnd.target = item
-      dnd.targetParent = parent
+      dnd.targetTree = instance
     },
     _dragEnd(event) {
       event.preventDefault()
       event.stopPropagation()
-      if (!dnd.target) {
+      if (!dnd.target || dnd.target.__path.includes(dnd.source.__path)) {
         return this._clear()
       }
       if (dnd.prev || dnd.next) {
         return this._dragMove(dnd.prev ? 'toPrev' : 'toNext')
       }
-      if (dnd.target.__path.includes(dnd.source.__path)) {
-        return this._clear()
-      }
-      this._dragMove(false)
+      this._dragMove()
     },
     _dragMove(where) {
+      let el = this.$el
       let source = dnd.source
       let target = dnd.target
+      let sourceData = dnd.sourceTree.data
+      let targetData = dnd.targetTree.data
+
+      if (!source || !target) return this._clear()
+
+      // prev or next
+      if (where) {
+        if (dnd.targetTree === dnd.sourceTree) {
+          // same origin
+          // insert
+          let to = targetData.findIndex(v => v === dnd.target)
+          if (where === 'toNext') {
+            to++
+          }
+          targetData.splice(to, 0, source)
+          // delete
+          let from = sourceData.findIndex((v, index) => v === dnd.source && index !== to)
+          sourceData.splice(from, 1)
+        } else {
+          // different origin
+          let to = targetData.findIndex(v => v === dnd.target)
+          let from = sourceData.findIndex(v => v === dnd.source)
+          if (where === 'toNext') {
+            to++
+          }
+          sourceData.splice(from, 1)
+          targetData.splice(to, 0, source)
+        }
+
+        // vue update
+        dnd.sourceTree.data = []
+        dnd.targetTree.data = []
+        requestAnimationFrame(() => {
+          dnd.sourceTree.data = sourceData
+          dnd.targetTree.data = targetData
+          this._clear()
+        })
+        return
+      }
+
       // delete
-      let mydata = this.data
-      this.data = false
-      mydata.splice(mydata.findIndex(v => v.__path === source.__path), 1)
+      sourceData.splice(sourceData.findIndex(v => v === source), 1)
 
-      // insert
       let targetChild = target.data || []
-      target.data && delete target.data
+      targetChild.push(source)
 
+      dnd.sourceTree.data = []
+      target.data = []
       requestAnimationFrame(() => {
-        this.data = mydata
-        targetChild.push(source)
+        dnd.sourceTree.data = sourceData
         this.$set(target, 'data', targetChild)
         target.open = true
-        // clear
+
         this._clear()
+        return
       })
     },
     _clear() {
+      dnd.path = ''
       dnd.source = null
       dnd.target = null
-      dnd.path = ''
+      dnd.sourceTree = null
+      dnd.targetTree = null
+      dnd.prev = false
+      dnd.next = false
       dnding = false
     },
   },
