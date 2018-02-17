@@ -462,7 +462,6 @@ export default {
       try {
         cfg.onSubmit && await cfg.onSubmit.call(this, cfg.value, this.$refs.form )
       } catch (err) {
-        console.log(this.submitName)
         this.tips[this.submitName] = err
       }
       this.sending = false
