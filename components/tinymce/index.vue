@@ -25,15 +25,13 @@
 // import 'tinymce/plugins/fullscreen'
 // import 'tinymce/plugins/preview'
 
-import Editor from 'lib/editor.js'
-
 const Options = {
   name: 'content',
   value: '',
   btnImage: false,
   getContent() {},
-  onPaste(val) {},
-  onInsert(str) {},
+  onPaste: str => str,
+  onInsert: str => str,
   onReplaceImage(rid, url) {},
   fullscreenStateChanged(obj) {},
 }
@@ -48,14 +46,7 @@ export default {
   },
   mounted() {
     let self = this
-    let toolbar = [
-      'undo redo',
-      'styleselect',
-      'bold italic',
-      'alignleft aligncenter alignright alignjustify',
-      'link unlink table imageUpload imagePick',
-      'code fullscreen'
-    ].join(' | ')
+    let toolbar = ['undo redo', 'styleselect', 'bold italic', 'alignleft aligncenter alignright alignjustify', 'link unlink table imageUpload imagePick', 'code fullscreen'].join(' | ')
 
     tinymce.init({
       // selector: 'textarea#'+ self.id,
@@ -75,21 +66,24 @@ export default {
           text-indent: 2em
         }
         p img {
-          max-width: 90%
-          border: 1px solid #ddd
-          min-width: 100px
-          min-height: 100px
-          display: block
-          margin: 0 auto
+          max-width: 90%;
+          border: 1px solid #ddd;
+          min-width: 100px;
+          min-height: 100px;
+          display: block;
+          margin: 0 auto;
         }
-        table.tb {
-          width: 90%
-          border: 1px solid #ddd
-          margin: 0 auto
+        table.mce-item-table {
+          width: 90%;
+          border: 1px solid #ddd;
+          margin: 0 auto;
           border-collapse: collapse
         }
-        table.tb td {
+        table.mce-item-table td {
           border: 1px solid #ddd
+        }
+        p.fancy-editor-image {
+          text-align: center
         }
       `,
       add_form_submit_trigger: false,
@@ -100,8 +94,9 @@ export default {
       // },
       code_dialog_width: '800',
       paste_postprocess(plugin, args) {
-        // paste upload
-        args.node.innerHTML = Editor.filter(args.node.innerHTML, (val, rid) => self.cfg.onPaste(val, rid))
+        if (self.cfg.onPaste) {
+          args.node.innerHTML = self.cfg.onPaste(args.node.innerHTML)
+        }
       },
       setup: ed => {
         ed.on('FullscreenStateChanged', e => this.cfg.fullscreenStateChanged(e))
@@ -117,27 +112,20 @@ export default {
             }
           }
         })
-        this.cfg.btnImage &&
+        if (this.cfg.btnImage) {
           ed.addButton('imageUpload', {
             text: '',
             icon: 'image',
             onclick: this.cfg.btnImage,
           })
-        this.cfg.btnImagePick &&
+        }
+        if (this.cfg.btnImagePick) {
           ed.addButton('imagePick', {
             text: 'pick',
             icon: '',
-            onclick: () => this.cfg.btnImagePick(Editor.getImage(ed.getContent())),
+            onclick: () => this.cfg.btnImagePick(ed.getContent()),
           })
-        // ed.addShortcut('alt+l', 'wfewef', cmdFunc:String, scope:Object):Boolean
-        // let pasteTime = null
-        // ed.on('paste', function(){
-        //     clearTimeout(pasteTime)
-        //     pasteTime = setTimeout(() => {
-        //         ed.setContent( Editor.imageFilter(ed.getContent()) )
-        //     },100)
-        // })
-
+        }
         // let content = ed.getContent()
         // let html = (new DOMParser()).parseFromString(content,'text/html')
         // for( let v of html.getElementsByTagName('img')){

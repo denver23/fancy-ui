@@ -178,15 +178,15 @@ const Options = {
     maxHeight: '',
   },
   trigger: false,
-  onClick: item => console.log(item),
+  onClick: item => {},
   onPostComplete: (res, item) => {},
 }
 
 export default {
   props: ['cfg'],
   created() {
-    this.dataTimer = null
     let cfg = this.cfg
+    this.dataTimer = null
     Object.keys(Options).forEach(i => cfg.hasOwnProperty(i) || this.$set(cfg, i, Options[i]))
   },
   watch: {
@@ -320,13 +320,6 @@ export default {
       }
       function _failed(e) {}
     },
-    // http://www.zhangxinxu.com/wordpress/2011/02/html5-drag-drop-%E6%8B%96%E6%8B%BD%E4%B8%8E%E6%8B%96%E6%94%BE%E7%AE%80%E4%BB%8B/
-    // drop (e){
-    //     let files = e.dataTransfer.files
-    //     let len = files.length
-    //     for(let v of files){
-    //     }
-    // },
   },
 }
 </script>
