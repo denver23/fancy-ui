@@ -140,7 +140,6 @@
 </template>
 
 <script>
-
 const Options = {
   data: null,
   field: 'name',
@@ -153,12 +152,12 @@ const Options = {
   onCreate: (item, parent, isCreate) => true,
   onEdit: (item, parent, isCreate) => true,
   onSubmit(value, item, parent) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       setTimeout(() => resolve(), 1000)
     })
   },
   onRemove(item, parent) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       setTimeout(() => resolve(), 1000)
     })
   },
@@ -175,16 +174,17 @@ export default {
     }
   },
   created() {
-    typeof this.treelevel === 'undefined' && Object.keys(Options).forEach(i => {
-      (i in this.cfg) || this.$set(this.cfg, i, Options[i])
-    })
+    typeof this.treelevel === 'undefined' &&
+      Object.keys(Options).forEach(i => {
+        i in this.cfg || this.$set(this.cfg, i, Options[i])
+      })
 
     this.data = (this.tree && this.tree.data) || this.cfg.data
     this.maxLevel = this.treeMaxLevel || this.cfg.maxLevel
     this.data.forEach(v => this.$set(v, 'folded', typeof v.folded === 'undefined' ? false : v.folded))
   },
   methods: {
-    _toggle: item => item.folded = !!!item.folded,
+    _toggle: item => (item.folded = !item.folded),
     _toggleName(event, index, item) {
       let elem = event.target.parentNode.parentNode
       let res = this.cfg.onClick(item, this.tree || this.cfg)
@@ -195,7 +195,6 @@ export default {
       // parent folded
       this.$set(this.data[index], 'folded', false)
       parent.data || this.$set(this.data[index], 'data', [])
-
       // default data
       let newItem = {}
       newItem[this.cfg.field] = ''
@@ -249,7 +248,7 @@ export default {
       try {
         await this.cfg.onRemove(item, this.tree || this.cfg)
         this.data.splice(index, 1)
-      } catch (e) { }
+      } catch (e) {}
     },
   },
 }
