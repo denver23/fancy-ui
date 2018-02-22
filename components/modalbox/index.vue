@@ -61,9 +61,24 @@
         animation: fancy-modalbox-loading 1s infinite steps(8)
 
     .fc-content
-      min-height: $form-height * 2
+      min-height: $form-height
       padding: $space * 2 $space
       box-sizing: border-box
+
+    .fc-tips
+      text-align: center
+      padding: 0 0 $space * 2
+      span
+        color: $colorAlerm
+        display: inline-block
+        animation: fancy-modalbox-cite 0.5s 2 ease-in forwards
+        @keyframes fancy-modalbox-cite
+          0%,100%
+            transform: translate3d(0, 0, 0)
+          25%
+            transform: translate3d(-$space, 0, 0)
+          75%
+            transform: translate3d($space, 0, 0)
 
     .fc-btns
       display: flex
@@ -118,6 +133,8 @@
         component(:is="cfg.component" v-bind:cfg="cfg.content" v-if="cfg.component")
         .fc-content(v-else v-html="cfg.content")
 
+      .fc-tips(v-if="cfg.tips")
+        span(v-text="cfg.tips")
       .fc-btns(v-if="cfg.confirm || cfg.cancel")
         span(:class="{'fc-sending': sending === 'confirm'}" v-if="cfg.confirm" @click="_done(1)")
           em {{cfg.confirm}}
@@ -127,12 +144,14 @@
 
 <script>
 import Drag from 'lib/drag'
+import { setTimeout } from 'timers'
 
 const Options = {
   title: '',
   content: '',
   confirm: 'confirm',
   cancel: 'cancel',
+  tips: '',
   component: '', // component组件
 
   overlay: true,
@@ -140,15 +159,12 @@ const Options = {
   onComplete(el) {},
   onConfirm(el) {},
   onCancel() {},
-  __name: 'modalbox',
 }
 
 export default {
   props: ['cfg'],
   data() {
-    return {
-      sending: false,
-    }
+    return { sending: false }
   },
   created() {
     Object.keys(Options).forEach(i => this.cfg.hasOwnProperty(i) || this.$set(this.cfg, i, Options[i]))
@@ -186,7 +202,6 @@ export default {
         type ? await this.cfg.onConfirm(this.$el) : await this.cfg.onCancel()
       } catch (e) {}
       this.sending = false
-      this.cfg.__name && (this.$parent[this.cfg.__name] = false)
     },
   },
 }

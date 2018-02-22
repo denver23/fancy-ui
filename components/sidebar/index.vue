@@ -62,6 +62,7 @@
 
     > .fc-wrap
       position: fixed
+      z-index: 1000
       top: 0
       left: 0
       bottom: 0
@@ -161,7 +162,7 @@
       div
         dl(v-for="(v, k) in cfg.data" v-bind:class="{'fc-fold': folded[k]}")
           dt(:class="'fc-'+ v.icon" @click="_setFold(k,v)") {{v.name}}
-          dd(v-for="v of v.children" v-bind:class="{'fc-active': v.id == cfg.active}")
+          dd(v-for="v of v.children", :class="{'fc-active': v.id == cfg.active}")
             a(
               v-bind="{href: v.url || 'javascript:', target: v.target || '_self', title: v.name}"
               @click="v.callback ? v.callback(v) : ''"

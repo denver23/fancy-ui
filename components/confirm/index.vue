@@ -77,59 +77,55 @@
 </template>
 
 <script>
-  const Options = {
-    message: '',
-    confirm: 'confirm',
-    cancel: 'cancel',
-    onConfirm() {},
-    onCancel() {},
-    __name: 'confirm',
-    // onConfirm() {
-    //   return new Promise((resolve, reject) => {
-    //     setTimeout(() => resolve(), 1000)
-    //   })
-    // },
-  }
-  export default {
-    props: ['cfg'],
-    data() {
-      return {
-        sending: false
+const Options = {
+  message: '',
+  confirm: 'confirm',
+  cancel: 'cancel',
+  onConfirm() {},
+  onCancel() {},
+  __name: 'confirm',
+  // onConfirm() {
+  //   return new Promise((resolve, reject) => {
+  //     setTimeout(() => resolve(), 1000)
+  //   })
+  // },
+}
+export default {
+  props: ['cfg'],
+  data() {
+    return { sending: false }
+  },
+  created() {
+    Object.keys(Options).forEach(i => this.cfg.hasOwnProperty(i) || this.$set(this.cfg, i, Options[i]))
+    document.addEventListener('keydown', this._kdown, false)
+  },
+  mounted() {
+    this.$el.focus()
+  },
+  destroyed() {
+    document.removeEventListener('keydown', this._kdown, false)
+  },
+  methods: {
+    _kdown(e) {
+      // enter space center esc
+      if ([13, 32, 100, 27].includes(e.keyCode)) {
+        e.preventDefault()
+        e.stopPropagation()
+        // esc
+        if (e.keyCode == 27 || !this.cfg.confirm) return this._done(0)
+        return this._done(1)
       }
     },
-    created() {
-      Object.keys(Options).forEach(i => {
-        (i in this.cfg) || this.$set(this.cfg, i, Options[i])
-      })
-      document.addEventListener('keydown', this._kdown, false)
+    _done: async function(type) {
+      if (this.sending) return
+      this.sending = type
+      try {
+        type ? await this.cfg.onConfirm() : await this.cfg.onCancel()
+      } catch (e) {}
+      this.sending = false
+      this.cfg.__name && (this.$parent[this.cfg.__name] = false)
     },
-    mounted() {
-      this.$el.focus()
-    },
-    destroyed() {
-      document.removeEventListener('keydown', this._kdown, false)
-    },
-    methods: {
-      _kdown(e) {
-        // enter space center esc
-        if ([13, 32, 100, 27].includes(e.keyCode)) {
-          e.preventDefault()
-          e.stopPropagation()
-          // esc
-          if (e.keyCode == 27 || !this.cfg.confirm) return this._done(0)
-          return this._done(1)
-        }
-      },
-      _done: async function(type) {
-        if (this.sending) return
-        this.sending = type
-        try {
-          type ? await this.cfg.onConfirm() : await this.cfg.onCancel()
-        } catch (e) {}
-        this.sending = false
-        this.cfg.__name && (this.$parent[this.cfg.__name] = false)
-      },
-    },
-  }
+  },
+}
 </script>
 

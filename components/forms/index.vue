@@ -449,7 +449,9 @@ export default {
             requestAnimationFrame(() => {
               this.tips[key] = res
               clearTimeout(timer[key])
-              timer[key] = setTimeout(() => this.tips[key] = false, 3000)
+              timer[key] = setTimeout(() => {
+                this.tips[key] = false
+              }, 3000)
             })
             return
           }
