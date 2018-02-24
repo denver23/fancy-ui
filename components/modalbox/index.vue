@@ -36,7 +36,7 @@
       .fc-title
         line-height: $row-height
         min-height: $row-height
-        padding: 0 0 0 0.5rem
+        padding: 0 0 0 $space
         margin: 0
         background: $colorTheme
         color: #fff
