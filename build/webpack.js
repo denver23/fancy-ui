@@ -35,12 +35,12 @@ function buildPro() {
       chunkModules: false,
     }) + '\n')
     console.log(chalk.cyan('  Build complete.\n'))
-      // console.log(chalk.yellow())
+    // console.log(chalk.yellow())
   })
 }
 
 function buildDev() {
-  const port = process.env.NODE_ENV === 'production' ? config.pro.port : config.dev.port;
+  const port = process.env.NODE_ENV === 'production' ? config.pro.port : config.dev.port
   // server
   const app = express()
   app.use(compression())
@@ -52,8 +52,8 @@ function buildDev() {
     noInfo: true,
   })
   const hotMiddleware = require('webpack-hot-middleware')(compiler, {
-    log: () => {},
-  });
+    log: () => { },
+  })
   // force page reload when html-webpack-plugin template changes
   compiler.plugin('compilation', function(compilation) {
     compilation.plugin('html-webpack-plugin-after-emit', function(data, cb) {
@@ -85,7 +85,6 @@ function buildDev() {
     req.url = '/'
     app.handle(req, res, next)
   })
-
 
   const server = app.listen(port)
   server.on('error', error => {

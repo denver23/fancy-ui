@@ -30,14 +30,14 @@
           border-bottom: none
           background: #fff
           a
-            color: $colorLink
+            color: $colorFont
         a
           padding: 0 $space * 4
           display: block
           outline: none
           text-align: center
           &:hover
-            color: $colorLink
+            color: $colorFont
 
     @media #{$device-phone}
       ul

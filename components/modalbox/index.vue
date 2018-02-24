@@ -1,6 +1,7 @@
 <!-- 组件 模态框 -->
 <style lang="sass">
   @import "~fancy_style"
+  @import "~fancy_mixins"
 
   .fancy-modalbox
     @keyframes fancy-modalbox-loading

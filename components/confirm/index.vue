@@ -1,5 +1,6 @@
 <style lang="sass">
   @import "~fancy_style"
+  @import "~fancy_mixins"
 
   .fancy-confirm
     @include mixin-mask()

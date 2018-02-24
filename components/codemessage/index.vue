@@ -1,5 +1,7 @@
 <style lang="sass">
   @import "~fancy_style"
+  @import "~fancy_mixins"
+
   .fancy-codemessage
     button
       @include mixin-button()

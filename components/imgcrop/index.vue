@@ -1,6 +1,7 @@
 <!-- 焦点图 -->
 <style lang="sass">
   @import "~fancy_style"
+  @import "~fancy_mixins"
 
   .fancy-imgcrop
     &:focus

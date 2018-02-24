@@ -1,10 +1,10 @@
 const path = require('path')
-const glob = require("glob")
+const glob = require('glob')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 const root = path.resolve(__dirname, '../')
 const src = path.resolve(__dirname, '../src/')
-const dist = path.resolve(__dirname, '../dist/');
+const dist = path.resolve(__dirname, '../dist/')
 // const name = __dirname.split(path.sep).slice(-2)[0]
 
 var entry = {
@@ -28,7 +28,7 @@ var htmlWebpack = [
       removeEmptyAttributes: true
     },
   })
-];
+]
 
 glob.sync(`${src}/views/**/*.js`).forEach(i => {
   let key = path.relative(src, i).replace(path.extname(i), '')
@@ -66,6 +66,7 @@ module.exports = {
     lib: `${root}/lib/`,
     fancy: `${root}/components/`,
     fancy_style: `${root}/components/fancy.style.sass`,
+    fancy_mixins: `${root}/components/fancy.mixins.sass`,
     // node
     vue$: 'vue/dist/vue.js',
     zepto$: 'zepto/dist/zepto.min.js',

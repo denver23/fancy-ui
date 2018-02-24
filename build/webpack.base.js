@@ -1,26 +1,27 @@
-const glob = require("glob")
-const path = require('path');
+// const path = require('path')
 const webpack = require('webpack')
-const multi = require("multi-loader")
+const multi = require('multi-loader')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 // https://github.com/DustinJackson/html-webpack-inline-source-plugin
-const HtmlWebpackPlugin = require('html-webpack-plugin')
+// const HtmlWebpackPlugin = require('html-webpack-plugin')
 const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin')
 
 // https://github.com/webpack/extract-text-webpack-plugin
-const ExtractTextPlugin = require("extract-text-webpack-plugin")
+const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const cssExtractTextPlugin = new ExtractTextPlugin({
-  filename: "[name].css",
+  filename: '[name].css',
   disable: false,
   allChunks: true,
-});
+})
 
 const config = require('./webpack.config.js')
 
 // add hot-reload related code to entry chunks
 if (process.env.NODE_ENV === 'development') {
-  Object.keys(config.entry).forEach(name => config.entry[name] = ['./build/dev-client'].concat(config.entry[name]))
+  Object.keys(config.entry).forEach(name => {
+    config.entry[name] = ['./build/dev-client'].concat(config.entry[name])
+  })
 }
 
 module.exports = {
@@ -42,12 +43,12 @@ module.exports = {
           loaders: {
             js: 'babel-loader',
             css: cssExtractTextPlugin.extract({
-              use: "css-loader!postcss-loader"
+              use: 'css-loader!postcss-loader'
             }),
             // sass: 'vue-style-loader!css-loader!svg-fill-loader/encodeSharp!postcss-loader!sass-loader?indentedSyntax',
             // jade: 'vue-html-loader!jade-html-loader',
             sass: cssExtractTextPlugin.extract({
-              use: "css-loader!svg-fill-loader/encodeSharp!postcss-loader!sass-loader?indentedSyntax",
+              use: 'css-loader!svg-fill-loader/encodeSharp!postcss-loader!sass-loader?indentedSyntax',
               fallback: 'vue-style-loader'
             }),
           },
@@ -66,13 +67,13 @@ module.exports = {
         test: /\.sass$/,
         // loader: 'vue-style-loader!css-loader!svg-fill-loader/encodeSharp!sass-loader?indentedSyntax',
         use: cssExtractTextPlugin.extract({
-          use: "css-loader!svg-fill-loader/encodeSharp!postcss-loader!sass-loader?indentedSyntax",
+          use: 'css-loader!svg-fill-loader/encodeSharp!postcss-loader!sass-loader?indentedSyntax',
           fallback: 'vue-style-loader'
         })
       },
       {
         test: /\.scss$/,
-        use: "vue-style-loader!css-loader!svg-fill-loader/encodeSharp!postcss-loader!sass-loader?indentedSyntax",
+        use: 'vue-style-loader!css-loader!svg-fill-loader/encodeSharp!postcss-loader!sass-loader?indentedSyntax',
       },
       {
         test: /\.(png|jpe?g|gif|webp)(\?.*)?$/,
@@ -134,7 +135,7 @@ module.exports = {
       }),
       new HtmlWebpackInlineSourcePlugin(),
       // new webpack.NoErrorsPlugin(),
-    ];
+    ]
     // html
     res = res.concat(config.htmlWebpack)
     // server
@@ -151,6 +152,6 @@ module.exports = {
         // https://github.com/kevlened/copy-webpack-plugin
       )
     }
-    return res;
+    return res
   })(),
 }
