@@ -58,7 +58,7 @@ module.exports = {
   },
   htmlWebpack,
   // variables
-  prefixName: 'tencent_',
+  prefixName: 'fancy_',
   networkRoot: '/v1',
 
   // alias

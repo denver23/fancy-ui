@@ -1,6 +1,6 @@
 {
   "name": "fancy-vue",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "vue2 component libraries",
   "repository": {
     "type": "git",
@@ -8,7 +8,6 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "server": "node build/server.js",
     "dev": "cross-env NODE_ENV=development node build/webpack.js",
     "pro": "cross-env NODE_ENV=production node build/webpack.js",
     "build": "cross-env NODE_ENV=build node build/webpack.js"

@@ -1,13 +1,13 @@
-require('shelljs/global')
 const ora = require('ora')
 const opn = require('opn')
-const path = require('path')
+// const path = require('path')
+const shell = require('shelljs')
 const chalk = require('chalk')
 const express = require('express')
 const webpack = require('webpack')
-const compression = require('compression');
+const compression = require('compression')
 const proxyMiddleware = require('http-proxy-middleware')
-const version = require('./check-versions')()
+require('./check-versions')()
 
 const config = require('./webpack.config')
 const webpackConfig = require('./webpack.base.js')
@@ -15,8 +15,8 @@ const spinner = ora('building for ' + process.env.NODE_ENV + ' ...')
 
 function _clear(path) {
   let directory = `${config.output.path}/${path || '*'}`
-  rm('-rf', directory);
-  path && mkdir('-p', directory);
+  shell.rm('-rf', directory)
+  path && shell.mkdir('-p', directory)
 }
 
 function buildPro() {
@@ -95,16 +95,15 @@ function buildDev() {
     switch (error.code) {
       case 'EACCES':
         console.error(port + ' requires elevated privileges')
-        process.exit(1)
         break
       case 'EADDRINUSE':
         console.error(port + ' is already in use')
-        process.exit(1)
         break
       default:
         throw error
     }
+    process.exit(1)
   })
 }
 
-process.env.NODE_ENV === 'development' ? buildDev() : buildPro();
+process.env.NODE_ENV === 'development' ? buildDev() : buildPro()
