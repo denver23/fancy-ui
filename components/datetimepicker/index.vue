@@ -257,23 +257,22 @@
 // let str = '2012.12-23 23:01:59'
 // let res = str.match(/^(\d{4,4})\D*(\d{1,2})\D+(\d{1,2})\D*(\d{1,2}):(\d{1,2}):(\d{1,2}).*/)
 // function buildCalendar(year = new Date().getFullYear(), month = new Date().getMonth(), validBegin = '', validEnd) {
-function buildCalendar(year, month, validBegin = '', validEnd) {
-  year = parseInt(year)
-  month = parseInt(month)
+function buildCalendar(y, m, validBegin = '', validEnd) {
+  let year = parseInt(y)
+  let month = parseInt(m)
 
   let firstWeekOfMonth = new Date(year, month, 1).getDay()
   let lastDayOfMonth = new Date(year, month + 1, 0).getDate()
   let lastDayOfLastMonth = new Date(year, month, 0).getDate()
 
   let beginTime = Date.parse(validBegin) || 0
-  let endTime = Date.parse(validEnd) || Date.parse('2100.12.30');
-  [beginTime, endTime] = [beginTime, endTime].sort()
+  let endTime = Date.parse(validEnd) || Date.parse('2100.12.30')
+  ;[beginTime, endTime] = [beginTime, endTime].sort()
 
   let row = 0
   let res = []
 
   for (let i = 1; i <= lastDayOfMonth; i++) {
-
     let date = new Date(year, month, i)
     let week = date.getDay()
     let time = Date.parse(date)
@@ -285,7 +284,6 @@ function buildCalendar(year, month, validBegin = '', validEnd) {
     if (!disabled && endTime > 0) {
       disabled = endTime < time
     }
-
     // first week
     if (week == 0) {
       res[row] = []
@@ -295,8 +293,8 @@ function buildCalendar(year, month, validBegin = '', validEnd) {
       let k = lastDayOfLastMonth - firstWeekOfMonth + 1
       for (let j = 0; j < firstWeekOfMonth; j++) {
         res[row].push({
-          year: month > 0 ? year : (year - 1),
-          month: month > 0 ? (month - 1) : 11,
+          year: month > 0 ? year : year - 1,
+          month: month > 0 ? month - 1 : 11,
           day: k,
           prevnext: true,
           disabled: disabled,
@@ -320,8 +318,8 @@ function buildCalendar(year, month, validBegin = '', validEnd) {
       let k = 1
       for (week; week < 6; week++) {
         res[row].push({
-          year: month >= 11 ? (year + 1) : year,
-          month: month >= 11 ? 0 : (month + 1),
+          year: month >= 11 ? year + 1 : year,
+          month: month >= 11 ? 0 : month + 1,
           day: k,
           prevnext: true,
           disabled: disabled,
@@ -333,13 +331,15 @@ function buildCalendar(year, month, validBegin = '', validEnd) {
   return res
 }
 
+const minYear = 1970
+const maxYear = 2100
 const Options = {
   target: '',
   value: Date.now(),
   beginDate: '',
   endDate: '',
-  minYear: 1970,
-  maxYear: 2100,
+  minYear,
+  maxYear,
   today: 'Today',
   weeks: ['Sun', 'Mon', 'Tue', 'Wen', 'Thu', 'Fri', 'Sat'],
   times: ['h', 'm', 's'],
@@ -366,7 +366,7 @@ export default {
   created() {
     let cfg = this.cfg
     Object.keys(Options).forEach(i => cfg.hasOwnProperty(i) || this.$set(cfg, i, Options[i]))
-    this.type = cfg.type || (String(cfg.value).indexOf(":") > 0 ? 'datetime' : 'date')
+    this.type = cfg.type || (String(cfg.value).indexOf(':') > 0 ? 'datetime' : 'date')
     this._getTime(cfg.value)
   },
   mounted() {
@@ -402,10 +402,14 @@ export default {
       if (!this.cfg.target) return false
       let elem = document.querySelector(this.cfg.target)
       let rect = elem ? elem.getBoundingClientRect() : false
-      this.position = rect ? {
-        top: (window.scrollY || window.pageYOffset) + rect.bottom + 'px',
-        left: (window.scrollX || window.pageXOffset) + rect.left + 'px',
-      } : false
+      if (rect) {
+        this.position = {
+          top: (window.scrollY || window.pageYOffset) + rect.bottom + 'px',
+          left: (window.scrollX || window.pageXOffset) + rect.left + 'px',
+        }
+      } else {
+        this.position = false
+      }
     },
     _getTime(value) {
       let date = Date.parse(value) ? new Date(Date.parse(value)) : new Date()
@@ -448,7 +452,7 @@ export default {
       this.day = t.getDate()
     },
     _yearChange(n) {
-      this.year = Math.min(Math.max(this.year + n, this.cfg.minYear), this.cfg.maxYear)
+      this.year = Math.min(Math.max(this.year + n, this.cfg.minYear || minYear), this.cfg.maxYear || maxYear)
     },
     _monthChange(n) {
       let newmonth = this.month + n
@@ -511,7 +515,7 @@ export default {
         this.cfg.onSelect(res)
       }
     },
-  }
+  },
 }
 </script>
 

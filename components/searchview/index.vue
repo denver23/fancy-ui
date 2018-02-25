@@ -1,8 +1,6 @@
 <!-- 即时搜索 -->
 <style lang="sass">
   @import "~fancy_style"
-
-
   .fancy-searchview
     position: relative
     z-index: 900
@@ -60,7 +58,7 @@
 </style>
 
 <template lang="pug">
-  div(v-if="cfg" class="fancy-searchview" @click.stop="")
+  .fancy-searchview(@click.stop="")
     input(
       type="text"
       name="{{name}}"
@@ -69,11 +67,6 @@
       @focus="onFocus()"
       @keydown.enter.stop="onEnter()"
       @keydown="onKeyup($event)"
-    )
-    input(
-      type="hidden"
-      name="{{id}}"
-      v-model="id"
     )
     template(v-if="typeof data === 'object'")
       ul(v-if="data.length > 0" v-el:ul)
@@ -88,54 +81,51 @@
 </template>
 
 <script>
-import Util from 'lib/util'
-import City from 'lib/city'
-
 const Options = {
-  id: 'id',             // id表单
-  name: 'name',           // name表单
-  url: '',               // ajax url
+  id: 'id', // id表单
+  name: 'name', // name表单
+  url: '', // ajax url
   empty: '无相关搜索结果',
   placeholder: '输入关键字',
-  storageName: '',               // 本地存储 名称
-  storageNum: 10,               // 本地存储 数量
-  tarElem: '',               // 目标元素
+  storageName: '', // 本地存储 名称
+  storageNum: 10, // 本地存储 数量
+  tarElem: '', // 目标元素
 }
 
 export default {
   props: ['cfg'],
-  data: () => Object.assign({}, Options, {
-    id: '',
-    txt: '',
-    data: false,           // 结果数据
-    city: City.getByID,    // 城市
-    index: 0,               // 键盘操作时的索引
-  }),
+  data() {
+    return {
+      id: '',
+      txt: '',
+      data: false, // 结果数据
+      index: 0, // 键盘操作时的索引
+    }
+  },
   created() {
     this.ajaxTimer = null
+    let cfg = this.cfg
+    Object.keys(Options).forEach(i => cfg.hasOwnProperty(i) || this.$set(cfg, i, Options[i]))
   },
   mounted() {
-    this.cfg && Object.assign(this.$data, this.cfg)
   },
   watch: {
     cfg: {
       handler(val) {
         Object.assign(this.$data, val)
       },
-      deep: true
+      deep: true,
     },
     tarElem(val) {
       val && this.$appendTo(val)
     },
     data(val) {
-      typeof val === 'object'
-        ? document.addEventListener('click', this.onClick)
-        : document.removeEventListener('click', this.onClick)
+      typeof val === 'object' ? document.addEventListener('click', this.onClick) : document.removeEventListener('click', this.onClick)
     },
   },
   filters: {
     highlight(str) {
-      return this.txt ? str.replace(new RegExp(this.txt, "ig"), '<em>' + this.txt + '</em>') : str
+      return this.txt ? str.replace(new RegExp(this.txt, 'ig'), '<em>' + this.txt + '</em>') : str
     },
   },
   methods: {
@@ -144,17 +134,20 @@ export default {
       this.data = false
     },
     onFocus() {
-      let storage = this.storageName
-      this.data = storage ? (Util.storage.get(storage) || false) : false
+      // let storage = this.storageName
+      // this.data = storage ? Util.storage.get(storage) || false : false
     },
     onEnter() {
-      $(this.$els.ul).find('li').eq(this.index).trigger('click')
+      $(this.$els.ul)
+        .find('li')
+        .eq(this.index)
+        .trigger('click')
     },
     onKeyup(e) {
       let self = this
       // 回车键
       if (e.keyCode == 13) return
-      //上下键移动
+      // 上下键移动
       if (e.keyCode == 38 || e.keyCode == 40) {
         let len = self.data.length
         if (len == 0) return
@@ -165,7 +158,7 @@ export default {
           self.index = 0
         }
         // 滚动效果不好
-        //$(self.$els.ul).children().eq( self.index )[0].scrollIntoView(true)
+        // $(self.$els.ul).children().eq( self.index )[0].scrollIntoView(true)
       } else {
         clearTimeout(self.ajaxTimer)
         self.ajaxTimer = setTimeout(() => {
@@ -174,7 +167,6 @@ export default {
       }
     },
     onSelect(v) {
-
       this.txt = v.name
       this.id = v.id
       this.data = false
@@ -193,11 +185,7 @@ export default {
     },
     getData(keywords, type) {
       let self = this
-      if (!self.url) {
-        DEBUG && console.log('url not empty')
-        return
-      }
-
+      if (!self.url) return
       if (keywords.length == 0) {
         self.data = false
         return
@@ -206,7 +194,7 @@ export default {
       $.ajax({
         url: self.url,
         data: {
-          keywords: keywords
+          keywords: keywords,
         },
         type: 'post',
         dataType: 'json',
@@ -217,11 +205,10 @@ export default {
           } else {
             self.data = false
           }
-        }
+        },
       })
-    }
+    },
   },
-
 }
 </script>
 

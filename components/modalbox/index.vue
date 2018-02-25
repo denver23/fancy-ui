@@ -144,22 +144,71 @@
 </template>
 
 <script>
-import Drag from 'lib/drag'
-import { setTimeout } from 'timers'
+const Drag = {
+  obj: null,
+  init(o, oRoot, minX, maxX, minY, maxY) {
+    o.onmousedown = Drag.start
+    o.root = oRoot && oRoot != null ? oRoot : o
+  },
+  start(event) {
+    let o = (Drag.obj = this)
+    let e = Drag.fixE(event)
+    if (!o.root.style.top || o.root.style.top.indexOf('%') >= 0) o.root.style.top = o.root.offsetTop + 'px'
+    if (!o.root.style.left || o.root.style.left.indexOf('%') >= 0) o.root.style.left = o.root.offsetLeft + 'px'
+    // let y = parseInt(o.root.style.top)
+    // let x = parseInt(o.root.style.left)
+    o.lastMouseX = e.clientX
+    o.lastMouseY = e.clientY
+
+    document.onmousemove = Drag.drag
+    document.onmouseup = Drag.end
+    return false
+  },
+  drag(event) {
+    let e = Drag.fixE(event)
+    let o = Drag.obj
+    let ey = e.clientY
+    let ex = e.clientX
+    let y = parseInt(o.root.style.top)
+    let x = parseInt(o.root.style.left)
+    let nx, ny
+
+    nx = x + ex - o.lastMouseX
+    ny = y + ey - o.lastMouseY
+
+    Drag.obj.root.style.left = nx + 'px'
+    Drag.obj.root.style.top = ny + 'px'
+    Drag.obj.lastMouseX = ex
+    Drag.obj.lastMouseY = ey
+    return false
+  },
+  end() {
+    document.onmousemove = null
+    document.onmouseup = null
+    Drag.obj = null
+  },
+  fixE(event) {
+    let e = event || window.event
+    if (typeof e.layerX == 'undefined') e.layerX = e.offsetX
+    if (typeof e.layerY == 'undefined') e.layerY = e.offsetY
+    return e
+  },
+}
 
 const Options = {
   title: '',
   content: '',
   confirm: 'confirm',
   cancel: 'cancel',
-  tips: '',
   component: '', // component组件
+  tips: '',
 
   overlay: true,
   draggable: true,
   onComplete(el) {},
   onConfirm(el) {},
   onCancel() {},
+  __name: 'modalbox',
 }
 
 export default {
@@ -200,7 +249,12 @@ export default {
       if (this.sending) return
       this.sending = type
       try {
-        type ? await this.cfg.onConfirm(this.$el) : await this.cfg.onCancel()
+        if (type) {
+          await this.cfg.onConfirm(this.$el)
+        } else {
+          await this.cfg.onCancel()
+          this.cfg.__name && (this.$parent[this.cfg.__name] = false)
+        }
       } catch (e) {}
       this.sending = false
     },
