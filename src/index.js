@@ -22,6 +22,7 @@ new Vue({
     'confirm': resolve => require(['./views/confirm'], resolve),
     'datetimepicker': resolve => require(['./views/datetimepicker'], resolve),
     'tree': resolve => require(['./views/tree'], resolve),
+    'searchview': resolve => require(['./views/searchview'], resolve),
   },
   mounted() {
     let self = this
@@ -29,14 +30,14 @@ new Vue({
       return window.location.pathname.split('/').slice(1, 3).filter(v => !!v).join('/')
     }
     function _toggle(name) {
-      self.appview = name || 'tree'
+      self.appview = name || 'searchview'
       window.history.pushState({ 'title': '' }, '', `/${name}`)
     }
     window.addEventListener('popstate', e => {
-      this.appview = _getRouter() || 'tree'
+      this.appview = _getRouter() || 'searchview'
     })
 
-    this.appview = _getRouter() || 'tree'
+    this.appview = _getRouter() || 'searchview'
     this.sidebar = {
       data: [
         {

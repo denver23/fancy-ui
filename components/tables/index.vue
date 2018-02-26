@@ -218,10 +218,9 @@ export default {
   },
   created() {
     let cfg = this.cfg
-    Object.keys(Options).forEach(
-      i => cfg.hasOwnProperty(i) || this.$set(cfg, i, Options[i]),
-    )
-    cfg.columns && cfg.columns.forEach((v, k) => {
+    Object.keys(Options).forEach(i => cfg.hasOwnProperty(i) || this.$set(cfg, i, Options[i]))
+    cfg.columns &&
+      cfg.columns.forEach((v, k) => {
         v.label === 'checkbox' && this.$set(this.modelAll, v.field, false)
       })
     cfg.onCreated && cfg.onCreated.call(this)
@@ -251,10 +250,7 @@ export default {
       this.modelAll[key] && this.cfg.data.forEach(v => arr.push(v[key]))
     },
     _onChk(key, item) {
-      this.modelAll[key] =
-        this.cfg.values[key] &&
-        this.cfg.values[key].includes(item[key]) &&
-        this.cfg.values[key].length === this.cfg.data.length
+      this.modelAll[key] = this.cfg.values[key] && this.cfg.values[key].includes(item[key]) && this.cfg.values[key].length === this.cfg.data.length
     },
   },
 }

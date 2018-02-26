@@ -1,15 +1,29 @@
 <!-- 即时搜索 -->
 <style lang="sass">
   @import "~fancy_style"
+
   .fancy-searchview
     position: relative
     z-index: 900
+    input
+      display: inline-block
+      height: $form-height
+      padding: 0 $space
+      margin-right: $space
+      min-width: 20rem
+      color: $colorFont
+      border: 1px solid $borderColor
+      -webkit-appearance: none
+      border-radius: 0
+      &:focus
+        border: 1px solid $colorAlerm
+        outline: none
     > div,
     > ul
       position: absolute
       left: 0
       top: $form-height
-      width: 30rem
+      min-width: 20rem
       max-height: 20rem
       overflow-y: auto
       border: 1px solid $borderColor
@@ -58,35 +72,34 @@
 </style>
 
 <template lang="pug">
-  .fancy-searchview(@click.stop="")
+  .fancy-searchview
     input(
-      type="text"
-      name="{{name}}"
-      placeholder="{{placeholder}}"
+      ref="inp"
+      v-bind="cfg.inputAttr"
       v-model="txt"
       @focus="onFocus()"
-      @keydown.enter.stop="onEnter()"
-      @keydown="onKeyup($event)"
+      @keyup="_kup($event)"
+      @keydown="_kdown($event)"
     )
-    template(v-if="typeof data === 'object'")
-      ul(v-if="data.length > 0" v-el:ul)
-        li(
-          v-for="(key,v) in data"
-          @click="onSelect(v)"
-          v-bind:class="{'fc-active': key == index}"
-        )
-          strong(v-html="v.name | highlight")
-          span(v-text="city(v.cityid).name")
-      div(v-else v-text="empty")
+    ul(ref="list" v-if="cfg.data && cfg.data.length > 0")
+      li(
+        v-for="(v,index) of cfg.data"
+        @click="onSelect(v)"
+        ,:class="{'fc-active': index == selectIndex}"
+      )
+        strong(v-html="$options.filters.highlight(v.name, txt)")
+    div(v-else v-text="empty")
 </template>
 
 <script>
 const Options = {
-  id: 'id', // id表单
-  name: 'name', // name表单
-  url: '', // ajax url
+  inputAttr: {
+    name: 'name',
+    type: 'text',
+    placeholder: 'Please keyword',
+  },
+  fetchUrl: '',
   empty: '无相关搜索结果',
-  placeholder: '输入关键字',
   storageName: '', // 本地存储 名称
   storageNum: 10, // 本地存储 数量
   tarElem: '', // 目标元素
@@ -96,38 +109,22 @@ export default {
   props: ['cfg'],
   data() {
     return {
-      id: '',
       txt: '',
-      data: false, // 结果数据
-      index: 0, // 键盘操作时的索引
+      selectIndex: 0, // 键盘操作时的索引
     }
   },
   created() {
     this.ajaxTimer = null
-    let cfg = this.cfg
-    Object.keys(Options).forEach(i => cfg.hasOwnProperty(i) || this.$set(cfg, i, Options[i]))
-  },
-  mounted() {
-  },
-  watch: {
-    cfg: {
-      handler(val) {
-        Object.assign(this.$data, val)
-      },
-      deep: true,
-    },
-    tarElem(val) {
-      val && this.$appendTo(val)
-    },
-    data(val) {
-      typeof val === 'object' ? document.addEventListener('click', this.onClick) : document.removeEventListener('click', this.onClick)
-    },
+    Object.keys(Options).forEach(i => this.cfg.hasOwnProperty(i) || this.$set(this.cfg, i, Options[i]))
+    // document.addEventListener('click', this.onClick) : document.removeEventListener('click', this.onClick)
+    // this.txt ? str.replace(new RegExp(this.txt, 'ig'), '<em>' + this.txt + '</em>') : str
   },
   filters: {
-    highlight(str) {
-      return this.txt ? str.replace(new RegExp(this.txt, 'ig'), '<em>' + this.txt + '</em>') : str
+    highlight(str, txt) {
+      return txt ? str.replace(new RegExp(txt, 'ig'), '<em>' + txt + '</em>') : str
     },
   },
+  mounted() {},
   methods: {
     onClick(e) {
       e.stopPropagation()
@@ -137,32 +134,36 @@ export default {
       // let storage = this.storageName
       // this.data = storage ? Util.storage.get(storage) || false : false
     },
-    onEnter() {
-      $(this.$els.ul)
-        .find('li')
-        .eq(this.index)
-        .trigger('click')
+    _kdown(e) {
+      e.preventDefault()
+      e.stopPropagation()
+      // $(this.$els.ul)
+      //   .find('li')
+      //   .eq(this.index)
+      //   .trigger('click')
     },
-    onKeyup(e) {
+    _kup(e) {
+      e.preventDefault()
+      e.stopPropagation()
+
       let self = this
-      // 回车键
+      // enter
       if (e.keyCode == 13) return
-      // 上下键移动
+      // up down key
       if (e.keyCode == 38 || e.keyCode == 40) {
-        let len = self.data.length
+        let len = this.cfg.data.length
         if (len == 0) return
-        self.index += e.keyCode == 40 ? 1 : -1
-        if (self.index < 0) {
-          self.index = len - 1
-        } else if (self.index >= len) {
-          self.index = 0
+        this.selectIndex += e.keyCode == 40 ? 1 : -1
+        if (this.selectIndex < 0) {
+          this.selectIndex = len - 1
+        } else if (this.selectIndex >= len) {
+          this.selectIndex = 0
         }
-        // 滚动效果不好
-        // $(self.$els.ul).children().eq( self.index )[0].scrollIntoView(true)
+        this.$refs.list.children[this.selectIndex].scrollIntoView(false)
       } else {
-        clearTimeout(self.ajaxTimer)
-        self.ajaxTimer = setTimeout(() => {
-          self.getData(self.txt)
+        clearTimeout(this.ajaxTimer)
+        this.ajaxTimer = setTimeout(() => {
+          this.getData(self.txt)
         }, 300)
       }
     },

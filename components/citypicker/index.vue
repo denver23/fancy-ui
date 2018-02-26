@@ -94,13 +94,11 @@
 </template>
 
 <script>
-
   import City from './city.js'
-
   const Options = {
-    value: '',  //cityid
+    value: '',
     maxLevel: 2,
-    onSelect(cityid, cityname, path) {console.log(cityid)},
+    onSelect(cityid, cityname, path) {},
     __name: 'citypicker',
   }
   export default {
@@ -129,7 +127,6 @@
       },
       children() {
         let id = 0
-        let fid = 0
         let level = this.level
         let getChild = function(fid) {
           let arr = []
@@ -151,14 +148,9 @@
           }
           return arr
         }
-        level && ({
-          id,
-          fid
-        } = this.breadcrumbs[level - 1])
+        level && ({id} = this.breadcrumbs[level - 1])
         // 直辖市 或 最后一级
-        return (City.zxs.indexOf(id) >= 0 || (level > 0 && level == this.cfg.maxLevel)) ?
-          [] :
-          getChild(id)
+        return (City.zxs.indexOf(id) >= 0 || (level > 0 && level == this.cfg.maxLevel)) ? [] : getChild(id)
       },
     },
     methods: {
