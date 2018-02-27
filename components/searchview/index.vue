@@ -105,7 +105,7 @@ export default {
   data() {
     return {
       show: false,
-      selectIndex: -1,
+      selectIndex: 0,
     }
   },
   created() {
