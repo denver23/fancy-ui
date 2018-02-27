@@ -70,7 +70,8 @@
   .fancy-searchview
     input(
       ref="inp"
-      v-bind="cfg.input"
+      type="text"
+      v-bind="[cfg.attr]"
       v-model="cfg.value"
       @focus="_focus($event)"
       @blur="_blur()"
@@ -86,19 +87,15 @@
           @click="_choose(v)"
         )
           span(v-html="$options.filters.highlight(v.name, cfg.value)")
-      div(v-else v-text="empty")
+      div(v-else v-text="cfg.empty")
 </template>
 
 <script>
 const Options = {
-  input: {
-    name: 'name',
-    type: 'text',
-    placeholder: 'Please keyword',
-  },
+  attr: {},
   data: '',
   value: '',
-  empty: '无相关搜索结果',
+  empty: '',
   onChange() {},
   onChoose: item => console.log(item),
 }
@@ -108,7 +105,7 @@ export default {
   data() {
     return {
       show: false,
-      selectIndex: 0,
+      selectIndex: -1,
     }
   },
   created() {
@@ -129,7 +126,6 @@ export default {
   methods: {
     _focus(e) {
       e.preventDefault()
-      e.stopPropagation()
       this.show = true
     },
     _blur() {
@@ -164,10 +160,11 @@ export default {
         }
         this.$refs.list.children[this.selectIndex].scrollIntoView(false)
       } else {
-        this.onChange(this.cfg.value)
+        this.cfg.onChange.call(this, this.cfg.value)
       }
     },
     _choose(v) {
+      if (this.selectIndex < 0) return
       let item = v || this.cfg.data[this.selectIndex]
       this.cfg.onChoose(item)
       this.show = false
