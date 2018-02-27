@@ -325,13 +325,13 @@
 </template>
 
 <script>
-
 function getQueryAll() {
   let res = {}
   let str = window.location.search.substr(1)
-  str != null && str.replace(/([^=&]+)=([^&]*)/g, (all, key, value) => {
-    value && (res[key] = decodeURIComponent(value))
-  })
+  str != null &&
+    str.replace(/([^=&]+)=([^&]*)/g, (all, key, value) => {
+      value && (res[key] = decodeURIComponent(value))
+    })
   return res
 }
 
@@ -341,10 +341,10 @@ const Options = {
   type: '', // search column forms
   value: {},
   pushstate: false, // object
-  onReset() { },
-  onReady(data, form) { },
-  onSubmit(data, form) { },
-  onPopstate(data, form) { },
+  onReset() {},
+  onReady(data, form) {},
+  onSubmit(data, form) {},
+  onPopstate(data, form) {},
   validator: false,
 }
 
@@ -364,39 +364,43 @@ export default {
 
     if (cfg.type === 'search') {
       Object.assign(cfg.value, getQueryAll())
-      typeof cfg.onPopstate === 'function' && window.addEventListener('popstate', e => {
-        Object.assign(cfg.value, getQueryAll())
-        cfg.onPopstate(cfg.value, this.$refs.form)
-      })
+      typeof cfg.onPopstate === 'function' &&
+        window.addEventListener('popstate', e => {
+          Object.assign(cfg.value, getQueryAll())
+          cfg.onPopstate(cfg.value, this.$refs.form)
+        })
     }
     // validator and submit
-    cfg.data && cfg.data.forEach(val => (Array.isArray(val) ? val : [val]).forEach(v => {
-      if (v.type === 'submit') {
-        this.submitName = v.name || '_submit_'
-        this.$set(this.tips, this.submitName, '')
-        this.$set(v, 'name', this.submitName)
-      } else if (v.name && !['reset', 'button', 'component'].includes(v.type)) {
-        this.$set(this.tips, v.name, '')
-        this.$set(cfg.value, v.name, (v.name in cfg.value) ? cfg.value[v.name] : (v.value || ''))
-        // set checkAll
-        if (v.type === 'checkbox' && v.checkAll) {
-          let _chked = true
-          for (let _chk of v.data) {
-            if (!cfg.value[v.name].includes(_chk.value)) {
-              _chked = false
-              break
+    cfg.data &&
+      cfg.data.forEach(val =>
+        (Array.isArray(val) ? val : [val]).forEach(v => {
+          if (v.type === 'submit') {
+            this.submitName = v.name || '_submit_'
+            this.$set(this.tips, this.submitName, '')
+            this.$set(v, 'name', this.submitName)
+          } else if (v.name && !['reset', 'button', 'component'].includes(v.type)) {
+            this.$set(this.tips, v.name, '')
+            this.$set(cfg.value, v.name, v.name in cfg.value ? cfg.value[v.name] : v.value || '')
+            // set checkAll
+            if (v.type === 'checkbox' && v.checkAll) {
+              let _chked = true
+              for (let _chk of v.data) {
+                if (!cfg.value[v.name].includes(_chk.value)) {
+                  _chked = false
+                  break
+                }
+              }
+              this.checkAll[v.name] = _chked
             }
           }
-          this.checkAll[v.name] = _chked
-        }
-      }
-    }))
+        }),
+      )
   },
   mounted() {
     requestAnimationFrame(() => {
       let cfg = this.cfg
       if (typeof cfg.onReady === 'function') {
-        cfg.onReady.call(this, cfg.value,this.$refs.form)
+        cfg.onReady.call(this, cfg.value, this.$refs.form)
       }
       if (typeof cfg.onReset === 'function') {
         let inp = this.$el.querySelector('input[type="reset"]')
@@ -408,10 +412,17 @@ export default {
     'cfg.pushstate'(val) {
       if (typeof val === 'object') {
         let url = window.location.href.split('?')[0]
-        let param = Object.entries(val).map(v => v[1] && v.join('=')).filter(v => v).join('&')
-        window.history.pushState({
-          'title': ''
-        }, '', `${url}?${param}`)
+        let param = Object.entries(val)
+          .map(v => v[1] && v.join('='))
+          .filter(v => v)
+          .join('&')
+        window.history.pushState(
+          {
+            title: '',
+          },
+          '',
+          `${url}?${param}`,
+        )
       }
     },
   },
@@ -463,7 +474,7 @@ export default {
       if (this.sending) return
       this.sending = true
       try {
-        cfg.onSubmit && await cfg.onSubmit.call(this, cfg.value, this.$refs.form )
+        cfg.onSubmit && (await cfg.onSubmit.call(this, cfg.value, this.$refs.form))
       } catch (err) {
         this.tips[this.submitName] = err
       }

@@ -1,6 +1,5 @@
 <style lang="sass">
   @import "~fancy_style"
-
   .fancy-message
     padding: $space * 4
     .fc-status
@@ -38,9 +37,9 @@
 </template>
 
 <script>
-
 const Options = {
-  status: 'success', // error | success | question | info | alert
+  // error | success | question | info | alert
+  status: 'success',
   content: '',
   url: 'back',
   time: -1, // millisecond <0: no jump
@@ -49,7 +48,7 @@ export default {
   props: ['cfg'],
   created() {
     Object.keys(Options).forEach(i => {
-      (i in this.cfg) || this.$set(this.cfg, i, Options[i])
+      i in this.cfg || this.$set(this.cfg, i, Options[i])
     })
   },
   mounted() {
@@ -57,15 +56,15 @@ export default {
   },
   methods: {
     jump(time, url) {
-      time = parseInt(time)
-      if (time >= 0 && url) {
+      let t = parseInt(time)
+      if (t >= 0 && url) {
         setTimeout(() => {
           if (typeof url === 'function') return url()
           if (url === 'back') return window.history.back()
           url === 'close' ? window.close() : (window.location = url)
-        }, time)
+        }, t)
       }
-    }
+    },
   },
 }
 </script>
