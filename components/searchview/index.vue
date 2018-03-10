@@ -168,7 +168,6 @@ export default {
       let item = v || this.cfg.data[this.selectIndex]
       this.cfg.onChoose(item)
       this.show = false
-      this.cfg.value = item.name
     },
   },
 }
