@@ -300,8 +300,8 @@
                 label(v-if="v.checkAll")
                   input(
                     type="checkbox",
-                    ,:name="v.name",
-                    ,:value="v.checkAll.value"
+                    :name="v.name",
+                    :value="v.checkAll.value"
                     v-model="checkAll[v.name]"
                     @click="_onChkAll(v)"
                   )
