@@ -266,7 +266,8 @@
 
               input(
                 v-else-if="['number','tel', 'password','hidden'].includes(v.type)"
-                v-bind="[{type: v.type, name: v.name, value: v.value, id: v.id || v.name}, v.attr]"
+                v-bind="[{name: v.name, value: v.value, id: v.id || v.name}, v.attr]"
+                ,:type="v.type"
                 v-model="cfg.value[v.name]"
               )
 
@@ -300,8 +301,8 @@
                 label(v-if="v.checkAll")
                   input(
                     type="checkbox",
-                    :name="v.name",
-                    :value="v.checkAll.value"
+                    ,:name="v.name"
+                    ,:value="v.checkAll.value"
                     v-model="checkAll[v.name]"
                     @click="_onChkAll(v)"
                   )
