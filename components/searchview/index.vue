@@ -29,6 +29,8 @@
       border: 1px solid $borderColor
       background: #fff
       margin-top: 1px
+      &:empty
+        display: none
     li
       cursor: pointer
       display: block
@@ -118,7 +120,7 @@ export default {
     show(val) {
       if (val && this.cfg.value && this.cfg.data) {
         let index = this.cfg.data.findIndex(v => v.name === this.cfg.value)
-        requestAnimationFrame(() => this.$refs.list.children[index].scrollIntoView(false))
+        index >= 0 && requestAnimationFrame(() => this.$refs.list.children[index].scrollIntoView(false))
       }
     },
   },
