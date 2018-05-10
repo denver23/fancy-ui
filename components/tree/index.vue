@@ -151,16 +151,8 @@ const Options = {
   onClick: (item, parent) => true,
   onCreate: (item, parent, isCreate) => true,
   onEdit: (item, parent, isCreate) => true,
-  onSubmit(value, item, parent) {
-    return new Promise(resolve => {
-      setTimeout(() => resolve(), 1000)
-    })
-  },
-  onRemove(item, parent) {
-    return new Promise(resolve => {
-      setTimeout(() => resolve(), 1000)
-    })
-  },
+  onSubmit: (value, item, parent, cb) => cb(),
+  onRemove: (item, parent, cb) => cb(),
 }
 
 export default {
@@ -226,7 +218,7 @@ export default {
         })
       }
     },
-    _submit: async function(event, index, item) {
+    _submit(event, index, item) {
       let parent = this.tree || this.cfg
       let newVal = event.target.value
       let oldVal = item[this.cfg.field]
@@ -236,19 +228,20 @@ export default {
         this.editIndex = false
         return
       }
-      try {
-        await this.cfg.onSubmit(newVal, item, parent)
-        item[this.cfg.field] = newVal
-      } catch (e) {
-        oldVal || this.data.splice(index, 1)
+
+      let cb = err => {
+        if (err) {
+          oldVal || this.data.splice(index, 1)
+        } else {
+          item[this.cfg.field] = newVal
+        }
+        this.editIndex = false
       }
-      this.editIndex = false
+      typeof this.cfg.onSubmit === 'function' ? this.cfg.onSubmit(newVal, cb, item, parent) : cb()
     },
-    _remove: async function(index, item) {
-      try {
-        await this.cfg.onRemove(item, this.tree || this.cfg)
-        this.data.splice(index, 1)
-      } catch (e) {}
+    _remove(index, item) {
+      let cb = err => (err ? false : this.data.splice(index, 1))
+      typeof this.cfg.onRemove === 'function' ? this.cfg.onRemove(item, cb, this.tree || this.cfg) : cb()
     },
   },
 }
