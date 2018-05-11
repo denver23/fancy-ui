@@ -149,9 +149,9 @@ const Options = {
   removeBtn: true,
   placeholder: '',
   onClick: (item, parent) => true,
-  onCreate: (item, parent, isCreate) => true,
+  onCreate: ({ item = {}, parent = {} }, cb) => cb(),
   onEdit: (item, parent, isCreate) => true,
-  onSubmit: (value, item, parent, cb) => cb(),
+  onSubmit: ({ value = '', item = {}, parent = {} }, cb) => cb(),
   onRemove: (item, parent, cb) => cb(),
 }
 
@@ -166,13 +166,11 @@ export default {
     }
   },
   created() {
-    typeof this.treelevel === 'undefined' &&
-      Object.keys(Options).forEach(i => {
-        i in this.cfg || this.$set(this.cfg, i, Options[i])
-      })
+    let cfg = this.cfg
+    typeof this.treelevel === 'undefined' && Object.keys(Options).forEach(i => cfg.hasOwnProperty(i) || this.$set(cfg, i, Options[i]))
 
-    this.data = (this.tree && this.tree.data) || this.cfg.data
-    this.maxLevel = this.treeMaxLevel || this.cfg.maxLevel
+    this.data = (this.tree && this.tree.data) || cfg.data
+    this.maxLevel = this.treeMaxLevel || cfg.maxLevel
     this.data.forEach(v => this.$set(v, 'folded', typeof v.folded === 'undefined' ? false : v.folded))
   },
   methods: {
@@ -194,14 +192,16 @@ export default {
       newItem.data = []
 
       parent.data.push(newItem)
-      let ispure = this.cfg.onCreate(newItem, parent, true)
-      if (ispure) {
+      let cb = err => {
+        if (err) return parent.data.pop()
+
         newItem['__disabled'] = false
         requestAnimationFrame(() => {
           let inp = event.target.parentNode.parentNode.nextElementSibling.querySelector(':scope > ul > li:last-child').querySelector('input[type="text"]')
           inp && inp.focus()
         })
       }
+      typeof this.cfg.onCreate === 'function' ? this.cfg.onCreate({ item: newItem, parent }, cb) : cb()
     },
     _edit(event, index, item, element) {
       let elem = element || event.target
@@ -220,10 +220,10 @@ export default {
     },
     _submit(event, index, item) {
       let parent = this.tree || this.cfg
-      let newVal = event.target.value
+      let value = event.target.value
       let oldVal = item[this.cfg.field]
 
-      if (!newVal || newVal === oldVal) {
+      if (!value || value === oldVal) {
         oldVal || this.data.splice(index, 1)
         this.editIndex = false
         return
@@ -233,11 +233,12 @@ export default {
         if (err) {
           oldVal || this.data.splice(index, 1)
         } else {
-          item[this.cfg.field] = newVal
+          item[this.cfg.field] = value
         }
         this.editIndex = false
       }
-      typeof this.cfg.onSubmit === 'function' ? this.cfg.onSubmit(newVal, cb, item, parent) : cb()
+      let data = { value, item, parent }
+      typeof this.cfg.onSubmit === 'function' ? this.cfg.onSubmit(data, cb) : cb()
     },
     _remove(index, item) {
       let cb = err => (err ? false : this.data.splice(index, 1))
