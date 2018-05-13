@@ -202,7 +202,7 @@ const Options = {
   cancel: 'cancel',
   component: '', // component组件
   tips: '',
-
+  style: null,
   overlay: true,
   draggable: true,
   onComplete(el) {},

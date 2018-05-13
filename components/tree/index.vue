@@ -128,7 +128,7 @@
 
           .fc-tool
             em.fc-pencil(v-if="cfg.editBtn && v.editBtn !== false" @click="_edit($event, index, v)")
-            em.fc-plus(v-if="cfg.insertBtn && v[cfg.field] && cfg.maxLevel > (treelevel || 0)" @click="_add($event, index, v)")
+            em.fc-plus(v-if="cfg.insertBtn && v[cfg.field] && cfg.maxLevel > (treelevel || 0)" @click="_create($event, index, v)")
             em.fc-trash(v-if="cfg.removeBtn && (!v.data || !v.data.length)" @click="_remove(index, v)")
         treeview(
           v-if="v.data && v.data.length && (treelevel || 0) < cfg.maxLevel"
@@ -149,10 +149,10 @@ const Options = {
   removeBtn: true,
   placeholder: '',
   onClick: (item, parent) => true,
+  onEdit: ({ item = {}, parent = {} }) => true,
   onCreate: ({ item = {}, parent = {} }, cb) => cb(),
-  onEdit: (item, parent, isCreate) => true,
-  onSubmit: ({ value = '', item = {}, parent = {} }, cb) => cb(),
-  onRemove: (item, parent, cb) => cb(),
+  onSubmit: ({ item = {}, parent = {}, value = '' }, cb) => cb(),
+  onRemove: ({ item = {}, parent = {} }, cb) => cb(),
 }
 
 export default {
@@ -181,7 +181,7 @@ export default {
       res ? this._edit(event, index, item, elem) : this._toggle(item)
     },
 
-    _add(event, index, parent) {
+    _create(event, index, parent) {
       // parent folded
       this.$set(this.data[index], 'folded', false)
       parent.data || this.$set(this.data[index], 'data', [])
@@ -197,16 +197,20 @@ export default {
 
         newItem['__disabled'] = false
         requestAnimationFrame(() => {
-          let inp = event.target.parentNode.parentNode.nextElementSibling.querySelector(':scope > ul > li:last-child').querySelector('input[type="text"]')
+          let node = event.target.parentNode.parentNode.nextElementSibling
+          let inp = node.querySelector(':scope > ul > li:last-child').querySelector('input[type="text"]')
           inp && inp.focus()
         })
       }
-      typeof this.cfg.onCreate === 'function' ? this.cfg.onCreate({ item: newItem, parent }, cb) : cb()
+      if (typeof this.cfg.onCreate === 'function') {
+        return this.cfg.onCreate({ item: newItem, parent }, cb)
+      }
+      return cb()
     },
     _edit(event, index, item, element) {
       let elem = element || event.target
       let parent = this.tree || this.cfg
-      let ispure = this.cfg.onEdit(item, parent, false)
+      let ispure = this.cfg.onEdit({ item, parent })
       if (ispure) {
         this.editIndex = index
         requestAnimationFrame(() => {
@@ -237,12 +241,17 @@ export default {
         }
         this.editIndex = false
       }
-      let data = { value, item, parent }
-      typeof this.cfg.onSubmit === 'function' ? this.cfg.onSubmit(data, cb) : cb()
+      if (typeof this.cfg.onSubmit === 'function') {
+        return this.cfg.onSubmit({ value, item, parent }, cb)
+      }
+      return cb()
     },
     _remove(index, item) {
       let cb = err => (err ? false : this.data.splice(index, 1))
-      typeof this.cfg.onRemove === 'function' ? this.cfg.onRemove(item, cb, this.tree || this.cfg) : cb()
+      if (typeof this.cfg.onRemove === 'function') {
+        return this.cfg.onRemove({ item, parent: this.tree || this.cfg }, cb)
+      }
+      return cb()
     },
   },
 }
