@@ -149,7 +149,7 @@ const Options = {
   removeBtn: true,
   placeholder: '',
   onClick: (item, parent) => true,
-  onEdit: ({ item = {}, parent = {} }) => true,
+  onEdit: ({ item = {}, parent = {} }, cb) => cb(),
   onCreate: ({ item = {}, parent = {} }, cb) => cb(),
   onSubmit: ({ item = {}, parent = {}, value = '' }, cb) => cb(),
   onRemove: ({ item = {}, parent = {} }, cb) => cb(),
@@ -210,8 +210,7 @@ export default {
     _edit(event, index, item, element) {
       let elem = element || event.target
       let parent = this.tree || this.cfg
-      let ispure = this.cfg.onEdit({ item, parent })
-      if (ispure) {
+      let cb = () => {
         this.editIndex = index
         requestAnimationFrame(() => {
           let inp = elem.parentNode.parentNode.querySelector('.fc-name > input[type="text"]')
@@ -221,6 +220,10 @@ export default {
           }
         })
       }
+      if (typeof this.cfg.onEdit === 'function') {
+        return this.cfg.onEdit({ item, parent }, cb)
+      }
+      return cb()
     },
     _submit(event, index, item) {
       let parent = this.tree || this.cfg
