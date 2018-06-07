@@ -16,7 +16,7 @@ var htmlWebpack = [
   // https://github.com/jantimon/html-webpack-plugin/issues/218
   new HtmlWebpackPlugin({
     data: {
-      title: 'fancy-vue demo',
+      title: 'fancy-ui demo',
     },
     filename: 'index.html',
     template: './src/index.pug',
