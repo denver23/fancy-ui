@@ -1,3 +1,46 @@
+<template lang="pug">
+  .fancy-notice(
+    :style="{'animation-duration': cfg.duration,'animation-delay': cfg.delay}"
+    v-if="cfg.message"
+    v-html="cfg.message"
+  )
+</template>
+
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
+
+export interface IFancyNotice {
+  message?: string
+  duration?: string
+  delay?: string
+  onComplete?: () => void
+}
+
+const options: IFancyNotice = {
+  message: '',
+  duration: '3s',
+  delay: '0s',
+  onComplete() {console.log('onComlete')},
+}
+
+@Component({
+  props: ['cfg'],
+})
+export default class App extends Vue {
+  private cfg: any
+
+  private mounted() {
+    Object.keys(options).forEach(i => {
+      this.cfg.hasOwnProperty(i) || this.$set(this.cfg, i, (options as any)[i])
+    })
+    this.cfg.message &&
+      this.cfg.onComplete &&
+      setTimeout(() => {
+        this.cfg.onComplete()
+      }, Math.trunc(this.cfg.duration) * 1000)
+  }
+}
+</script>
 <style lang="sass">
   @import "~fancy_style"
 
@@ -42,31 +85,3 @@
       animation-name: anim-notice-mobile
 
 </style>
-
-<template lang="pug">
-  .fancy-notice(
-    :style="{'animation-duration': cfg.duration,'animation-delay': cfg.delay}"
-    v-if="cfg.message"
-    v-html="cfg.message"
-  )
-</template>
-
-<script>
-const Options = {
-  message: '',
-  duration: '3s',
-  delay: '0s',
-  onComplete() { }
-}
-export default {
-  props: ['cfg'],
-  mounted() {
-    Object.keys(Options).forEach(i => {
-      (i in this.cfg) || this.$set(this.cfg, i, Options[i])
-    })
-    this.cfg.message && this.cfg.onComplete && setTimeout(() => {
-      this.cfg.onComplete()
-    }, parseInt(this.cfg.duration) * 1000)
-  },
-}
-</script>

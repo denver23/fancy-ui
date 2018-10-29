@@ -1,3 +1,81 @@
+<template lang="pug">
+  .fancy-sidebar(:class="{'fc-state': state}")
+    .fc-switch(@click="onSetState()")
+    .fc-wrap
+      div
+        dl(v-for="(v, k) in cfg.data" v-bind:class="{'fc-fold': folded[k]}")
+          dt(:class="'fc-'+ v.icon" @click="onSetFold(k,v)") {{v.name}}
+          dd(v-for="v of v.children", :class="{'fc-active': v.id == cfg.active}")
+            a(
+              v-bind="{href: v.url || 'javascript:', target: v.target || '_self', title: v.name}"
+              @click="v.callback ? v.callback(v) : ''"
+            ) {{v.name}}
+</template>
+
+<script lang="ts">
+import { Component, Watch, Vue } from 'vue-property-decorator'
+
+export interface IFancySideBar {
+  data: any
+  active?: string
+  onSlide?: (v: boolean) => void
+  callback?: (data: any) => void
+}
+
+const options: IFancySideBar = {
+  data: null,
+  active: '',
+  onSlide(v) {
+    console.log(v)
+  },
+  callback(data) {
+    console.log(data)
+  },
+}
+
+@Component({
+  props: ['cfg'],
+})
+export default class App extends Vue {
+  private cfg: any
+  private state: boolean = false
+  private folded: any = {}
+
+  private created() {
+    Object.keys(options).forEach(i => {
+      this.cfg.hasOwnProperty(i) || this.$set(this.cfg, i, (options as any)[i])
+    })
+
+    const storage: any = this.cfg.callback() || {}
+    this.state = storage.state || false
+    this.folded = storage.folded || {}
+
+    this.onCfgDataChanged(this.cfg.data)
+  }
+
+  @Watch('state')
+  private onStateChanged(val: boolean, oldVal: boolean) {
+    this.cfg.onSlide(val)
+  }
+
+  @Watch('cfg.data')
+  private onCfgDataChanged(val: object) {
+    for (const i of Object.keys(val)) {
+      this.$set(this.folded, i, this.folded[i] || false)
+    }
+  }
+
+  private onSetState(): void {
+    this.state = !this.state
+    this.cfg.callback(this.state, this.folded)
+  }
+  private onSetFold(name: string) {
+    this.folded[name] = !this.folded[name]
+    this.cfg.callback(this.state, this.folded)
+  }
+}
+</script>
+
 <style lang="sass">
   @import "~fancy_style"
 
@@ -154,69 +232,4 @@
         width: 10rem
         overflow: hidden
 </style>
-
-<template lang="pug">
-  .fancy-sidebar(:class="{'fc-state': state}")
-    .fc-switch(@click="_setState()")
-    .fc-wrap
-      div
-        dl(v-for="(v, k) in cfg.data" v-bind:class="{'fc-fold': folded[k]}")
-          dt(:class="'fc-'+ v.icon" @click="_setFold(k,v)") {{v.name}}
-          dd(v-for="v of v.children", :class="{'fc-active': v.id == cfg.active}")
-            a(
-              v-bind="{href: v.url || 'javascript:', target: v.target || '_self', title: v.name}"
-              @click="v.callback ? v.callback(v) : ''"
-            ) {{v.name}}
-</template>
-
-<script>
-const Options = {
-  data: null,
-  active: '',
-  onSlide(bool) { },
-  callback(data) { },
-}
-export default {
-  props: ['cfg'],
-  data() {
-    return {
-      state: false,
-      folded: {},
-    }
-  },
-  created() {
-    Object.keys(Options).forEach(i => {
-      (i in this.cfg) || this.$set(this.cfg, i, Options[i])
-    })
-    let storage = this.cfg.callback() || {}
-    this.state = storage.state || false
-    this.folded = storage.folded || {}
-
-    this._updateFold(this.cfg.data)
-  },
-  watch: {
-    state(val) {
-      this.cfg.onSlide(val)
-    },
-    'cfg.data'(val) {
-      this._updateFold(val)
-    },
-  },
-  methods: {
-    _setState() {
-      this.state = !this.state
-      this.cfg.callback(this.state, this.folded)
-    },
-    _setFold(name, item) {
-      this.folded[name] = !this.folded[name]
-      this.cfg.callback(this.state, this.folded)
-    },
-    _updateFold(val) {
-      for (let i in val) {
-        this.$set(this.folded, i, this.folded[i] || false)
-      }
-    },
-  },
-}
-</script>
 

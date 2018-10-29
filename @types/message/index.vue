@@ -1,3 +1,57 @@
+<template lang="pug">
+  .fancy-message(v-if="cfg.content && cfg.time != 0")
+    .fc-status(:class="'fc-'+ cfg.status")
+    .fc-content(:class="'fc-'+ cfg.status" v-html="cfg.content || cfg.status")
+</template>
+
+<script lang="ts">
+declare var window: any
+import { Component, Vue } from 'vue-property-decorator'
+
+export interface IFancyMessage {
+  status?: string
+  content?: string
+  url?: string
+  time?: number
+}
+
+const options: IFancyMessage = {
+  // error | success | question | info | alert
+  status: 'success',
+  content: '',
+  url: 'back',
+  time: -1, // millisecond <0: no jump
+}
+
+@Component({
+  props: ['cfg'],
+})
+export default class App extends Vue {
+  private cfg: any
+  private created() {
+    Object.keys(options).forEach(i => {
+      this.cfg.hasOwnProperty(i) || this.$set(this.cfg, i, (options as any)[i])
+    })
+  }
+  private mounted() {
+    this.jump(this.cfg.time, this.cfg.url)
+  }
+  private jump(time: number, url: string | (() => void)) {
+    const t = Math.trunc(time)
+    if (t >= 0 && url) {
+      setTimeout(() => {
+        if (typeof url === 'function') {
+          return url()
+        }
+        if (url === 'back') {
+          return window.history.back()
+        }
+        url === 'close' ? window.close() : (window.location = url)
+      }, t)
+    }
+  }
+}
+</script>
 <style lang="sass">
   @import "~fancy_style"
   .fancy-message
@@ -29,42 +83,3 @@
       &.fc-exclamation
         color: $colorAlerm
 </style>
-
-<template lang="pug">
-  .fancy-message(v-if="cfg.content && cfg.time != 0")
-    .fc-status(:class="'fc-'+ cfg.status")
-    .fc-content(:class="'fc-'+ cfg.status" v-html="cfg.content || cfg.status")
-</template>
-
-<script>
-const Options = {
-  // error | success | question | info | alert
-  status: 'success',
-  content: '',
-  url: 'back',
-  time: -1, // millisecond <0: no jump
-}
-export default {
-  props: ['cfg'],
-  created() {
-    Object.keys(Options).forEach(i => {
-      i in this.cfg || this.$set(this.cfg, i, Options[i])
-    })
-  },
-  mounted() {
-    this.jump(this.cfg.time, this.cfg.url)
-  },
-  methods: {
-    jump(time, url) {
-      let t = parseInt(time)
-      if (t >= 0 && url) {
-        setTimeout(() => {
-          if (typeof url === 'function') return url()
-          if (url === 'back') return window.history.back()
-          url === 'close' ? window.close() : (window.location = url)
-        }, t)
-      }
-    },
-  },
-}
-</script>
