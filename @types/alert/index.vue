@@ -28,9 +28,7 @@ const options: IFancyAlert = {
 export default class App extends Vue {
   private cfg: any
   public created() {
-    Object.keys(options).forEach(i => {
-      this.cfg.hasOwnProperty(i) || this.$set(this.cfg, i, (options as any)[i])
-    })
+    Object.keys(options).forEach(i => this.cfg.hasOwnProperty(i) || this.$set(this.cfg, i, (options as any)[i]))
     document.addEventListener('keydown', this.onKdown, false)
   }
 
@@ -42,7 +40,7 @@ export default class App extends Vue {
     document.removeEventListener('keydown', this.onKdown, false)
   }
 
-  private onKdown(e: any) {
+  private onKdown(e: KeyboardEvent) {
     // enter space center esc
     if ([13, 32, 100, 27].includes(e.keyCode)) {
       e.preventDefault()

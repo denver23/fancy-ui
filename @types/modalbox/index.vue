@@ -4,7 +4,7 @@
     div(:style="cfg.style" ref="box")
       .fc-title(v-if="cfg.title" ref="title")
         strong(v-html="cfg.title")
-        label(@click="_done(0)")
+        label(@click="onDone(0)")
 
       .fc-loading(v-if="cfg.content === 'loading'")
       .fc-wrap(v-else)
@@ -14,15 +14,72 @@
       .fc-tips(v-if="cfg.tips")
         span(v-text="cfg.tips")
       .fc-btns(v-if="cfg.confirm || cfg.cancel")
-        span(:class="{'fc-sending': sending === 'confirm'}" v-if="cfg.confirm" @click="_done(1)")
+        span(:class="{'fc-sending': sending === 'confirm'}" v-if="cfg.confirm" @click="onDone(1)")
           em {{cfg.confirm}}
-        span(:class="{'fc-sending': sending === 'cancel'}" v-if="cfg.cancel" @click="_done(0)")
+        span(:class="{'fc-sending': sending === 'cancel'}" v-if="cfg.cancel" @click="onDone(0)")
           em {{cfg.cancel}}
 </template>
 
 <script lang="ts">
 declare var document: any
 declare var window: any
+
+class DragClass {
+  private target: HTMLElement
+  private handler: HTMLElement
+  private handlerAttr: any = {}
+
+  constructor(handler: HTMLElement, target: HTMLElement) {
+    this.handler = handler
+    this.target = target || handler
+    handler.onmousedown = this.onStart
+  }
+
+  private onStart(event: MouseEvent) {
+    const target = this.target
+    if (!target.style.top || target.style.top.indexOf('%') >= 0) {
+      target.style.top = target.offsetTop + 'px'
+    }
+    if (!target.style.left || target.style.left.indexOf('%') >= 0) {
+      target.style.left = target.offsetLeft + 'px'
+    }
+    // let y = parseInt(o.root.style.top)
+    // let x = parseInt(o.root.style.left)
+    const e = event || window.event
+    this.handlerAttr.lastMouseX = e.clientX
+    this.handlerAttr.lastMouseY = e.clientY
+
+    document.onmousemove = this.onDrag
+    document.onmouseup = this.onEnd
+  }
+
+  private onDrag(event: MouseEvent) {
+    let nx
+    let ny
+    const e = event || window.event
+    const ey = e.clientY
+    const ex = e.clientX
+
+    const top: string = this.target.style.top === null ? '0' : this.target.style.top
+    const left: string = this.target.style.left === null ? '0' : this.target.style.left
+    const y = parseInt(top, 10)
+    const x = parseInt(left, 10)
+
+    nx = x + ex - this.handlerAttr.lastMouseX
+    ny = y + ey - this.handlerAttr.lastMouseY
+
+    this.target.style.left = nx + 'px'
+    this.target.style.top = ny + 'px'
+    this.handlerAttr.lastMouseX = ex
+    this.handlerAttr.lastMouseY = ey
+    return false
+  }
+
+  private onEnd() {
+    document.onmousemove = null
+    document.onmouseup = null
+  }
+}
 
 const Drag = {
   obj: null,
@@ -31,8 +88,9 @@ const Drag = {
     o.root = oRoot && oRoot != null ? oRoot : o
   },
   start(event: any) {
-    let o = (Drag.obj = this)
-    let e = Drag.fixE(event)
+    Drag.obj = this
+    const e = Drag.fixE(event)
+    const o = this
     if (!o.root.style.top || o.root.style.top.indexOf('%') >= 0) {
       o.root.style.top = o.root.offsetTop + 'px'
     }
@@ -48,32 +106,14 @@ const Drag = {
     document.onmouseup = Drag.end
     return
   },
-  drag(event: any) {
-    const e = Drag.fixE(event)
-    const o: any = Drag.obj
-    const ey = e.clientY
-    const ex = e.clientX
-    const y = Math.trunc(o.root.style.top)
-    const x = Math.trunc(o.root.style.left)
-    let nx
-    let ny
-
-    nx = x + ex - o.lastMouseX
-    ny = y + ey - o.lastMouseY
-
-    o.root.style.left = nx + 'px'
-    o.root.style.top = ny + 'px'
-    o.lastMouseX = ex
-    o.lastMouseY = ey
-    return false
-  },
+  drag(event: any) {},
   end() {
     document.onmousemove = null
     document.onmouseup = null
     Drag.obj = null
   },
   fixE(event: any) {
-    let e = event || window.event
+    const e: any = event || window.event
     if (typeof e.layerX === 'undefined') {
       e.layerX = e.offsetX
     }
@@ -84,88 +124,93 @@ const Drag = {
   },
 }
 
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Watch, Vue } from 'vue-property-decorator'
 
-export interface IFancyAlert {
-  title: string,
-  content: string,
-  confirm: string,
-  cancel: string,
-  component: any, // component组件
-  tips: string,
-  style: object,
-  overlay: true,
-  draggable: true,
-  onComplete(el) {},
-  onConfirm(el) {},
-  onCancel() {},
-  __name: 'modalbox',
+export interface IFancyModalBox {
+  title?: string
+  content?: string
+  confirm?: string
+  cancel?: string
+  component?: any // component组件
+  tips?: string
+  style?: object
+  overlay?: true
+  draggable?: true
+  onComplete?: (el: HTMLElement) => void
+  onConfirm?: (el: HTMLElement) => void
+  onCancel?: () => void
 }
 
-const Options = {
+const options: IFancyModalBox = {
   title: '',
   content: '',
   confirm: 'confirm',
   cancel: 'cancel',
   component: '', // component组件
   tips: '',
-  style: null,
   overlay: true,
   draggable: true,
-  onComplete(el) {},
-  onConfirm(el) {},
-  onCancel() {},
-  __name: 'modalbox',
 }
 
-export default {
+@Component({
   props: ['cfg'],
-  data() {
-    return { sending: false }
-  },
-  created() {
-    Object.keys(Options).forEach(i => this.cfg.hasOwnProperty(i) || this.$set(this.cfg, i, Options[i]))
-  },
-  mounted() {
+})
+export default class App extends Vue {
+  private cfg: any
+  private sending: boolean = false
+
+  @Watch('cfg.content')
+  private onContentChanged(val: string) {
+    requestAnimationFrame(() => val !== 'loading' && this.cfg.onComplete && this.cfg.onComplete(this.$el))
+  }
+
+  private created() {
+    Object.keys(options).forEach(i => this.cfg.hasOwnProperty(i) || this.$set(this.cfg, i, (options as any)[i]))
+  }
+
+  private mounted() {
     this.cfg.content !== 'loading' && this.cfg.onComplete && this.cfg.onComplete(this.$el)
     this.cfg.draggable && Drag.init(this.$refs.title || this.$refs.box, this.$refs.box)
-    document.addEventListener('keydown', this._kdown, false)
-  },
-  destroyed() {
-    document.removeEventListener('keydown', this._kdown, false)
-  },
-  watch: {
-    'cfg.content'(val) {
-      requestAnimationFrame(() => val !== 'loading' && this.cfg.onComplete && this.cfg.onComplete(this.$el))
-    },
-  },
-  methods: {
-    _kdown(e) {
-      if (this.cfg.content) {
-        // enter space
-        if (this.cfg.confirm && [13, 100, 32].includes(e.keyCode)) {
-          e.preventDefault()
-          e.stopPropagation()
-          return this._done(1)
-        }
-        // esc
-        if (e.keyCode == 27) this._done(0)
+    document.addEventListener('keydown', this.onKdown, false)
+  }
+
+  private destroyed() {
+    document.removeEventListener('keydown', this.onKdown, false)
+  }
+
+  private onKdown(e: KeyboardEvent) {
+    if (!this.cfg.content) {
+      return
+    }
+    // enter space
+    if (this.cfg.confirm && [13, 100, 32].includes(e.keyCode)) {
+      e.preventDefault()
+      e.stopPropagation()
+      return this.onDone(1)
+    }
+    // esc
+    if (e.keyCode === 27) {
+      this.onDone(0)
+    }
+  }
+
+  private async onDone(type: number) {
+    if (this.sending) {
+      return
+    }
+    this.sending = !!type
+    try {
+      if (type) {
+        await this.cfg.onConfirm(this.$el)
+      } else {
+        await this.cfg.onCancel()
+        // this.cfg.__name && (this.$parent[this.cfg.__name] = false)
       }
-    },
-    _done: async function(type) {
-      if (this.sending) return
-      this.sending = type
-      try {
-        if (type) {
-          await this.cfg.onConfirm(this.$el)
-        } else {
-          await this.cfg.onCancel()
-          this.cfg.__name && (this.$parent[this.cfg.__name] = false)
-        }
-      } catch (e) {}
-      this.sending = false
-    },
-  },
+    } catch (e) {
+      console.log(e)
+    }
+    this.sending = false
+  }
 }
 </script>
 
