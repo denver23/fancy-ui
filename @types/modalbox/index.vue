@@ -2,7 +2,7 @@
 <template lang="pug">
   .fancy-modalbox(:class="cfg.overlay ? 'fc-mask' : 'fc-nomask'" v-if="cfg.content")
     div(:style="cfg.style" ref="box")
-      .fc-title(v-if="cfg.title" ref="title")
+      .fc-title(v-if="cfg.title" ref="title" draggable="cfg.draggable" @dragstart="onDragStart")
         strong(v-html="cfg.title")
         label(@click="onDone(0)")
 
@@ -24,106 +24,6 @@
 declare var document: any
 declare var window: any
 
-class DragClass {
-  private target: HTMLElement
-  private handler: HTMLElement
-  private handlerAttr: any = {}
-
-  constructor(handler: HTMLElement, target: HTMLElement) {
-    this.handler = handler
-    this.target = target || handler
-    handler.onmousedown = this.onStart
-  }
-
-  private onStart(event: MouseEvent) {
-    const target = this.target
-    if (!target.style.top || target.style.top.indexOf('%') >= 0) {
-      target.style.top = target.offsetTop + 'px'
-    }
-    if (!target.style.left || target.style.left.indexOf('%') >= 0) {
-      target.style.left = target.offsetLeft + 'px'
-    }
-    // let y = parseInt(o.root.style.top)
-    // let x = parseInt(o.root.style.left)
-    const e = event || window.event
-    this.handlerAttr.lastMouseX = e.clientX
-    this.handlerAttr.lastMouseY = e.clientY
-
-    document.onmousemove = this.onDrag
-    document.onmouseup = this.onEnd
-  }
-
-  private onDrag(event: MouseEvent) {
-    let nx
-    let ny
-    const e = event || window.event
-    const ey = e.clientY
-    const ex = e.clientX
-
-    const top: string = this.target.style.top === null ? '0' : this.target.style.top
-    const left: string = this.target.style.left === null ? '0' : this.target.style.left
-    const y = parseInt(top, 10)
-    const x = parseInt(left, 10)
-
-    nx = x + ex - this.handlerAttr.lastMouseX
-    ny = y + ey - this.handlerAttr.lastMouseY
-
-    this.target.style.left = nx + 'px'
-    this.target.style.top = ny + 'px'
-    this.handlerAttr.lastMouseX = ex
-    this.handlerAttr.lastMouseY = ey
-    return false
-  }
-
-  private onEnd() {
-    document.onmousemove = null
-    document.onmouseup = null
-  }
-}
-
-const Drag = {
-  obj: null,
-  init(o: any, oRoot: any) {
-    o.onmousedown = Drag.start
-    o.root = oRoot && oRoot != null ? oRoot : o
-  },
-  start(event: any) {
-    Drag.obj = this
-    const e = Drag.fixE(event)
-    const o = this
-    if (!o.root.style.top || o.root.style.top.indexOf('%') >= 0) {
-      o.root.style.top = o.root.offsetTop + 'px'
-    }
-    if (!o.root.style.left || o.root.style.left.indexOf('%') >= 0) {
-      o.root.style.left = o.root.offsetLeft + 'px'
-    }
-    // let y = parseInt(o.root.style.top)
-    // let x = parseInt(o.root.style.left)
-    o.lastMouseX = e.clientX
-    o.lastMouseY = e.clientY
-
-    document.onmousemove = Drag.drag
-    document.onmouseup = Drag.end
-    return
-  },
-  drag(event: any) {},
-  end() {
-    document.onmousemove = null
-    document.onmouseup = null
-    Drag.obj = null
-  },
-  fixE(event: any) {
-    const e: any = event || window.event
-    if (typeof e.layerX === 'undefined') {
-      e.layerX = e.offsetX
-    }
-    if (typeof e.layerY === 'undefined') {
-      e.layerY = e.offsetY
-    }
-    return e
-  },
-}
-
 import { Component, Watch, Vue } from 'vue-property-decorator'
 
 export interface IFancyModalBox {
@@ -134,8 +34,8 @@ export interface IFancyModalBox {
   component?: any // component组件
   tips?: string
   style?: object
-  overlay?: true
-  draggable?: true
+  overlay?: boolean
+  draggable?: boolean
   onComplete?: (el: HTMLElement) => void
   onConfirm?: (el: HTMLElement) => void
   onCancel?: () => void
@@ -170,7 +70,6 @@ export default class App extends Vue {
 
   private mounted() {
     this.cfg.content !== 'loading' && this.cfg.onComplete && this.cfg.onComplete(this.$el)
-    this.cfg.draggable && Drag.init(this.$refs.title || this.$refs.box, this.$refs.box)
     document.addEventListener('keydown', this.onKdown, false)
   }
 
