@@ -19,7 +19,7 @@ export interface IFancySideBar {
   data: any
   active?: string
   onSlide?: (v: boolean) => void
-  callback?: (data: any) => void
+  callback?: (state?: boolean, data?: any) => any
 }
 
 const options: IFancySideBar = {
@@ -28,7 +28,7 @@ const options: IFancySideBar = {
   onSlide(v) {
     console.log(v)
   },
-  callback(data) {
+  callback(state, data) {
     console.log(data)
   },
 }
