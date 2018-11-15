@@ -1,5 +1,11 @@
 import { Component, Vue } from 'vue-property-decorator'
-import { IFancyAlert } from '../interfaces'
+
+export interface IFancyAlert {
+  message?: string
+  confirm?: string
+  ismask?: boolean
+  onConfirm?: () => {}
+}
 
 const options: IFancyAlert = {
   message: '',
