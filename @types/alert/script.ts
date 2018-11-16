@@ -1,13 +1,13 @@
 import { Component, Vue } from 'vue-property-decorator'
 
-export interface IFancyAlert {
+export interface IAlert {
   message?: string
   confirm?: string
   ismask?: boolean
   onConfirm?: () => {}
 }
 
-const options: IFancyAlert = {
+const options: IAlert = {
   message: '',
   confirm: 'ok',
   ismask: true,

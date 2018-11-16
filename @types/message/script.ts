@@ -1,6 +1,6 @@
 import { Component, Vue } from 'vue-property-decorator'
 
-export const enum EFancyMessageStatus {
+export const enum EMessage {
   error = 'error',
   success = 'success',
   question = 'question',
@@ -9,21 +9,20 @@ export const enum EFancyMessageStatus {
 }
 
 /**
- * @param status error | success | question | info | alert
+ * @param status
  * @param content
  * @param url: back | url
  * @param time {-1} millisecond < 0: no jump
  */
-export interface IFancyMessage {
-  status?: EFancyMessageStatus
+export interface IMessage {
+  status?: EMessage
   content?: string
   url?: string
   time?: number
 }
 
-// error | success | question | info | alert
-const options: IFancyMessage = {
-  status: EFancyMessageStatus.success,
+const options: IMessage = {
+  status: EMessage.success,
   content: '',
   url: 'back',
   time: -1, // millisecond <0: no jump

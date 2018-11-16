@@ -1,7 +1,16 @@
 import { Component, Watch, Vue } from 'vue-property-decorator'
-import { IFancyCodeMessage } from '../interfaces'
 
-const options: IFancyCodeMessage = {
+export interface ICodeMessage {
+  show?: boolean
+  text?: string
+  repeat?: string
+  duration?: number
+  history?: number
+  auto?: boolean
+  onSubmit?: () => {}
+}
+
+const options: ICodeMessage = {
   show: true,
   text: 'Send',
   repeat: 'Resend code',
@@ -17,7 +26,7 @@ const options: IFancyCodeMessage = {
  * wegweg
  */
 export default class App extends Vue {
-  private cfg: any
+  private cfg: ICodeMessage = null
   private downtime: number = 0
   private timer: any = null
 
