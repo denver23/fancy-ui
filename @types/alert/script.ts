@@ -4,7 +4,7 @@ export interface IAlert {
   message?: string
   confirm?: string
   ismask?: boolean
-  onConfirm?: () => {}
+  onConfirm?: () => void
 }
 
 const options: IAlert = {
@@ -17,7 +17,7 @@ const options: IAlert = {
   props: ['cfg'],
 })
 export default class App extends Vue {
-  private cfg: any
+  private cfg: IAlert
 
   public created() {
     Object.keys(options).forEach(i => {
