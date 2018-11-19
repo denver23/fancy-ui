@@ -1,4 +1,29 @@
-<!-- 即时搜索 -->
+<template lang="pug">
+  .fancy-searchview
+    input(
+      ref="inp"
+      type="text"
+      v-bind="[cfg.attr]"
+      v-model="cfg.value"
+      @focus="onFocus($event)"
+      @blur="onBlur()"
+      @keyup="onKeyUp($event)"
+      @keydown="onKeyDown($event)"
+      autocomplete="off"
+    )
+    template(v-if="show")
+      ul(ref="list" v-if="cfg.data && cfg.data.length > 0")
+        li(
+          v-for="(v,index) of cfg.data",
+          :class="{'fc-active': index == selectIndex}"
+          @click="onChoose(v)"
+        )
+          span(v-html="$options.filters.highlight(v.name, cfg.value)")
+      div(v-else v-text="cfg.empty")
+</template>
+
+<script src="./script.ts"></script>
+
 <style lang="sass">
   @import "~fancy_style"
   $size: 20rem
@@ -67,111 +92,3 @@
       ul,div
         width: 100%
 </style>
-
-<template lang="pug">
-  .fancy-searchview
-    input(
-      ref="inp"
-      type="text"
-      v-bind="[cfg.attr]"
-      v-model="cfg.value"
-      @focus="_focus($event)"
-      @blur="_blur()"
-      @keyup="_kup($event)"
-      @keydown="_kdown($event)"
-      autocomplete="off"
-    )
-    template(v-if="show")
-      ul(ref="list" v-if="cfg.data && cfg.data.length > 0")
-        li(
-          v-for="(v,index) of cfg.data",
-          :class="{'fc-active': index == selectIndex}"
-          @click="_choose(v)"
-        )
-          span(v-html="$options.filters.highlight(v.name, cfg.value)")
-      div(v-else v-text="cfg.empty")
-</template>
-
-<script>
-const Options = {
-  attr: {},
-  data: '',
-  value: '',
-  empty: '',
-  onChange() {},
-  onChoose: item => console.log(item),
-}
-
-export default {
-  props: ['cfg'],
-  data() {
-    return {
-      show: false,
-      selectIndex: 0,
-    }
-  },
-  created() {
-    Object.keys(Options).forEach(i => this.cfg.hasOwnProperty(i) || this.$set(this.cfg, i, Options[i]))
-  },
-  filters: {
-    highlight: (str, val) => (val ? str.replace(new RegExp(val, 'ig'), `<em>${val}</em>`) : str),
-  },
-  watch: {
-    show(val) {
-      if (val && this.cfg.value && this.cfg.data) {
-        let index = this.cfg.data.findIndex(v => v.name === this.cfg.value)
-        index >= 0 && requestAnimationFrame(() => this.$refs.list.children[index].scrollIntoView(false))
-      }
-    },
-  },
-  mounted() {},
-  methods: {
-    _focus(e) {
-      e.preventDefault()
-      this.show = true
-    },
-    _blur() {
-      setTimeout(() => (this.show = false), 200)
-    },
-    _kdown(e) {
-      if ([13, 38, 40].includes(e.keyCode)) {
-        e.preventDefault()
-        e.stopPropagation()
-      }
-      // enter
-      if (e.keyCode == 13) {
-        return this._choose()
-      }
-    },
-    _kup(e) {
-      if ([13, 38, 40].includes(e.keyCode)) {
-        e.preventDefault()
-        e.stopPropagation()
-      }
-      // enter
-      if (e.keyCode == 13) return
-      // up down key
-      if (e.keyCode == 38 || e.keyCode == 40) {
-        let len = this.cfg.data.length
-        if (len == 0) return
-        this.selectIndex += e.keyCode == 40 ? 1 : -1
-        if (this.selectIndex < 0) {
-          this.selectIndex = len - 1
-        } else if (this.selectIndex >= len) {
-          this.selectIndex = 0
-        }
-        this.$refs.list.children[this.selectIndex].scrollIntoView(false)
-      } else {
-        this.cfg.onChange.call(this, this.cfg.value)
-      }
-    },
-    _choose(v) {
-      if (this.selectIndex < 0) return
-      let item = v || this.cfg.data[this.selectIndex]
-      this.cfg.onChoose(item)
-      this.show = false
-    },
-  },
-}
-</script>
-

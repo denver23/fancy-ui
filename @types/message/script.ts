@@ -17,7 +17,7 @@ export const enum EMessage {
 export interface IMessage {
   status?: EMessage
   content?: string
-  url?: string
+  url?: string | (() => void)
   time?: number
 }
 
@@ -32,7 +32,7 @@ const options: IMessage = {
   props: ['cfg'],
 })
 export default class App extends Vue {
-  private cfg: any
+  private cfg: IMessage
 
   protected created() {
     Object.keys(options).forEach(i => {

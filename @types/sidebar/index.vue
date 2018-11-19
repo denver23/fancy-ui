@@ -3,7 +3,7 @@
     .fc-switch(@click="onSetState()")
     .fc-wrap
       div
-        dl(v-for="(v, k) in cfg.data" v-bind:class="{'fc-fold': folded[k]}")
+        dl(v-for="(v, k) in cfg.data", :class="{'fc-fold': folded[k]}")
           dt(:class="'fc-'+ v.icon" @click="onSetFold(k,v)") {{v.name}}
           dd(v-for="v of v.children", :class="{'fc-active': v.id == cfg.active}")
             a(
@@ -12,69 +12,7 @@
             ) {{v.name}}
 </template>
 
-<script lang="ts">
-import { Component, Watch, Vue } from 'vue-property-decorator'
-
-export interface IFancySideBar {
-  data: any
-  active?: string
-  onSlide?: (v: boolean) => void
-  callback?: (state?: boolean, data?: any) => any
-}
-
-const options: IFancySideBar = {
-  data: null,
-  active: '',
-  onSlide(v) {
-    console.log(v)
-  },
-  callback(state, data) {
-    console.log(data)
-  },
-}
-
-@Component({
-  props: ['cfg'],
-})
-export default class App extends Vue {
-  private cfg: any
-  private state: boolean = false
-  private folded: any = {}
-
-  private created() {
-    Object.keys(options).forEach(i => {
-      this.cfg.hasOwnProperty(i) || this.$set(this.cfg, i, (options as any)[i])
-    })
-
-    const storage: any = this.cfg.callback() || {}
-    this.state = storage.state || false
-    this.folded = storage.folded || {}
-
-    this.onCfgDataChanged(this.cfg.data)
-  }
-
-  @Watch('state')
-  private onStateChanged(val: boolean, oldVal: boolean) {
-    this.cfg.onSlide(val)
-  }
-
-  @Watch('cfg.data')
-  private onCfgDataChanged(val: object) {
-    for (const i of Object.keys(val)) {
-      this.$set(this.folded, i, this.folded[i] || false)
-    }
-  }
-
-  private onSetState(): void {
-    this.state = !this.state
-    this.cfg.callback(this.state, this.folded)
-  }
-  private onSetFold(name: string) {
-    this.folded[name] = !this.folded[name]
-    this.cfg.callback(this.state, this.folded)
-  }
-}
-</script>
+<script src="./script.ts"></script>
 
 <style lang="sass">
   @import "~fancy_style"

@@ -1,3 +1,13 @@
+<template lang="pug">
+  .fancy-tabs(v-if="cfg.data")
+    ul
+      li(:class="{'fc-active': cfg.active === k}" v-for="(v, k) in cfg.data")
+        a(:href="v.url" v-html="v.title")
+      li
+</template>
+
+<script src="./script.ts"></script>
+
 <style lang="sass">
   @import "~fancy_style"
 
@@ -46,17 +56,3 @@
           &:last-child
             display: none
 </style>
-
-<template lang="pug">
-  .fancy-tabs(v-if="cfg.data")
-    ul
-      li(:class="{'fc-active': cfg.active === k}" v-for="(v, k) in cfg.data")
-        a(:href="v.url" v-html="v.title")
-      li
-</template>
-
-<script>
-  export default {
-    props: ['cfg'],
-  }
-</script>

@@ -6,41 +6,8 @@
   )
 </template>
 
-<script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+<script src="./script.ts"></script>
 
-export interface IFancyNotice {
-  message?: string
-  duration?: string
-  delay?: string
-  onComplete?: () => void
-}
-
-const options: IFancyNotice = {
-  message: '',
-  duration: '3s',
-  delay: '0s',
-  onComplete() {console.log('onComlete')},
-}
-
-@Component({
-  props: ['cfg'],
-})
-export default class App extends Vue {
-  private cfg: any
-
-  private mounted() {
-    Object.keys(options).forEach(i => {
-      this.cfg.hasOwnProperty(i) || this.$set(this.cfg, i, (options as any)[i])
-    })
-    this.cfg.message &&
-      this.cfg.onComplete &&
-      setTimeout(() => {
-        this.cfg.onComplete()
-      }, Math.trunc(this.cfg.duration) * 1000)
-  }
-}
-</script>
 <style lang="sass">
   @import "~fancy_style"
 

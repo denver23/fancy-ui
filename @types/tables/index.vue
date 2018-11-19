@@ -1,3 +1,43 @@
+<template lang="pug">
+  .fancy-tables
+    .fc-tool
+      .fc-picker(ref="picker" v-if="cfg.picker")
+        button(@click.stop="pickerState = !pickerState") {{cfg.picker.name}}
+        div(v-show="pickerState" @click.stop="")
+          label(v-for="v of cfg.columns" v-if="v.label && cfg.picker && false == cfg.picker.filter.includes(v.label)")
+            input(type="checkbox",:value="v.label" v-model="cfg.picker.value")
+            span {{v.label}}
+    ol
+      ul.fc-header
+        template(v-for="(v, index) of cfg.columns")
+          li(
+            v-if="v.label && (!cfg.picker || cfg.picker.value.includes(v.label)) || v.label === 'checkbox'"
+            ,:class="[v.field, {'fc-noflex': v.style && v.style.width}]"
+            ,:style="v.style"
+          )
+            label(v-if="v.label === 'checkbox'" )
+              input(type="checkbox" @click="onChkAll(v)" v-model="modelAll[v.field]")
+            div(v-else v-html="v.label")
+
+      ul(v-if="cfg.data && cfg.data.length" v-for="value of cfg.data" transition="fc-fade")
+        template(v-for="(v, index) of cfg.columns")
+          li(
+            v-if="v.label && (!cfg.picker || cfg.picker.value.includes(v.label)) || v.label === 'checkbox'"
+            ,:class="[v.field, {'fc-noflex': v.style && v.style.width}]"
+            ,:style="v.style"
+          )
+            label(v-if="v.label === 'checkbox'")
+              input(type="checkbox",:value="value[v.field]" v-model="cfg.values[v.field]" @click="onChk(v.field,value)")
+            div(v-else v-bind:ps="v.label" v-html="(typeof v.callback == 'function' ? v.callback(value) : value[v.field])")
+
+    .fc-loading(v-if="cfg.state === 'loading'")
+    .fc-state(v-else v-html="cfg.state")
+    //- | {{cfg.values}}
+
+</template>
+
+<script src="./script.ts"></script>
+
 <style lang="sass">
   @import "~fancy_style"
 
@@ -156,102 +196,3 @@
       input
         margin: 0 0.5rem 0 0
 </style>
-
-<template lang="pug">
-  .fancy-tables
-    .fc-tool
-      .fc-picker(ref="picker" v-if="cfg.picker")
-        button(@click.stop="pickerState = !pickerState") {{cfg.picker.name}}
-        div(v-show="pickerState" @click.stop="")
-          label(v-for="v of cfg.columns" v-if="v.label && cfg.picker && false == cfg.picker.filter.includes(v.label)")
-            input(type="checkbox",:value="v.label" v-model="cfg.picker.value")
-            span {{v.label}}
-    ol
-      ul.fc-header
-        template(v-for="(v, index) of cfg.columns")
-          li(
-            v-if="v.label && (!cfg.picker || cfg.picker.value.includes(v.label)) || v.label === 'checkbox'"
-            ,:class="[v.field, {'fc-noflex': v.style && v.style.width}]"
-            ,:style="v.style"
-          )
-            label(v-if="v.label === 'checkbox'" )
-              input(type="checkbox" @click="_onChkAll(v)" v-model="modelAll[v.field]")
-            div(v-else v-html="v.label")
-
-      ul(v-if="cfg.data && cfg.data.length" v-for="value of cfg.data" transition="fc-fade")
-        template(v-for="(v, index) of cfg.columns")
-          li(
-            v-if="v.label && (!cfg.picker || cfg.picker.value.includes(v.label)) || v.label === 'checkbox'"
-            ,:class="[v.field, {'fc-noflex': v.style && v.style.width}]"
-            ,:style="v.style"
-          )
-            label(v-if="v.label === 'checkbox'")
-              input(type="checkbox",:value="value[v.field]" v-model="cfg.values[v.field]" @click="_onChk(v.field,value)")
-            div(v-else v-bind:ps="v.label" v-html="(typeof v.callback == 'function' ? v.callback(value) : value[v.field])")
-
-    .fc-loading(v-if="cfg.state === 'loading'")
-    .fc-state(v-else v-html="cfg.state")
-    //- | {{cfg.values}}
-
-</template>
-
-<script>
-const Options = {
-  data: '',
-  columns: '',
-  values: {},
-  state: 'loading',
-  picker: {
-    name: '',
-    value: [],
-    filter: [],
-  },
-  onCreated() {},
-}
-export default {
-  props: ['cfg'],
-  data() {
-    return {
-      pickerState: false,
-      modelAll: {},
-    }
-  },
-  created() {
-    let cfg = this.cfg
-    Object.keys(Options).forEach(i => cfg.hasOwnProperty(i) || this.$set(cfg, i, Options[i]))
-    cfg.columns &&
-      cfg.columns.forEach((v, k) => {
-        v.label === 'checkbox' && this.$set(this.modelAll, v.field, false)
-      })
-    cfg.onCreated && cfg.onCreated.call(this)
-  },
-  mounted() {
-    document.addEventListener('click', this._onPicker, false)
-  },
-  destroyed() {
-    document.removeEventListener('click', this._onPicker, false)
-  },
-  watch: {
-    'cfg.data'(val) {
-      for (let i in this.modelAll) {
-        this.modelAll[i] = false
-        this.cfg.values[i] = []
-      }
-    },
-  },
-  methods: {
-    _onPicker() {
-      this.pickerState = false
-    },
-    _onChkAll(column) {
-      let key = column.field
-      let arr = this.cfg.values[key] || []
-      arr.splice(0)
-      this.modelAll[key] && this.cfg.data.forEach(v => arr.push(v[key]))
-    },
-    _onChk(key, item) {
-      this.modelAll[key] = this.cfg.values[key] && this.cfg.values[key].includes(item[key]) && this.cfg.values[key].length === this.cfg.data.length
-    },
-  },
-}
-</script>
