@@ -3,20 +3,20 @@
     ul(v-if="data.length")
       li(:class="{'fc-folded': v.folded}" v-for="(v,index) in data")
         div.fc-item
-          .fc-arrow(@click="_toggle(v)")
+          .fc-arrow(@click="toggle(v)")
           .fc-name
             input(
               v-if="!v[cfg.field] || editIndex === index"
               type="text"
               v-bind="{value: v[cfg.field], placeholder: cfg.placeholder, disabled: v.__disabled}"
-              @keydown.enter.stop="_submit($event, index, v)"
+              @keydown.enter.stop="onSubmit($event, index, v)"
             )
-            span(v-else @click="_toggleName($event, index, v)") {{v[cfg.field]}}
+            span(v-else @click="toggleName($event, index, v)") {{v[cfg.field]}}
 
           .fc-tool
-            em.fc-pencil(v-if="cfg.editBtn && v.editBtn !== false" @click="_edit($event, index, v)")
-            em.fc-plus(v-if="cfg.insertBtn && v[cfg.field] && cfg.maxLevel > (treelevel || 0)" @click="_create($event, index, v)")
-            em.fc-trash(v-if="cfg.removeBtn && (!v.data || !v.data.length)" @click="_remove(index, v)")
+            em.fc-pencil(v-if="cfg.editBtn && v.editBtn !== false" @click="onEdit($event, index, v)")
+            em.fc-plus(v-if="cfg.insertBtn && v[cfg.field] && cfg.maxLevel > (treelevel || 0)" @click="onCreate($event, index, v)")
+            em.fc-trash(v-if="cfg.removeBtn && (!v.data || !v.data.length)" @click="onRemove(index, v)")
         treeview(
           v-if="v.data && v.data.length && (treelevel || 0) < cfg.maxLevel"
           v-bind:tree="v"
