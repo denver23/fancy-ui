@@ -1,3 +1,23 @@
+<template lang="pug">
+  .fancy-citypicker(@click="onClose")
+    div(@click.stop="")
+      h4
+        em.fc-back(v-if="level" @click="onBack()")
+        em.fc-delete(v-else @click="onClear()")
+        span {{title}}
+        em(@click="onClose")
+
+      ul(ref="picker")
+        li(
+          v-for="(v,k) of children"
+          v-bind:class="{'fc-chked': current.id == v.id, 'fc-active': index == k }"
+          v-text="v.name"
+          @click="onChoose(k, v)"
+        )
+</template>
+
+<script src="./script.ts"></script>
+
 <style lang="sass">
   @import "~fancy_style"
   @import "~fancy_mixins"
@@ -74,158 +94,3 @@
         max-width: 60%
 
 </style>
-
-<template lang="pug">
-  .fancy-citypicker(@click="_close")
-    div(@click.stop="")
-      h4
-        em.fc-back(v-if="level" @click="_back()")
-        em.fc-delete(v-else @click="_clear()")
-        span {{title}}
-        em(@click="_close")
-
-      ul(ref="picker")
-        li(
-          v-for="(v,k) of children"
-          v-bind:class="{'fc-chked': current.id == v.id, 'fc-active': index == k }"
-          v-text="v.name"
-          @click="_choose(k, v)"
-        )
-</template>
-
-<script>
-  import City from './city.js'
-  const Options = {
-    value: '',
-    maxLevel: 2,
-    onSelect(cityid, cityname, path) {},
-    __name: 'citypicker',
-  }
-  export default {
-    props: ['cfg'],
-    data() {
-      return {
-        current: {},
-        level: 0,
-        index: 0, // keyboard index
-        breadcrumbs: [],
-      }
-    },
-    created() {
-      Object.keys(Options).forEach(i => {
-        (i in this.cfg) || this.$set(this.cfg, i, Options[i])
-      })
-      this._getdata(this.cfg.value)
-      document.addEventListener('keydown', this._kdown, false)
-    },
-    destroyed() {
-      document.removeEventListener('keydown', this._kdown, false)
-    },
-    computed: {
-      title() {
-        return City.category[this.level]
-      },
-      children() {
-        let id = 0
-        let level = this.level
-        let getChild = function(fid) {
-          let arr = []
-          if (!fid) {
-            // 第一级,按顺序显示
-            for (let n of City.province) {
-              for (let v of City.data) {
-                if (v.fid == 0 && v.name === n) {
-                  arr.push(v)
-                  break
-                }
-              }
-            }
-          } else {
-            // 第n级
-            for (let v of City.data) {
-              if (v.fid == fid) arr.push(v)
-            }
-          }
-          return arr
-        }
-        level && ({id} = this.breadcrumbs[level - 1])
-        // 直辖市 或 最后一级
-        return (City.zxs.indexOf(id) >= 0 || (level > 0 && level == this.cfg.maxLevel)) ? [] : getChild(id)
-      },
-    },
-    methods: {
-      _getdata(val) {
-        if (val) {
-          let parents = City.getPath(val)
-          if (parents) {
-            this.breadcrumbs = parents
-            this.level = parents.length - 1
-            this.current = City.getByID(val) || ''
-
-            let index = this.children.findIndex((value, index, arr) => value.id == this.current.id)
-            this.index = index < 0 ? 0 : index
-          }
-        }
-      },
-      _scrollview() {
-        let list = this.$refs.picker.children
-        if (this.index >= list.length) {
-          this.index = 0
-        }
-        list[this.index].scrollIntoView(false)
-      },
-      _kdown(e) {
-        if ([8, 13, 27, 37, 38, 39, 40, 100].includes(e.keyCode)) {
-          e.preventDefault()
-          e.stopPropagation()
-          // Esc
-          if (27 == e.keyCode) return this._close()
-          // enter
-          if ([13, 100].includes(e.keyCode)) return this._choose(this.index, this.children[this.index])
-          // let back
-          if ([8, 37].includes(e.keyCode)) return this._back()
-
-          let max = this.children.length || 1
-          // up down
-          if ([38, 40].includes(e.keyCode)) {
-            this.index += e.keyCode == 40 ? 1 : -1
-            if (this.index < 0) {
-              this.index = max - 1
-            } else if (this.index == max) {
-              this.index = 0
-            }
-            this._scrollview()
-          }
-        }
-      },
-      _choose(index, item) {
-        this.index = index
-        this.current = item
-        this.breadcrumbs = this.breadcrumbs.slice(0, this.level)
-        this.breadcrumbs.push(item)
-        this.level++
-        if (!this.children.length) {
-          this.cfg.onSelect && this.cfg.onSelect(item.id, item.name, this.breadcrumbs)
-          this.level--
-          this._close()
-        }
-      },
-      _clear() {
-        this.level = 0
-        this._close()
-        this.cfg.onSelect && this.cfg.onSelect('', '')
-      },
-      _back() {
-        if (this.level == 0) return
-        this.level--
-        this.current = this.breadcrumbs[this.level]
-        let index = this.children.findIndex((value, index, arr) => value.id == this.current.id)
-        this.index = Math.max(0, index)
-        this._scrollview()
-      },
-      _close() {
-        this.cfg.__name && (this.$parent[this.cfg.__name] = false)
-      }
-    },
-  }
-</script>
