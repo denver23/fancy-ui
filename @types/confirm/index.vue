@@ -1,3 +1,15 @@
+
+<template lang="pug">
+  .fancy-confirm(tabindex="1")
+    div
+      .fc-msg(v-html="cfg.message")
+      .fc-btns
+        span(:class="{'fc-sending': sending}" v-if="cfg.confirm" @click="onClick(1)") {{cfg.confirm}}
+        span(v-if="cfg.cancel" @click="onClick(0)") {{cfg.cancel}}
+</template>
+
+<script src="./script.ts"></script>
+
 <style lang="sass">
   @import "~fancy_style"
   @import "~fancy_mixins"
@@ -67,66 +79,3 @@
         min-width: 40%
 
 </style>
-
-<template lang="pug">
-  .fancy-confirm(tabindex="1")
-    div
-      .fc-msg(v-html="cfg.message")
-      .fc-btns
-        span(:class="{'fc-sending': sending}" v-if="cfg.confirm" @click="_done(1)") {{cfg.confirm}}
-        span(v-if="cfg.cancel" @click="_done(0)") {{cfg.cancel}}
-</template>
-
-<script>
-const Options = {
-  message: '',
-  confirm: 'confirm',
-  cancel: 'cancel',
-  onConfirm() {},
-  onCancel() {},
-  __name: 'confirm',
-  // onConfirm() {
-  //   return new Promise((resolve, reject) => {
-  //     setTimeout(() => resolve(), 1000)
-  //   })
-  // },
-}
-export default {
-  props: ['cfg'],
-  data() {
-    return { sending: false }
-  },
-  created() {
-    Object.keys(Options).forEach(i => this.cfg.hasOwnProperty(i) || this.$set(this.cfg, i, Options[i]))
-    document.addEventListener('keydown', this._kdown, false)
-  },
-  mounted() {
-    this.$el.focus()
-  },
-  destroyed() {
-    document.removeEventListener('keydown', this._kdown, false)
-  },
-  methods: {
-    _kdown(e) {
-      // enter space center esc
-      if ([13, 32, 100, 27].includes(e.keyCode)) {
-        e.preventDefault()
-        e.stopPropagation()
-        // esc
-        if (e.keyCode == 27 || !this.cfg.confirm) return this._done(0)
-        return this._done(1)
-      }
-    },
-    _done: async function(type) {
-      if (this.sending) return
-      this.sending = type
-      try {
-        type ? await this.cfg.onConfirm() : await this.cfg.onCancel()
-      } catch (e) {}
-      this.sending = false
-      this.cfg.__name && (this.$parent[this.cfg.__name] = false)
-    },
-  },
-}
-</script>
-
