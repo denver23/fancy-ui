@@ -1,3 +1,99 @@
+<template lang="pug">
+  form.fancy-forms(
+    :class="'fc-'+ (cfg.type || 'forms')"
+    ref="form"
+    @submit="onSubmit"
+    method="post"
+    autocomplete="off"
+    onSubmit="return false"
+  )
+    template(v-for="row of cfg.data")
+      dl(v-if="row")
+        template(v-if="v" v-for="v of (Array.isArray(row) ? row : [row])")
+          dt(v-if="typeof v.label !== 'undefined'")
+            label(:for="v.id || v.name" v-html="v.label" v-if="v.label")
+          dd
+            input(
+              v-if="!v.type || v.type === 'text'"
+              type="text"
+              v-bind="[{id: v.id || v.name, name: v.name}, v.attr]"
+              v-model="cfg.value[v.name]"
+            )
+            template(v-else)
+              input(
+                v-if="['reset','button'].includes(v.type)"
+                v-bind="[{type: v.type, name: v.name, value: v.value}, v.attr]"
+              )
+              input(
+                v-else-if="v.type === 'submit'"
+                type="submit"
+                v-bind="[{name: v.name, value: v.value}, v.attr]"
+                ,:disabled="sending"
+              )
+
+              input(
+                v-else-if="['number','tel', 'password','hidden'].includes(v.type)"
+                v-bind="[{name: v.name, value: v.value, id: v.id || v.name}, v.attr]"
+                ,:type="v.type"
+                v-model="cfg.value[v.name]"
+              )
+
+              textarea(
+                v-else-if="v.type === 'textarea'"
+                v-bind="[{id: v.id || v.name, name: v.name}, v.attr]"
+                v-model="cfg.value[v.name]"
+              )
+
+              select(
+                v-else-if="v.type === 'select'"
+                v-bind="[{id: v.id || v.name, name: v.name}, v.attr]"
+                v-model="cfg.value[v.name]"
+              )
+                option(
+                  v-for="vv of v.data"
+                  ,:value="typeof vv === 'string' ? vv : vv.value"
+                  v-html="vv.label || vv.value || vv"
+                )
+
+              label(v-else-if="v.type === 'radio'" v-for="(vv,k) of v.data")
+                input(
+                  type="radio"
+                  ,:name="v.name"
+                  ,:value="vv.value"
+                  v-model="cfg.value[v.name]"
+                )
+                span(v-html="vv.label")
+
+              template(v-else-if="v.type === 'checkbox'")
+                label(v-if="v.checkAll")
+                  input(
+                    type="checkbox",
+                    ,:name="v.name"
+                    ,:value="v.checkAll.value"
+                    v-model="checkAll[v.name]"
+                    @click="onChkAll(v)"
+                  )
+                  span(v-html="v.checkAll.label")
+                label(v-for="(vv,k) of v.data")
+                  input(
+                    type="checkbox"
+                    ,:name="v.name"
+                    ,:value="vv.value"
+                    v-model="cfg.value[v.name]"
+                    @click="onChk(v, vv)"
+                  )
+                  span(v-html="vv.label")
+
+              component(:is="v.name",:cfg="v.value" v-else-if="v.type === 'component' && v.value" )
+              //- others
+              span(v-else v-html="v.value" v-bind="v.attr")
+
+            //- tips
+            cite(v-if="tips[v.name] || (sending && v.type === 'submit')" v-text="tips[v.name]")
+</template>
+
+<script src="./script.ts"></script>
+
 <style lang="sass">
   @import "~fancy_style"
   @import "~fancy_mixins"
@@ -230,257 +326,3 @@
     @media #{$device-mobile}
       @include in-mobile()
 </style>
-
-<template lang="pug">
-  form.fancy-forms(
-    :class="'fc-'+ (cfg.type || 'forms')"
-    ref="form"
-    @submit="_submit"
-    method="post"
-    autocomplete="off"
-    onSubmit="return false"
-  )
-    template(v-for="row of cfg.data")
-      dl(v-if="row")
-        template(v-if="v" v-for="v of (Array.isArray(row) ? row : [row])")
-          dt(v-if="typeof v.label !== 'undefined'")
-            label(:for="v.id || v.name" v-html="v.label" v-if="v.label")
-          dd
-            input(
-              v-if="!v.type || v.type === 'text'"
-              type="text"
-              v-bind="[{id: v.id || v.name, name: v.name}, v.attr]"
-              v-model="cfg.value[v.name]"
-            )
-            template(v-else)
-              input(
-                v-if="['reset','button'].includes(v.type)"
-                v-bind="[{type: v.type, name: v.name, value: v.value}, v.attr]"
-              )
-              input(
-                v-else-if="v.type === 'submit'"
-                type="submit"
-                v-bind="[{name: v.name, value: v.value}, v.attr]"
-                ,:disabled="sending"
-              )
-
-              input(
-                v-else-if="['number','tel', 'password','hidden'].includes(v.type)"
-                v-bind="[{name: v.name, value: v.value, id: v.id || v.name}, v.attr]"
-                ,:type="v.type"
-                v-model="cfg.value[v.name]"
-              )
-
-              textarea(
-                v-else-if="v.type === 'textarea'"
-                v-bind="[{id: v.id || v.name, name: v.name}, v.attr]"
-                v-model="cfg.value[v.name]"
-              )
-
-              select(
-                v-else-if="v.type === 'select'"
-                v-bind="[{id: v.id || v.name, name: v.name}, v.attr]"
-                v-model="cfg.value[v.name]"
-              )
-                option(
-                  v-for="vv of v.data"
-                  ,:value="typeof vv === 'string' ? vv : vv.value"
-                  v-html="vv.label || vv.value || vv"
-                )
-
-              label(v-else-if="v.type === 'radio'" v-for="(vv,k) of v.data")
-                input(
-                  type="radio"
-                  ,:name="v.name"
-                  ,:value="vv.value"
-                  v-model="cfg.value[v.name]"
-                )
-                span(v-html="vv.label")
-
-              template(v-else-if="v.type === 'checkbox'")
-                label(v-if="v.checkAll")
-                  input(
-                    type="checkbox",
-                    ,:name="v.name"
-                    ,:value="v.checkAll.value"
-                    v-model="checkAll[v.name]"
-                    @click="_onChkAll(v)"
-                  )
-                  span(v-html="v.checkAll.label")
-                label(v-for="(vv,k) of v.data")
-                  input(
-                    type="checkbox"
-                    ,:name="v.name"
-                    ,:value="vv.value"
-                    v-model="cfg.value[v.name]"
-                    @click="_onChk(v, vv)"
-                  )
-                  span(v-html="vv.label")
-
-              component(:is="v.name",:cfg="v.value" v-else-if="v.type === 'component' && v.value" )
-              //- others
-              span(v-else v-html="v.value" v-bind="v.attr")
-
-            //- tips
-            cite(v-if="tips[v.name] || (sending && v.type === 'submit')" v-text="tips[v.name]")
-</template>
-
-<script>
-function getQueryAll() {
-  let res = {}
-  let str = window.location.search.substr(1)
-  str != null &&
-    str.replace(/([^=&]+)=([^&]*)/g, (all, key, value) => {
-      value && (res[key] = decodeURIComponent(value))
-    })
-  return res
-}
-
-let timer = {}
-const Options = {
-  data: false,
-  type: '', // search column forms
-  value: {},
-  pushstate: false, // object
-  onReset() {},
-  onReady(data, form) {},
-  onSubmit(data, form) {},
-  onPopstate(data, form) {},
-  validator: false,
-}
-
-export default {
-  props: ['cfg'],
-  data() {
-    return {
-      tips: {},
-      sending: false,
-      submitName: '_submit_',
-      checkAll: {},
-    }
-  },
-  created() {
-    let cfg = this.cfg
-    Object.keys(Options).forEach(i => cfg.hasOwnProperty(i) || this.$set(cfg, i, Options[i]))
-
-    if (cfg.type === 'search') {
-      Object.assign(cfg.value, getQueryAll())
-      typeof cfg.onPopstate === 'function' &&
-        window.addEventListener('popstate', e => {
-          Object.assign(cfg.value, getQueryAll())
-          cfg.onPopstate(cfg.value, this.$refs.form)
-        })
-    }
-    // validator and submit
-    cfg.data &&
-      cfg.data.forEach(val =>
-        (Array.isArray(val) ? val : [val]).forEach(v => {
-          if (v.type === 'submit') {
-            this.submitName = v.name || '_submit_'
-            this.$set(this.tips, this.submitName, '')
-            this.$set(v, 'name', this.submitName)
-          } else if (v.name && !['reset', 'button', 'component'].includes(v.type)) {
-            this.$set(this.tips, v.name, '')
-            this.$set(cfg.value, v.name, v.name in cfg.value ? cfg.value[v.name] : v.value || '')
-            // set checkAll
-            if (v.type === 'checkbox' && v.checkAll) {
-              let _chked = true
-              for (let _chk of v.data) {
-                if (!cfg.value[v.name].includes(_chk.value)) {
-                  _chked = false
-                  break
-                }
-              }
-              this.checkAll[v.name] = _chked
-            }
-          }
-        }),
-      )
-  },
-  mounted() {
-    requestAnimationFrame(() => {
-      let cfg = this.cfg
-      if (typeof cfg.onReady === 'function') {
-        cfg.onReady.call(this, cfg.value, this.$refs.form)
-      }
-      if (typeof cfg.onReset === 'function') {
-        let inp = this.$el.querySelector('input[type="reset"]')
-        inp && inp.addEventListener('click', cfg.onReset.bind(this))
-      }
-    })
-  },
-  watch: {
-    'cfg.pushstate'(val) {
-      if (typeof val === 'object') {
-        let url = window.location.href.split('?')[0]
-        let param = Object.entries(val)
-          .map(v => v[1] && v.join('='))
-          .filter(v => v)
-          .join('&')
-        window.history.pushState(
-          {
-            title: '',
-          },
-          '',
-          `${url}?${param}`,
-        )
-      }
-    },
-  },
-  methods: {
-    _onChkAll(v) {
-      let arr = this.cfg.value[v.name]
-      arr.splice(0)
-      if (this.checkAll[v.name]) {
-        v.data.forEach(v => arr.push(v.value))
-        if (typeof v.checkAll.value != 'undefined') arr.push(v.checkAll.value)
-      }
-    },
-    _onChk(v, vv) {
-      if (v.checkAll) {
-        let _val = this.cfg.value[v.name]
-        if (_val && _val.includes(vv.value)) {
-          if (_val.length == v.data.length) {
-            this.checkAll[v.name] = v.checkAll.value || true
-            if (typeof v.checkAll.value != 'undefined') _val.push(v.checkAll.value)
-          }
-        } else {
-          this.checkAll[v.name] = false
-          let _i = _val.findIndex(n => n === v.checkAll.value)
-          if (_i >= 0) _val.splice(_i, 1)
-        }
-      }
-    },
-    _submit: async function() {
-      let cfg = this.cfg
-      if (cfg.validator) {
-        for (let [key, _func] of Object.entries(cfg.validator)) {
-          let res = _func(cfg.value[key], cfg.value)
-          if (res !== true) {
-            this.tips[key] = false
-            this.$el.querySelector(`[name="${key}"]`).focus()
-            requestAnimationFrame(() => {
-              this.tips[key] = res
-              clearTimeout(timer[key])
-              timer[key] = setTimeout(() => {
-                this.tips[key] = false
-              }, 3000)
-            })
-            return
-          }
-        }
-      }
-
-      this.tips[this.submitName] = ''
-      if (this.sending) return
-      this.sending = true
-      try {
-        cfg.onSubmit && (await cfg.onSubmit.call(this, cfg.value, this.$refs.form))
-      } catch (err) {
-        this.tips[this.submitName] = err
-      }
-      this.sending = false
-    },
-  },
-}
-</script>

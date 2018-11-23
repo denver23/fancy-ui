@@ -4,7 +4,7 @@ import { Component, Watch, Vue } from 'vue-property-decorator'
 // let res = str.match(/^(\d{4,4})\D*(\d{1,2})\D+(\d{1,2})\D*(\d{1,2}):(\d{1,2}):(\d{1,2}).*/)
 // function buildCalendar(year = new Date().getFullYear(), month = new Date().getMonth(), validBegin = '', validEnd) {
 
-function buildCalendar(y: string, m: string, validBegin: string = '', validEnd: string) {
+function buildCalendar(y: string, m: string, validBegin: string = '', validEnd: string): any[] {
   const year = parseInt(y, 10)
   const month = parseInt(m, 10)
 
@@ -84,7 +84,7 @@ function buildCalendar(y: string, m: string, validBegin: string = '', validEnd: 
 
 export interface IDatetimePicker {
   target: string
-  value: number
+  value: string
   type: string
   beginDate?: string
   endDate?: string
@@ -95,14 +95,14 @@ export interface IDatetimePicker {
   times?: string[]
   confirm?: string
   cancel?: string
-  onSelect?: (str: string) => void
+  onSelect?: (date: Date) => void
 }
 
 const minYear = 1970
 const maxYear = 2100
 const options: IDatetimePicker = {
   target: '',
-  value: Date.now(),
+  value: '',
   type: 'date',
   beginDate: '',
   endDate: '',
@@ -113,7 +113,7 @@ const options: IDatetimePicker = {
   times: ['h', 'm', 's'],
   confirm: 'Confirm',
   cancel: 'Cancel',
-  onSelect: str => console.log(str),
+  onSelect: date => console.log(date),
 }
 
 @Component({
@@ -127,7 +127,8 @@ export default class App extends Vue {
   private hour: number = 0
   private minute: number = 0
   private second: number = 0
-  private type: string = '' // date|datetime
+
+  protected type: string = '' // date|datetime
   protected position: any = false
 
   protected created() {
@@ -135,7 +136,7 @@ export default class App extends Vue {
       this.cfg.hasOwnProperty(i) || this.$set(this.cfg, i, (options as any)[i])
     })
     this.type = this.cfg.type || (String(this.cfg.value).indexOf(':') > 0 ? 'datetime' : 'date')
-    this.getTime(cfg.value)
+    this.getTime(this.cfg.value)
   }
 
   protected mounted() {
@@ -155,14 +156,14 @@ export default class App extends Vue {
   }
 
   @Watch('year')
-  protected onYearChanged(val: number) {
+  protected yearChanged(val: number) {
     // last day of month
     const lastday = new Date(val, this.month + 1, 0).getDate()
     this.day = Math.min(this.day, lastday)
   }
 
   @Watch('month')
-  protected onMonthChanged(val: number) {
+  protected monthChanged(val: number) {
     // last day of month
     const lastday = new Date(this.year, val + 1, 0).getDate()
     this.day = Math.min(this.day, lastday)
@@ -193,66 +194,89 @@ export default class App extends Vue {
     this.second = date.getSeconds()
   }
 
-  protected onClose(e) {
+  protected onClose(e?: MouseEvent) {
     e && e.stopPropagation && e.stopPropagation()
-    this.cfg.__name && (this.$parent[this.cfg.__name] = false)
   }
-  protected onKeyDown(e) {
+  protected onKeyDown(e: KeyboardEvent) {
     if ([8, 27, 13, 32, 37, 38, 39, 40].includes(e.keyCode)) {
       e.preventDefault()
       e.stopPropagation()
     }
     // back Esc
-    if ([8, 27].includes(e.keyCode)) return this.onClose()
+    if ([8, 27].includes(e.keyCode)) {
+      return this.onClose()
+    }
     // enter space
-    if ([13, 32].includes(e.keyCode)) return this.onSubmit()
+    if ([13, 32].includes(e.keyCode)) {
+      return this.onSubmit()
+    }
     // up down
-    if (e.keyCode == 38) this.onDayChange(-7)
-    if (e.keyCode == 40) this.onDayChange(7)
+    if (e.keyCode === 38) {
+      this.onDayChange(-7)
+    }
+    if (e.keyCode === 40) {
+      this.onDayChange(7)
+    }
     // left right
-    if (e.keyCode == 37) this.onDayChange(-1)
-    if (e.keyCode == 39) this.onDayChange(1)
+    if (e.keyCode === 37) {
+      this.onDayChange(-1)
+    }
+    if (e.keyCode === 39) {
+      this.onDayChange(1)
+    }
   }
-  protected onKeyDownInp(e) {
+
+  protected onKeyDownInp(e: KeyboardEvent) {
     e.stopPropagation()
     // return enter
-    if (e.keyCode == 13) return this.onSubmit()
+    if (e.keyCode === 13) {
+      return this.onSubmit()
+    }
   }
+
   protected goToday() {
-    let t = new Date()
+    const t = new Date()
     this.year = t.getFullYear()
     this.month = t.getMonth()
     this.day = t.getDate()
   }
-  protected onYearChange(n) {
+
+  protected onYearChange(n: number) {
     this.year = Math.min(Math.max(this.year + n, this.cfg.minYear || minYear), this.cfg.maxYear || maxYear)
   }
-  protected onMonthChange(n) {
-    let newmonth = this.month + n
+  protected onMonthChange(n: number) {
+    const newmonth = this.month + n
     if (newmonth > 11) {
-      if (this.year >= this.cfg.maxYear) return
+      if (this.year >= this.cfg.maxYear) {
+        return
+      }
       this.year++
       this.month = 0
       return
     }
     if (newmonth < 0) {
-      if (this.year <= this.cfg.minYear) return
+      if (this.year <= this.cfg.minYear) {
+        return
+      }
       this.year--
       this.month = 11
       return
     }
     this.month = newmonth
   }
-  protected onDayChange(n) {
+
+  protected onDayChange(n: number) {
     // last day of last month
-    let prelastday = new Date(this.year, this.month, 0).getDate()
+    const prelastday = new Date(this.year, this.month, 0).getDate()
     // last day of month
-    let lastday = new Date(this.year, this.month + 1, 0).getDate()
-    let newday = this.day + n
+    const lastday = new Date(this.year, this.month + 1, 0).getDate()
+    const newday = this.day + n
 
     if (newday > lastday) {
-      if (this.month == 11) {
-        if (this.year >= this.cfg.maxYear) return
+      if (this.month === 11) {
+        if (this.year >= this.cfg.maxYear) {
+          return
+        }
         this.year++
         this.month = 0
       } else {
@@ -262,8 +286,10 @@ export default class App extends Vue {
       return
     }
     if (newday < 1) {
-      if (this.month == 0) {
-        if (this.year <= this.cfg.minYear) return
+      if (this.month === 0) {
+        if (this.year <= this.cfg.minYear) {
+          return
+        }
         this.year--
         this.month = 11
       } else {
@@ -275,19 +301,17 @@ export default class App extends Vue {
     this.day = newday
     // this.day = Math.min( Math.max(this.day + n, 1), lastday )
   }
-  protected onChoose(item) {
+  protected onChoose(item: any) {
     this.year = item.year
     this.month = item.month
     this.day = item.day
     this.onSubmit()
   }
   protected onSubmit() {
-    let res = new Date(
+    const res = new Date(
       [this.year, this.month + 1, this.day].join('/') + ' ' + [this.hour, this.minute, this.second].join(':'),
     )
-    if (!isNaN(res)) {
-      this.onClose()
-      this.cfg.onSelect(res)
-    }
+    this.onClose()
+    this.cfg.onSelect(res)
   }
 }

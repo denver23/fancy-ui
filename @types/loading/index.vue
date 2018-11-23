@@ -1,3 +1,13 @@
+
+
+<template lang="pug">
+  .fancy-loading
+    em
+    div(v-if="cfg.content" v-html="cfg.content")
+</template>
+
+<script src="./script.ts"></script>
+
 <style lang="sass">
   @import "~fancy_style"
   .fancy-loading
@@ -18,21 +28,3 @@
       padding-top: $space
       text-align: center
 </style>
-
-<template lang="pug">
-  .fancy-loading
-    em
-    div(v-if="cfg.content" v-html="cfg.content")
-</template>
-
-<script>
-const Options = {
-  content: '',
-}
-export default {
-  props: ['cfg'],
-  created() {
-    Object.keys(Options).forEach(i => this.cfg.hasOwnProperty(i) || this.$set(this.cfg, i, Options[i]))
-  },
-}
-</script>
