@@ -1,10 +1,22 @@
+import { Component, Vue } from 'vue-property-decorator'
 
-const Options = {
+export interface ILoading {
+  content: string
+}
+
+const options: ILoading = {
   content: '',
 }
-export default {
+
+@Component({
   props: ['cfg'],
-  created() {
-    Object.keys(Options).forEach(i => this.cfg.hasOwnProperty(i) || this.$set(this.cfg, i, Options[i]))
-  },
+})
+export default class App extends Vue {
+  private cfg: ILoading
+
+  protected created() {
+    Object.keys(options).forEach(i => {
+      this.cfg.hasOwnProperty(i) || this.$set(this.cfg, i, (options as any)[i])
+    })
+  }
 }

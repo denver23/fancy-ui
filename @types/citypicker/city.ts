@@ -598,7 +598,7 @@ const zxs = ['1', '2', '9', '22', '32', '33', '34']
 function getPath(id: string) {
   const res: any[] = []
   // 递归
-  const d = function(n: string) {
+  const d = (n: string) => {
     if (!n) {
       return
     }
