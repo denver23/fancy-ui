@@ -1,4 +1,4 @@
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 
 export const enum EMessage {
   error = 'error',
@@ -28,11 +28,9 @@ const options: IMessage = {
   time: -1, // millisecond <0: no jump
 }
 
-@Component({
-  props: ['cfg'],
-})
+@Component
 export default class App extends Vue {
-  private cfg: IMessage
+  @Prop() private cfg: IMessage
 
   protected created() {
     Object.keys(options).forEach(i => {

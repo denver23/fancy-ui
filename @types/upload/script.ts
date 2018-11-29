@@ -1,4 +1,4 @@
-import { Component, Watch, Vue } from 'vue-property-decorator'
+import { Component, Prop, Watch, Vue } from 'vue-property-decorator'
 
 function isData(str: string): boolean {
   return /^data:image.*base64,/.test(str)
@@ -40,11 +40,9 @@ const options: IUpload = {
   trigger: false,
 }
 
-@Component({
-  props: ['cfg'],
-})
+@Component
 export default class App extends Vue {
-  private cfg: IUpload
+  @Prop() private cfg: IUpload
   private dataTimer: any = null
 
   protected created() {

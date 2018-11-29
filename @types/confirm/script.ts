@@ -1,4 +1,4 @@
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 
 export interface IConfirm {
   message?: string
@@ -14,11 +14,9 @@ const options: IConfirm = {
   cancel: 'cancel',
 }
 
-@Component({
-  props: ['cfg'],
-})
+@Component
 export default class App extends Vue {
-  private cfg: IConfirm
+  @Prop() private cfg: IConfirm
   private sending: boolean = false
 
   protected created() {

@@ -48,14 +48,16 @@
         display: block
         width: $row-height
         height: $row-height
-        background: url(images/android-close.svg?fill=#{$colorTheme}) no-repeat center
-        background-size: 70% auto
+        mask: url(images/android-close.svg) no-repeat center
+        mask-size: 70% auto
+        background-color: $colorTheme
         &:hover
           opacity: 0.5
         &.fc-delete
-          background-image: url(images/ios-trash-outline.svg?fill=#{$borderColor})
+          mask-image: url(images/ios-trash-outline.svg)
+          background-color: $borderColor
         &.fc-back
-          background-image: url(images/android-arrow-back.svg?fill=#{$colorTheme})
+          mask-image: url(images/android-arrow-back.svg)
     ul
       flex: 1
       overflow-y: auto

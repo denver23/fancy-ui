@@ -1,4 +1,4 @@
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 
 export interface ITabs {
   data: any[]
@@ -10,11 +10,9 @@ const options: ITabs = {
   active: 0,
 }
 
-@Component({
-  props: ['cfg'],
-})
+@Component
 export default class App extends Vue {
-  private cfg: ITabs
+  @Prop() private cfg: ITabs
 
   protected created() {
     Object.keys(options).forEach(i => {

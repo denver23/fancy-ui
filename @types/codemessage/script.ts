@@ -1,4 +1,4 @@
-import { Component, Watch, Vue } from 'vue-property-decorator'
+import { Component, Watch, Vue, Prop } from 'vue-property-decorator'
 
 export interface ICodeMessage {
   show?: boolean
@@ -19,11 +19,10 @@ const options: ICodeMessage = {
   auto: false,
 }
 
-@Component({
-  props: ['cfg'],
-})
+@Component
 export default class App extends Vue {
-  private cfg: ICodeMessage = null
+  @Prop() private cfg: ICodeMessage
+
   private downtime: number = 0
   private timer: any = null
 

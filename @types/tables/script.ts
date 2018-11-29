@@ -1,4 +1,4 @@
-import { Component, Watch, Vue } from 'vue-property-decorator'
+import { Component, Prop, Watch, Vue } from 'vue-property-decorator'
 
 export interface ITables {
   data: any
@@ -21,11 +21,10 @@ const options: ITables = {
   },
 }
 
-@Component({
-  props: ['cfg'],
-})
+@Component
 export default class App extends Vue {
-  private cfg: ITables
+  @Prop() private cfg: ITables
+
   protected modelAll: any = {}
   protected pickerState: boolean = false
 

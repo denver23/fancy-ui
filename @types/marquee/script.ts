@@ -1,4 +1,4 @@
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 
 export interface IMarquee {
   data?: any[]
@@ -15,11 +15,9 @@ const options: IMarquee = {
   dataFormat: (val: any) => `<a href="${val.url}">${val.name}</a>`,
 }
 
-@Component({
-  props: ['cfg'],
-})
+@Component
 export default class App extends Vue {
-  private cfg: IMarquee
+  @Prop() private cfg: IMarquee
 
   protected mounted() {
     Object.keys(options).forEach(i => {

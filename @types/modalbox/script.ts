@@ -1,4 +1,4 @@
-import { Component, Watch, Vue } from 'vue-property-decorator'
+import { Component, Prop, Watch, Vue } from 'vue-property-decorator'
 
 export interface IModalBox {
   title?: string
@@ -26,11 +26,10 @@ const options: IModalBox = {
   draggable: true,
 }
 
-@Component({
-  props: ['cfg'],
-})
+@Component
 export default class App extends Vue {
-  private cfg: any
+  @Prop() private cfg: IModalBox
+
   private sending: boolean = false
 
   @Watch('cfg.content')

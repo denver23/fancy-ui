@@ -1,4 +1,4 @@
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 
 export interface ILoading {
   content: string
@@ -8,11 +8,9 @@ const options: ILoading = {
   content: '',
 }
 
-@Component({
-  props: ['cfg'],
-})
+@Component
 export default class App extends Vue {
-  private cfg: ILoading
+  @Prop() private cfg: ILoading
 
   protected created() {
     Object.keys(options).forEach(i => {

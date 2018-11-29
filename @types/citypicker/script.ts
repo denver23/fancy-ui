@@ -1,4 +1,4 @@
-import { Component, Watch, Vue } from 'vue-property-decorator'
+import { Component, Prop, Watch, Vue } from 'vue-property-decorator'
 import City from './city'
 
 export interface ICityPicker {
@@ -12,11 +12,10 @@ const options: ICityPicker = {
   maxLevel: 2,
 }
 
-@Component({
-  props: ['cfg'],
-})
+@Component
 export default class App extends Vue {
-  private cfg: ICityPicker
+  @Prop() private cfg: ICityPicker
+
   private current: any = {}
   private level: number = 0
   private index: number = 0

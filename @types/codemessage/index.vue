@@ -1,9 +1,9 @@
 <template lang="pug">
-  .fancy-codemessage(v-if="cfg.show")
+  .fancy-codemessage(v-if="cfg && cfg.show")
     button(
       v-bind="{disabled: downtime > 0}"
       v-text="txt"
-      @click="click"
+      @click="onClick"
       type="button"
     )
 </template>

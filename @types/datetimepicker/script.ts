@@ -1,4 +1,4 @@
-import { Component, Watch, Vue } from 'vue-property-decorator'
+import { Component, Prop, Watch, Vue } from 'vue-property-decorator'
 
 // let str = '2012.12-23 23:01:59'
 // let res = str.match(/^(\d{4,4})\D*(\d{1,2})\D+(\d{1,2})\D*(\d{1,2}):(\d{1,2}):(\d{1,2}).*/)
@@ -116,11 +116,10 @@ const options: IDatetimePicker = {
   onSelect: date => console.log(date),
 }
 
-@Component({
-  props: ['cfg'],
-})
+@Component
 export default class App extends Vue {
-  private cfg: IDatetimePicker
+  @Prop() private cfg: IDatetimePicker
+
   private year: number = 0
   private month: number = 0
   private day: number = 0

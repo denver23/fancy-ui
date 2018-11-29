@@ -1,4 +1,4 @@
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 
 export interface ITree {
   data: any
@@ -30,11 +30,9 @@ const options: ITree = {
   onRemove: (param, cb) => cb(),
 }
 
-@Component({
-  props: ['cfg'],
-})
+@Component
 export default class App extends Vue {
-  private cfg: ITree
+  @Prop() private cfg: ITree
   private tree: any
   private treelevel: number | undefined
   private treeMaxLevel: number

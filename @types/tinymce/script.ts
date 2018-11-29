@@ -8,7 +8,7 @@
 // import 'tinymce/plugins/contextmenu'
 // import 'tinymce/plugins/fullscreen'
 // import 'tinymce/plugins/preview'
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 declare const tinymce: any
 export interface ITinymce {
   name: string
@@ -28,11 +28,9 @@ const options: ITinymce = {
   btnImage: false,
 }
 
-@Component({
-  props: ['cfg'],
-})
+@Component
 export default class App extends Vue {
-  private cfg: ITinymce
+  @Prop() private cfg: ITinymce
 
   protected created() {
     Object.keys(options).forEach(i => {

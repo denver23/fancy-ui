@@ -1,4 +1,4 @@
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 
 export interface IPagination {
   total?: number
@@ -23,11 +23,9 @@ const options: IPagination = {
   lastPage: '',
 }
 
-@Component({
-  props: ['cfg'],
-})
+@Component
 export default class App extends Vue {
-  private cfg: IPagination
+  @Prop() private cfg: IPagination
 
   protected created() {
     Object.keys(options).forEach(i => {

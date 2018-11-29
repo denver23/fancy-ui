@@ -1,4 +1,4 @@
-import { Component, Watch, Vue } from 'vue-property-decorator'
+import { Component, Prop, Watch, Vue } from 'vue-property-decorator'
 
 function getQueryAll() {
   const res: any = {}
@@ -33,11 +33,10 @@ const options: IForms = {
   validator: false,
 }
 
-@Component({
-  props: ['cfg'],
-})
+@Component
 export default class App extends Vue {
-  private cfg: IForms
+  @Prop() private cfg: IForms
+
   protected tips: any = {}
   protected sending: boolean = false
   protected submitName: string = 'onSubmit_'

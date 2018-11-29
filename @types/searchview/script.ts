@@ -1,4 +1,4 @@
-import { Component, Watch, Vue } from 'vue-property-decorator'
+import { Component, Prop, Watch, Vue } from 'vue-property-decorator'
 
 export interface ISearchView {
   attr?: any
@@ -18,7 +18,6 @@ const options: ISearchView = {
 }
 
 @Component({
-  props: ['cfg'],
   filters: {
     highlight(str: string, val: string) {
       return val ? str.replace(new RegExp(val, 'ig'), `<em>${val}</em>`) : str
@@ -26,7 +25,8 @@ const options: ISearchView = {
   },
 })
 export default class App extends Vue {
-  private cfg: ISearchView
+  @Prop() private cfg: ISearchView
+
   private show: boolean = false
   private selectIndex: number = 0
 
@@ -37,7 +37,7 @@ export default class App extends Vue {
   }
 
   @Watch('show')
-  private onShowChanged(val: boolean) {
+  protected onShowChanged(val: boolean) {
     if (val && this.cfg.value && this.cfg.data) {
       const index = this.cfg.data.findIndex(v => v.name === this.cfg.value)
       const list: any = this.$refs.list

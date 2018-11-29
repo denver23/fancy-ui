@@ -1,4 +1,4 @@
-import { Component, Watch, Vue } from 'vue-property-decorator'
+import { Component, Prop, Watch, Vue } from 'vue-property-decorator'
 
 export interface ISideBar {
   data: any
@@ -12,11 +12,10 @@ const options: ISideBar = {
   active: '',
 }
 
-@Component({
-  props: ['cfg'],
-})
+@Component
 export default class App extends Vue {
-  private cfg: ISideBar
+  @Prop() private cfg: ISideBar
+
   private state: boolean = false
   private folded: any = {}
 

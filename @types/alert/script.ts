@@ -1,4 +1,4 @@
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 
 export interface IAlert {
   message?: string
@@ -13,11 +13,9 @@ const options: IAlert = {
   ismask: true,
 }
 
-@Component({
-  props: ['cfg'],
-})
+@Component
 export default class App extends Vue {
-  private cfg: IAlert
+  @Prop() private cfg: IAlert
 
   public created() {
     Object.keys(options).forEach(i => {
