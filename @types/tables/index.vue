@@ -4,7 +4,7 @@
       .fc-picker(ref="picker" v-if="cfg.picker")
         button(@click.stop="pickerState = !pickerState") {{cfg.picker.name}}
         div(v-show="pickerState" @click.stop="")
-          label(v-for="v of cfg.columns" v-if="v.label && cfg.picker && false == cfg.picker.filter.includes(v.label)")
+          label(v-for="v of cfg.columns" v-if="v.label && cfg.picker")
             input(type="checkbox",:value="v.label" v-model="cfg.picker.value")
             span {{v.label}}
     ol

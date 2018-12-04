@@ -1,8 +1,8 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
 
 export interface ITabs {
-  data: any[]
-  active: number
+  data: any
+  active: string | number
 }
 
 const options: ITabs = {

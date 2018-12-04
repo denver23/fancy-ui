@@ -1,11 +1,17 @@
 import { Component, Prop, Watch, Vue } from 'vue-property-decorator'
 
+interface ITablesPicker {
+  name: string
+  value: any[]
+  filter: any[]
+}
+
 export interface ITables {
-  data: any
-  columns: any[]
-  values: any
-  state: string
-  picker: object
+  data?: any
+  columns?: any[]
+  values?: any
+  state?: string
+  picker?: ITablesPicker
   onCreated?: () => void
 }
 
@@ -22,8 +28,8 @@ const options: ITables = {
 }
 
 @Component
-export default class App extends Vue {
-  @Prop() private cfg: ITables
+export default class ComponentTables extends Vue {
+  @Prop() protected cfg: ITables
 
   protected modelAll: any = {}
   protected pickerState: boolean = false
