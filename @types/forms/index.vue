@@ -1,6 +1,6 @@
 <template lang="pug">
   form.fancy-forms(
-    :class="'fc-'+ (cfg.type || 'forms')"
+    :class="'fc-'+ (cfg.category || 'forms')"
     ref="form"
     @submit="onSubmit"
     method="post"

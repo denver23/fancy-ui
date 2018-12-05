@@ -13,24 +13,77 @@ function getQueryAll() {
   return res
 }
 
+export const enum EFormsCategory {
+  forms = 'forms',
+  search = 'search',
+}
+export const enum EFormsType {
+  button = 'button',
+  checkbox = 'checkbox',
+  component = 'component',
+  hidden = 'hidden',
+  number = 'number',
+  password = 'password',
+  radio = 'radio',
+  reset = 'reset',
+  select = 'select',
+  submit = 'submit',
+  tel = 'tel',
+  text = 'text',
+  textarea = 'textarea',
+}
+
+export interface IFormValue {
+  [key: string]: string | number | string[] | number[]
+}
+// form attribute
+export interface IFormsAttr {
+  [key: string]: string | number
+}
+// select checkbox radio
+export interface IFormsOption {
+  label: string
+  value: string | number
+}
+
+export interface IFormsItem {
+  name: string
+  label?: string
+  value?: string | number
+  checkAll?: boolean
+  type?: EFormsType
+  attr?: IFormsAttr
+  data?: IFormsOption[]
+}
+
+// 多行表单
+export interface IFormsItemMult {
+  [index: number]: IFormsItem
+}
+
+// 验证器
+export interface IFormValidator {
+  [key: string]: (key: string | number | string[] | number[], value: IFormValue) => boolean
+}
+
 export interface IForms {
-  data: any[]
-  type: string
-  value: any
+  data: Array<IFormsItem | IFormsItemMult>
+  value: IFormValue
+  category?: EFormsCategory
+  validator?: IFormValidator
   pushstate?: any
-  validator?: any
   onReset?: () => void
-  onReady?: (data: any, form: HTMLFormElement) => void
-  onSubmit?: (data: any, form: HTMLFormElement) => void
-  onPopstate?: (data: any, form: HTMLFormElement) => void
+  onReady?: (data: IFormValue, form: HTMLFormElement) => void
+  onSubmit?: (data: IFormValue, form: HTMLFormElement) => void
+  onPopstate?: (data: IFormValue, form: HTMLFormElement) => void
 }
 
 const options: IForms = {
   data: null,
-  type: '', // search column forms
+  category: EFormsCategory.forms, // search column forms
   value: {},
   pushstate: false, // object
-  validator: false,
+  validator: null,
 }
 
 @Component
@@ -49,7 +102,7 @@ export default class App extends Vue {
     })
 
     const cfg = this.cfg
-    if (cfg.type === 'search') {
+    if (cfg.category === 'search') {
       Object.assign(cfg.value, getQueryAll())
       typeof cfg.onPopstate === 'function' &&
         window.addEventListener('popstate', () => {
@@ -72,7 +125,7 @@ export default class App extends Vue {
             if (v.type === 'checkbox' && v.checkAll) {
               let chked = true
               for (const chk of v.data) {
-                if (!cfg.value[v.name].includes(chk.value)) {
+                if (false === (cfg.value[v.name] as any[]).includes(chk.value)) {
                   chked = false
                   break
                 }
@@ -110,7 +163,7 @@ export default class App extends Vue {
   }
 
   protected onChkAll(v: any) {
-    const arr = this.cfg.value[v.name]
+    const arr = this.cfg.value[v.name] as any[]
     arr.splice(0)
     if (this.checkAll[v.name]) {
       v.data.forEach((vv: any) => arr.push(vv.value))
@@ -121,7 +174,7 @@ export default class App extends Vue {
   }
   protected onChk(v: any, vv: any) {
     if (v.checkAll) {
-      const val = this.cfg.value[v.name]
+      const val = this.cfg.value[v.name] as any[]
       if (val && val.includes(vv.value)) {
         if (val.length === v.data.length) {
           this.checkAll[v.name] = v.checkAll.value || true
@@ -142,7 +195,7 @@ export default class App extends Vue {
   protected async onSubmit() {
     const cfg = this.cfg
     if (cfg.validator) {
-      for (const [key, func] of Object.entries(cfg.validator) as [string, any]) {
+      for (const [key, func] of Object.entries(cfg.validator)) {
         const res: boolean = func(cfg.value[key], cfg.value)
         if (res !== true) {
           this.tips[key] = false
