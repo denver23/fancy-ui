@@ -127,8 +127,9 @@
         display: inline-block
         width: $row-height
         height: $row-height
-        background: url(images/spinner.svg?fill=#{$colorTheme}) no-repeat center
-        background-size: 100%
+        mask: url(images/spinner.svg) no-repeat center
+        mask-size: 100%
+        background-color: $colorTheme
         animation: fancy-tables-loading 1s infinite steps(8)
         @keyframes fancy-tables-loading
           0%

@@ -16,8 +16,9 @@
     min-height: $row-height
     > em
       flex: 1
-      background: url(images/spinner.svg?fill=#{$colorTheme}) no-repeat center center
-      background-size: auto 100%
+      background-color: $colorTheme
+      mask: url(images/spinner.svg) no-repeat center center
+      mask-size: auto 100%
       animation: fancy-loading 1s infinite steps(8)
       @keyframes fancy-loading
         0%

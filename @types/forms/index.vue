@@ -160,21 +160,22 @@
           + span
             display: inline-block
             padding-left: 2rem
-            background-repeat: no-repeat
-            background-position: 0 center
-            background-size: 1.5rem auto
+            mask-repeat: no-repeat
+            mask-position: 0 center
+            mask-size: 1.5rem auto
+            background: $colorFont
         &[type="radio"]
           + span
-            background-image: url(images/android-radio-button-off.svg?fill=#{$colorFont})
+            mask-image: url(images/android-radio-button-off.svg)
           &:checked
             + span
-              background-image: url(images/android-radio-button-on.svg?fill=#{$colorFont})
+              mask-image: url(images/android-radio-button-on.svg)
         &[type="checkbox"]
           + span
-            background-image: url(images/android-checkbox-outline-blank.svg?fill=#{$colorFont})
+            mask-image: url(images/android-checkbox-outline-blank.svg)
           &:checked
             + span
-              background-image: url(images/android-checkbox-outline.svg?fill=#{$colorFont})
+              mask-image: url(images/android-checkbox-outline.svg)
     > dl
       padding: $space
       display: flex
@@ -288,8 +289,9 @@
                   left: 0
                   height: $form-height
                   width: $form-height
-                  background: url(images/spinner.svg?fill=#fff) no-repeat center
-                  background-size: auto 50%
+                  mask: url(images/spinner.svg) no-repeat center
+                  mask-size: auto 50%
+                  background-color: #fff
                   animation: fancy-forms-sending 1s infinite steps(8)
                   @keyframes fancy-forms-sending
                     0%

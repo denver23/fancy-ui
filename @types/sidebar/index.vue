@@ -121,9 +121,10 @@
           top: 0
           width: $size
           height: $size
-          background-repeat: no-repeat
-          background-position: center
-          background-size: 60%
+          mask-repeat: no-repeat
+          mask-position: center
+          mask-size: 60%
+          background-color: $icon-color
         &::after
           content: ""
           position: absolute
@@ -139,16 +140,16 @@
 
         &.fc-automobile
           &::before
-            background-image: url(images/model-s.svg?fill=#{$icon-color})
+            mask-image: url(images/model-s.svg)
         &.fc-sitemap
           &::before
-            background-image: url(images/android-apps.svg?fill=#{$icon-color})
+            mask-image: url(images/android-apps.svg)
         &.fc-cubes
           &::before
-            background-image: url(images/merge.svg?fill=#{$icon-color})
+            mask-image: url(images/merge.svg)
         &.fc-cog
           &::before
-            background-image: url(images/gear-a.svg?fill=#{$icon-color})
+            mask-image: url(images/gear-a.svg)
       dd
         transition: height 0.2s ease-in
         color: $font-color

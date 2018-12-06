@@ -12,16 +12,20 @@
     padding: $space * 4
     .fc-status
       height: $space * 24
-      background: url(images/checkmark-circled.svg?fill=#{$colorGreen}) no-repeat center center
-      background-size: auto 100%
+      mask: url(images/checkmark-circled.svg) no-repeat center center
+      mask-size: auto 100%
+      background-color: $colorGreen
       &.fc-error
-        background-image: url(images/close-circled.svg?fill=#{$colorRed})
+        mask-image: url(images/close-circled.svg)
+        background-color: $colorRed
       &.fc-question
-        background-image: url(images/help-circled.svg?fill=#{$colorAlerm})
+        mask-image: url(images/help-circled.svg)
+        background-color: $colorAlerm
       &.fc-info,
       &.fc-alerm,
       &.fc-exclamation
-        background-image: url(images/android-alert.svg?fill=#{$colorAlerm})
+        mask-image: url(images/android-alert.svg)
+        background-color: $colorAlerm
 
     .fc-content
       margin: $space * 2 auto
