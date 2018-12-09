@@ -16,7 +16,7 @@ const options: IConfirm = {
 
 @Component
 export default class App extends Vue {
-  @Prop() private cfg: IConfirm
+  @Prop() protected cfg: IConfirm
   private sending: boolean = false
 
   protected created() {
@@ -53,7 +53,7 @@ export default class App extends Vue {
     }
     this.sending = !!type
     try {
-      type ? await this.cfg.onConfirm() : await this.cfg.onCancel()
+      type === 1 ? await this.cfg.onConfirm.call(this) : await this.cfg.onCancel.call(this)
     } catch (e) {
       console.log(e)
     }

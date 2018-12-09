@@ -6,9 +6,16 @@ interface ITablesPicker {
   filter: any[]
 }
 
+interface ITablesColumns {
+  label?: string
+  field: string
+  style?: any
+  callback?: (v: any) => string
+}
+
 export interface ITables {
   data?: any
-  columns?: any[]
+  columns?: ITablesColumns[]
   values?: any
   state?: string
   picker?: ITablesPicker
