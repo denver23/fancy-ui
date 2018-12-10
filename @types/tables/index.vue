@@ -1,39 +1,26 @@
 <template lang="pug">
   .fancy-tables
-    .fc-tool
-      .fc-picker(ref="picker" v-if="cfg.picker")
-        button(@click.stop="pickerState = !pickerState") {{cfg.picker.name}}
-        div(v-show="pickerState" @click.stop="")
-          label(v-for="v of cfg.columns" v-if="v.label && cfg.picker")
-            input(type="checkbox",:value="v.label" v-model="cfg.picker.value")
-            span {{v.label}}
     ol
       ul.fc-header
         template(v-for="(v, index) of cfg.columns")
           li(
-            v-if="v.label && (!cfg.picker || cfg.picker.value.includes(v.label)) || v.label === 'checkbox'"
-            ,:class="[v.field, {'fc-noflex': v.style && v.style.width}]"
+            v-if="cfg.columnFilter.includes(v.label) === false"
+            ,:class="[v.field, {'fc-w': v.style && v.style.width}]"
             ,:style="v.style"
           )
-            label(v-if="v.label === 'checkbox'" )
-              input(type="checkbox" @click="onChkAll(v)" v-model="modelAll[v.field]")
-            div(v-else v-html="v.label")
+            div(v-html="v.label || ''")
 
       ul(v-if="cfg.data && cfg.data.length" v-for="value of cfg.data" transition="fc-fade")
         template(v-for="(v, index) of cfg.columns")
           li(
-            v-if="v.label && (!cfg.picker || cfg.picker.value.includes(v.label)) || v.label === 'checkbox'"
-            ,:class="[v.field, {'fc-noflex': v.style && v.style.width}]"
+            v-if="cfg.columnFilter.includes(v.label) === false"
+            ,:class="[v.field, {'fc-w': v.style && v.style.width}]"
             ,:style="v.style"
           )
-            label(v-if="v.label === 'checkbox'")
-              input(type="checkbox",:value="value[v.field]" v-model="cfg.values[v.field]" @click="onChk(v.field,value)")
-            div(v-else v-bind:ps="v.label" v-html="(typeof v.callback == 'function' ? v.callback(value) : value[v.field])")
+            div(v-bind:ps="v.label" v-html="(typeof v.callback == 'function' ? v.callback(value) : value[v.field])")
 
     .fc-loading(v-if="cfg.state === 'loading'")
     .fc-state(v-else v-html="cfg.state")
-    //- | {{cfg.values}}
-
 </template>
 
 <script src="./script.ts"></script>
@@ -75,7 +62,7 @@
           border-right: 1px solid $borderColor
           &:last-child
             border-right: none
-          &.fc-noflex
+          &.fc-w
             flex: none
           > div,
           > label
@@ -92,7 +79,7 @@
       @media #{$device-pad}
         > ul
           > li
-            &.fc-noflex
+            &.fc-w
               flex: 1
       @media #{$device-phone}
         > ul
@@ -105,7 +92,7 @@
             align-items: baseline
             border-bottom: 1px dashed #f1f1f1
             border-right: none
-            &.fc-noflex
+            &.fc-w
               flex: 0 0 100%
             > div
               padding: $space
@@ -149,51 +136,51 @@
       &:empty
         display: none
 
-    .fc-picker
-      float: right
-      height: $row-height
-      position: relative
+    // .fc-picker
+    //   float: right
+    //   height: $row-height
+    //   position: relative
 
-      button
-        border: 1px solid $borderColor
-        height: $row-height
-        line-height: normal
-        border-radius: $borderRadius
-        padding-right: $space * 4
-        cursor: pointer
-        background: #fff
-        position: relative
-        box-sizing: border-box
-        color: $colorFont
-        &::after
-          $_s: $row-height / 6
-          content: ""
-          position: absolute
-          right: $space
-          top: 50%
-          width: 0
-          height: 0
-          border-left: $_s solid transparent
-          border-right: $_s solid transparent
-          border-top: $_s * 5 / 4 solid $colorFont
-          transform: translateY(-50%)
-      > div
-        min-width: 10rem
-        position: absolute
-        top: $row-height
-        right: 0
-        margin-top: 2px
-        background: #fff
-        box-shadow: 0 0 6px $borderColor
-      label
-        line-height: 2em
-        height: 2em
-        padding: 0 $space
-        display: block
-        cursor: pointer
-        font-weight: normal
-        &:hover
-          background: $borderColor
-      input
-        margin: 0 0.5rem 0 0
+    //   button
+    //     border: 1px solid $borderColor
+    //     height: $row-height
+    //     line-height: normal
+    //     border-radius: $borderRadius
+    //     padding-right: $space * 4
+    //     cursor: pointer
+    //     background: #fff
+    //     position: relative
+    //     box-sizing: border-box
+    //     color: $colorFont
+    //     &::after
+    //       $_s: $row-height / 6
+    //       content: ""
+    //       position: absolute
+    //       right: $space
+    //       top: 50%
+    //       width: 0
+    //       height: 0
+    //       border-left: $_s solid transparent
+    //       border-right: $_s solid transparent
+    //       border-top: $_s * 5 / 4 solid $colorFont
+    //       transform: translateY(-50%)
+    //   > div
+    //     min-width: 10rem
+    //     position: absolute
+    //     top: $row-height
+    //     right: 0
+    //     margin-top: 2px
+    //     background: #fff
+    //     box-shadow: 0 0 6px $borderColor
+    //   label
+    //     line-height: 2em
+    //     height: 2em
+    //     padding: 0 $space
+    //     display: block
+    //     cursor: pointer
+    //     font-weight: normal
+    //     &:hover
+    //       background: $borderColor
+    //   input
+    //     margin: 0 0.5rem 0 0
 </style>

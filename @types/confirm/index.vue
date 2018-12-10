@@ -62,8 +62,9 @@
               right: 0
               height: $form-height
               width: $form-height / 3 * 2
-              background: url(images/spinner.svg?fill=#fff) no-repeat center center
-              background-size: auto 50%
+              mask: url(images/spinner.svg) no-repeat center center
+              mask-size: auto 50%
+              background-color: #fff
               animation: fancy-confirm-sending 1s infinite steps(8)
               @keyframes fancy-confirm-sending
                 0%
