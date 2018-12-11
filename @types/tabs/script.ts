@@ -1,7 +1,15 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
 
+interface ITabsItem {
+  title: string
+  url?: string
+}
+interface ITabsData {
+  [key: string]: ITabsItem
+}
+
 export interface ITabs {
-  data: any
+  data: ITabsData
   active: string | number
 }
 
