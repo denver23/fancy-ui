@@ -5,11 +5,16 @@ export interface ICityPicker {
   value?: string
   maxLevel?: number
   onSelect?: (cityid: string, cityname: string, path?: string[]) => any
+  onClose?: () => void
 }
 
 const options: ICityPicker = {
   value: '',
   maxLevel: 2,
+  onClose(this: App) {
+    console.log(this.$parent.$children)
+    // console.log(this.$parent.$children.find(v => v === this).cfg = null)
+  },
 }
 
 @Component
@@ -150,6 +155,6 @@ export default class App extends Vue {
   }
 
   protected onClose() {
-    console.log('onClose')
+    this.cfg.onClose && this.cfg.onClose.call(this)
   }
 }
