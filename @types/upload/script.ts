@@ -10,16 +10,35 @@ function isBlob(str: string): boolean {
   return /^blob:/.test(str)
 }
 
+export enum EUploadDock {
+  right = 'right',
+  none = 'none',
+}
+
+interface IUploadItem {
+  rid?: string
+  url?: string
+  src?: string
+  type?: string
+  base64?: string
+  progress?: number
+}
+
+interface IUploadSize {
+  maxWidth?: string
+  maxHeight?: string
+}
+
 export interface IUpload {
-  data: any[]
-  dock?: string
+  data?: IUploadItem[]
+  dock?: EUploadDock
   button?: boolean
   field?: string
   param?: any
-  size?: any
+  size?: IUploadSize
   trigger: boolean
   onClick?: (item: any) => void
-  onPostComplete?: (res: any, item: any) => boolean
+  onPostComplete?: (res: any, item: IUploadItem) => boolean
 }
 
 // let data = [
@@ -29,7 +48,7 @@ export interface IUpload {
 
 const options: IUpload = {
   data: [],
-  dock: 'none',
+  dock: EUploadDock.none,
   button: false,
   field: 'file',
   param: {},

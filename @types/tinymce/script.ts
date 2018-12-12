@@ -10,11 +10,12 @@
 // import 'tinymce/plugins/preview'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 declare const tinymce: any
+
 export interface ITinymce {
   name: string
   value: string
-  btnImage: boolean
-  btnImagePick?: (str: string) => string
+  btnImage: () => void
+  btnImagePick?: (str: string) => void
   getContent?: () => string
   onPaste?: (str: string) => string
   onInsert?: (str: string) => string
@@ -25,7 +26,7 @@ export interface ITinymce {
 const options: ITinymce = {
   name: 'content',
   value: '',
-  btnImage: false,
+  btnImage: null,
 }
 
 @Component

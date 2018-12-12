@@ -38,7 +38,7 @@ export interface IFormValue {
 }
 // form attribute
 export interface IFormsAttr {
-  [key: string]: string | number
+  [key: string]: string | number | any
 }
 // select checkbox radio
 export interface IFormsOption {
@@ -49,7 +49,7 @@ export interface IFormsOption {
 export interface IFormsItem {
   name: string
   label?: string
-  value?: string | number
+  value?: string | number | any
   checkAll?: boolean
   type?: EFormsType
   attr?: IFormsAttr
@@ -63,7 +63,7 @@ export interface IFormsItemMult {
 
 // 验证器
 export interface IFormValidator {
-  [key: string]: (key: string | number | string[] | number[], value: IFormValue) => boolean
+  [key: string]: (val: string | number | string[] | number[], formVal?: IFormValue) => boolean | string | number
 }
 
 export interface IForms {
@@ -196,8 +196,8 @@ export default class App extends Vue {
     const cfg = this.cfg
     if (cfg.validator) {
       for (const [key, func] of Object.entries(cfg.validator)) {
-        const res: boolean = func(cfg.value[key], cfg.value)
-        if (res !== true) {
+        const res: any = func(cfg.value[key], cfg.value)
+        if (!res) {
           this.tips[key] = false
 
           const input: HTMLInputElement = this.$el.querySelector(`[name="${key}"]`)

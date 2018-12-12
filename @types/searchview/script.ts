@@ -1,11 +1,16 @@
 import { Component, Prop, Watch, Vue } from 'vue-property-decorator'
 
+interface ISearchItem {
+  name: string
+  url?: string
+}
+
 export interface ISearchView {
   attr?: any
-  data?: any[]
-  value?: any
+  data?: ISearchItem[]
+  value?: string
   empty?: string
-  onChange?: () => void
+  onChange?: (val: string) => void
   onChoose?: (item?: any) => void
 }
 
@@ -27,8 +32,8 @@ const options: ISearchView = {
 export default class App extends Vue {
   @Prop() private cfg: ISearchView
 
-  private show: boolean = false
-  private selectIndex: number = 0
+  protected show: boolean = false
+  protected selectIndex: number = 0
 
   protected created() {
     Object.keys(options).forEach(i => {
