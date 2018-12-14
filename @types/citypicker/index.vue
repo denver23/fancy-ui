@@ -1,5 +1,5 @@
 <template lang="pug">
-  .fancy-citypicker(@click="onClose")
+  .fancy-citypicker(@click="onClose" v-show="cfg.visible")
     div(@click.stop="")
       h4
         em.fc-back(v-if="level" @click="onBack()")

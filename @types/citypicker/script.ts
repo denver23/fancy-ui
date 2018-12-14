@@ -4,17 +4,15 @@ import City from './city'
 export interface ICityPicker {
   value?: string
   maxLevel?: number
+  visible?: boolean
   onSelect?: (cityid: string, cityname: string, path?: string[]) => any
   onClose?: () => void
 }
 
 const options: ICityPicker = {
   value: '',
+  visible: true,
   maxLevel: 2,
-  onClose(this: App) {
-    console.log(this.$parent.$children)
-    // console.log(this.$parent.$children.find(v => v === this).cfg = null)
-  },
 }
 
 @Component
@@ -155,6 +153,7 @@ export default class App extends Vue {
   }
 
   protected onClose() {
+    this.cfg.visible = false
     this.cfg.onClose && this.cfg.onClose.call(this)
   }
 }
