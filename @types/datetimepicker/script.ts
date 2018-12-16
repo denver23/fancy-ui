@@ -85,7 +85,7 @@ function buildCalendar(y: string, m: string, validBegin: string = '', validEnd: 
 export interface IDatetimePicker {
   target: string
   value: string
-  type: string
+  format: string
   beginDate?: string
   endDate?: string
   minYear?: number
@@ -103,7 +103,7 @@ const maxYear = 2100
 const options: IDatetimePicker = {
   target: '',
   value: '',
-  type: 'date',
+  format: 'date',
   beginDate: '',
   endDate: '',
   minYear,
@@ -118,7 +118,7 @@ const options: IDatetimePicker = {
 
 @Component
 export default class App extends Vue {
-  @Prop() private cfg: IDatetimePicker
+  @Prop() protected cfg: IDatetimePicker
 
   private year: number = 0
   private month: number = 0
@@ -127,14 +127,15 @@ export default class App extends Vue {
   private minute: number = 0
   private second: number = 0
 
-  protected type: string = '' // date|datetime
+  protected format: string = '' // date|datetime
   protected position: any = false
 
   protected created() {
     Object.keys(options).forEach(i => {
       this.cfg.hasOwnProperty(i) || this.$set(this.cfg, i, (options as any)[i])
     })
-    this.type = this.cfg.type || (String(this.cfg.value).indexOf(':') > 0 ? 'datetime' : 'date')
+    console.log(this.cfg)
+    this.format = this.cfg.format || (String(this.cfg.value).indexOf(':') > 0 ? 'datetime' : 'date')
     this.getTime(this.cfg.value)
   }
 

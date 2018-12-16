@@ -1,5 +1,5 @@
 import { Component, Prop, Watch, Vue } from 'vue-property-decorator'
-import City from './city'
+import cityConfig from './cityConfig'
 
 export interface ICityPicker {
   value?: string
@@ -37,7 +37,7 @@ export default class App extends Vue {
   }
 
   protected get title() {
-    return City.category[this.level]
+    return cityConfig.category[this.level]
   }
 
   protected get children() {
@@ -47,8 +47,8 @@ export default class App extends Vue {
       const arr = []
       if (!fid) {
         // 第一级,按顺序显示
-        for (const n of City.province) {
-          for (const v of City.data) {
+        for (const n of cityConfig.province) {
+          for (const v of cityConfig.data) {
             if (v.fid === '0' && v.name === n) {
               arr.push(v)
               break
@@ -57,7 +57,7 @@ export default class App extends Vue {
         }
       } else {
         // 第n级
-        for (const v of City.data) {
+        for (const v of cityConfig.data) {
           if (v.fid === fid) {
             arr.push(v)
           }
@@ -67,16 +67,16 @@ export default class App extends Vue {
     }
     level && ({ id } = this.breadcrumbs[level - 1])
     // 直辖市 或 最后一级
-    return City.zxs.indexOf(id) >= 0 || (level > 0 && level === this.cfg.maxLevel) ? [] : getChild(id)
+    return cityConfig.zxs.indexOf(id) >= 0 || (level > 0 && level === this.cfg.maxLevel) ? [] : getChild(id)
   }
 
   protected getdata(val: string) {
     if (val) {
-      const parents = City.getPath(val)
+      const parents = cityConfig.getPath(val)
       if (parents) {
         this.breadcrumbs = parents
         this.level = parents.length - 1
-        this.current = City.getByID(val) || ''
+        this.current = cityConfig.getByID(val) || ''
 
         const index = this.children.findIndex(value => value.id === this.current.id)
         this.index = index < 0 ? 0 : index
@@ -89,7 +89,7 @@ export default class App extends Vue {
     if (this.index >= list.length) {
       this.index = 0
     }
-    list[this.index].scrollIntoView(false)
+    list[this.index].scrollIntoView({ behavior: 'smooth' })
   }
   protected onKeyDown(e: KeyboardEvent) {
     if ([8, 13, 27, 37, 38, 39, 40, 100].includes(e.keyCode)) {

@@ -2,7 +2,7 @@
 <template lang="pug">
   .fancy-datetimepicker(:style="position" @click="onClose")
     div(@click.stop="")
-      .fc-tool(v-if="type !== 'time'")
+      .fc-tool(v-if="format !== 'time'")
         i.fc-l(@click="onYearChange(-1)")
         span(v-text="year")
         i.fc-r(@click="onYearChange(1)")
@@ -10,7 +10,8 @@
         i.fc-l(@click="onMonthChange(-1)")
         span(v-text="month+1")
         i.fc-r(@click="onMonthChange(1)")
-      .fc-table(v-if="type !== 'time'")
+
+      .fc-table(v-if="format !== 'time'")
         ul
           li(v-for="week of cfg.weeks" class="fc-week")
             span {{week}}
@@ -23,7 +24,7 @@
             span(v-text="v.day")
             //- Lunar
             //- em(v-if="showLunar"){{child.lunar}}
-      template(v-if="type === 'datetime' || type === 'time'")
+      template(v-if="format === 'datetime' || format === 'time'")
         .fc-time
           input(
             type="number"

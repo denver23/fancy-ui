@@ -6,7 +6,6 @@
         em.fc-delete(v-else @click="onClear()")
         span {{title}}
         em(@click="onClose")
-
       ul(ref="picker")
         li(
           v-for="(v,k) of children"
