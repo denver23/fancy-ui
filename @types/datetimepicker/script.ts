@@ -95,6 +95,7 @@ export interface IDatetimePicker {
   times?: string[]
   confirm?: string
   cancel?: string
+  visible?: boolean
   onSelect?: (date: Date) => void
 }
 
@@ -113,6 +114,7 @@ const options: IDatetimePicker = {
   times: ['h', 'm', 's'],
   confirm: 'Confirm',
   cancel: 'Cancel',
+  visible: true,
   onSelect: date => console.log(date),
 }
 
@@ -134,7 +136,6 @@ export default class App extends Vue {
     Object.keys(options).forEach(i => {
       this.cfg.hasOwnProperty(i) || this.$set(this.cfg, i, (options as any)[i])
     })
-    console.log(this.cfg)
     this.format = this.cfg.format || (String(this.cfg.value).indexOf(':') > 0 ? 'datetime' : 'date')
     this.getTime(this.cfg.value)
   }
@@ -167,6 +168,21 @@ export default class App extends Vue {
     // last day of month
     const lastday = new Date(this.year, val + 1, 0).getDate()
     this.day = Math.min(this.day, lastday)
+  }
+
+  @Watch('cfg.visible')
+  protected visibleChanged(val: boolean) {
+    if (val) {
+      document.querySelector('body').addEventListener('click', this.bodyEvent, false)
+    } else {
+      document.querySelector('body').removeEventListener('click', this.bodyEvent, false)
+    }
+  }
+
+  private bodyEvent(e: Event) {
+    e.stopPropagation()
+    e.preventDefault()
+    this.cfg.visible = false
   }
 
   protected getPosition() {
@@ -312,6 +328,7 @@ export default class App extends Vue {
       [this.year, this.month + 1, this.day].join('/') + ' ' + [this.hour, this.minute, this.second].join(':'),
     )
     this.onClose()
+    this.cfg.visible = false
     this.cfg.onSelect(res)
   }
 }

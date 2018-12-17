@@ -1,6 +1,6 @@
 
 <template lang="pug">
-  .fancy-datetimepicker(:style="position" @click="onClose")
+  .fancy-datetimepicker(:style="position" @click="onClose" v-show="cfg.visible")
     div(@click.stop="")
       .fc-tool(v-if="format !== 'time'")
         i.fc-l(@click="onYearChange(-1)")
