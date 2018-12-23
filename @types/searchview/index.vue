@@ -11,7 +11,7 @@
       @keydown="onKeyDown($event)"
       autocomplete="off"
     )
-    template(v-if="show")
+    template(v-if="cfg.visible")
       ul(ref="list" v-if="cfg.data && cfg.data.length > 0")
         li(
           v-for="(v,index) of cfg.data",

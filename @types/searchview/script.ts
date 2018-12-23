@@ -10,6 +10,7 @@ export interface ISearchView {
   data?: ISearchItem[]
   value?: string
   empty?: string
+  visible?: boolean
   onChange?: (val: string) => void
   onChoose?: (item?: any) => void
 }
@@ -19,6 +20,7 @@ const options: ISearchView = {
   data: [],
   value: '',
   empty: '',
+  visible: true,
   onChoose: (item: any) => console.log(item),
 }
 
@@ -31,8 +33,6 @@ const options: ISearchView = {
 })
 export default class App extends Vue {
   @Prop() private cfg: ISearchView
-
-  protected show: boolean = false
   protected selectIndex: number = 0
 
   protected created() {
@@ -41,7 +41,7 @@ export default class App extends Vue {
     })
   }
 
-  @Watch('show')
+  @Watch('cfg.visible')
   protected onShowChanged(val: boolean) {
     if (val && this.cfg.value && this.cfg.data) {
       const index = this.cfg.data.findIndex(v => v.name === this.cfg.value)
@@ -52,10 +52,10 @@ export default class App extends Vue {
 
   protected onFocus(e: any) {
     e.preventDefault()
-    this.show = true
+    this.cfg.visible = true
   }
   protected onBlur() {
-    setTimeout(() => (this.show = false), 200)
+    setTimeout(() => (this.cfg.visible = false), 200)
   }
 
   protected onKeyDown(e: KeyboardEvent) {
@@ -75,8 +75,10 @@ export default class App extends Vue {
     }
     // enter
     if (e.keyCode === 13) {
+      this.cfg.visible = false
       return
     }
+    this.cfg.visible = true
     // up down key
     if (e.keyCode === 38 || e.keyCode === 40) {
       const len = this.cfg.data.length
@@ -98,11 +100,11 @@ export default class App extends Vue {
   }
 
   protected onChoose(val?: any) {
+    this.cfg.visible = false
     if (this.selectIndex < 0) {
       return
     }
     const item = val || this.cfg.data[this.selectIndex]
-    this.cfg.onChoose(item)
-    this.show = false
+    item && this.cfg.onChoose(item)
   }
 }

@@ -1,7 +1,7 @@
 
 <template lang="pug">
   .fancy-datetimepicker(:style="position" @click="onClose" v-show="cfg.visible")
-    div(@click.stop="")
+    div(@click.stop="" @mousedown.stop="")
       .fc-tool(v-if="format !== 'time'")
         i.fc-l(@click="onYearChange(-1)")
         span(v-text="year")
@@ -57,7 +57,7 @@
         .fc-bot
           span(@click="onSubmit") {{cfg.confirm}}
           span(@click="onClose") {{cfg.cancel}}
-
+      div(ref="scrollview")
 </template>
 
 <script src="./script.ts"></script>

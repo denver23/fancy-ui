@@ -142,14 +142,12 @@ export default class App extends Vue {
 
   protected mounted() {
     requestAnimationFrame(() => {
-      document.addEventListener('click', this.onClose, false)
-      document.addEventListener('keydown', this.onKeyDown, false)
       this.getPosition()
+      this.onScrollView()
     })
   }
   protected destroyed() {
-    document.removeEventListener('click', this.onClose, false)
-    document.removeEventListener('keydown', this.onKeyDown, false)
+    this.unbindEvent()
   }
 
   protected get days() {
@@ -172,17 +170,29 @@ export default class App extends Vue {
 
   @Watch('cfg.visible')
   protected visibleChanged(val: boolean) {
-    if (val) {
-      document.querySelector('body').addEventListener('click', this.bodyEvent, false)
-    } else {
-      document.querySelector('body').removeEventListener('click', this.bodyEvent, false)
-    }
+    val ? this.bindEvent() : this.unbindEvent()
+  }
+
+  private bindEvent() {
+    document.querySelector('body').addEventListener('mousedown', this.bodyEvent, false)
+    document.querySelector('body').addEventListener('click', this.bodyEvent, false)
+    document.addEventListener('keydown', this.onKeyDown, false)
+    this.onScrollView()
+  }
+  private unbindEvent() {
+    document.querySelector('body').removeEventListener('mousedown', this.bodyEvent, false)
+    document.querySelector('body').removeEventListener('click', this.bodyEvent, false)
+    document.removeEventListener('keydown', this.onKeyDown, false)
   }
 
   private bodyEvent(e: Event) {
     e.stopPropagation()
     e.preventDefault()
     this.cfg.visible = false
+  }
+
+  private onScrollView() {
+    requestAnimationFrame(() => this.$el.scrollIntoView({ behavior: 'smooth' }))
   }
 
   protected getPosition() {
