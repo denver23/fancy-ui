@@ -160,22 +160,34 @@
           + span
             display: inline-block
             padding-left: 2rem
-            mask-repeat: no-repeat
-            mask-position: 0 center
-            mask-size: 1.5rem auto
-            background: $colorFont
+            position: relative
+            &::before
+              content: ''
+              position: absolute
+              top: 0
+              left: 0
+              bottom: 0
+              right: 0
+              background: $colorFont
+              mask-repeat: no-repeat
+              mask-position: 0 center
+              mask-size: 1.5rem auto
         &[type="radio"]
           + span
-            mask-image: url(images/android-radio-button-off.svg)
+            &::before
+              mask-image: url(images/android-radio-button-off.svg)
           &:checked
             + span
-              mask-image: url(images/android-radio-button-on.svg)
+              &::before
+                mask-image: url(images/android-radio-button-on.svg)
         &[type="checkbox"]
           + span
-            mask-image: url(images/android-checkbox-outline-blank.svg)
+            &::before
+              mask-image: url(images/android-checkbox-outline-blank.svg)
           &:checked
             + span
-              mask-image: url(images/android-checkbox-outline.svg)
+              &::before
+                mask-image: url(images/android-checkbox-outline.svg)
     > dl
       padding: $space
       display: flex
