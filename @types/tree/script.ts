@@ -2,12 +2,12 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 
 export interface ITree {
   data: any
-  field: string
-  maxLevel: number
-  editBtn: boolean
-  insertBtn: boolean
-  removeBtn: boolean
-  placeholder: string
+  field?: string
+  maxLevel?: number
+  editBtn?: boolean
+  insertBtn?: boolean
+  removeBtn?: boolean
+  placeholder?: string
   onClick?: (item: any, parent: any) => boolean
   onEdit?: (param: object, cb: () => void) => void
   onCreate?: (param: object, cb: () => void) => void

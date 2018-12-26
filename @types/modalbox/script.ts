@@ -2,7 +2,7 @@ import { Component, Prop, Watch, Vue } from 'vue-property-decorator'
 
 export interface IModalBox {
   title?: string
-  content?: string
+  content?: string | any
   confirm?: string
   cancel?: string
   component?: any // component组件
