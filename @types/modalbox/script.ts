@@ -10,8 +10,8 @@ export interface IModalBox {
   style?: object
   overlay?: boolean
   draggable?: boolean
-  onComplete?: (el: HTMLElement) => void
-  onConfirm?: (el: HTMLElement) => void
+  onComplete?: (el: Element) => void
+  onConfirm?: (el: Element) => void
   onCancel?: () => void
 }
 

@@ -27,7 +27,7 @@ export default class App extends Vue {
   }
 
   protected mounted() {
-    this.$el.focus()
+    (this.$el as any).focus()
   }
 
   protected destroyed() {

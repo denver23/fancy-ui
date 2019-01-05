@@ -141,7 +141,7 @@ export default class App extends Vue {
     requestAnimationFrame(() => {
       const cfg = this.cfg
       if (typeof cfg.onReady === 'function') {
-        cfg.onReady.call(this, cfg.value, this.$refs.form)
+        cfg.onReady.call(this, cfg.value, this.$refs.form as HTMLFormElement)
       }
       if (typeof cfg.onReset === 'function') {
         const inp = this.$el.querySelector('input[type="reset"]')
@@ -221,7 +221,7 @@ export default class App extends Vue {
     }
     this.sending = true
     try {
-      cfg.onSubmit && (await cfg.onSubmit.call(this, cfg.value, this.$refs.form))
+      cfg.onSubmit && (await cfg.onSubmit.call(this, cfg.value, this.$refs.form as HTMLFormElement))
     } catch (err) {
       this.tips[this.submitName] = err
     }
