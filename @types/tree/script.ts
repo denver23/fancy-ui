@@ -30,7 +30,9 @@ const options: ITree = {
   onRemove: (param, cb) => cb(),
 }
 
-@Component
+@Component({
+  name: 'treeview',
+})
 export default class App extends Vue {
   @Prop() private cfg: ITree
   private tree: any
@@ -47,7 +49,6 @@ export default class App extends Vue {
       Object.keys(options).forEach(i => {
         this.cfg.hasOwnProperty(i) || this.$set(this.cfg, i, (options as any)[i])
       })
-
     this.data = (this.tree && this.tree.data) || cfg.data
     this.maxLevel = this.treeMaxLevel || cfg.maxLevel
     this.data.forEach((v: any) => this.$set(v, 'folded', typeof v.folded === 'undefined' ? false : v.folded))
