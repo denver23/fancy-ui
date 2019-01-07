@@ -122,14 +122,15 @@
             width: $lineHeight
             opacity: 0.3
             cursor: pointer
-            background: url(images/android-create.svg?fill=#{$colorFont}) no-repeat center
-            background-size: 80%
+            mask: url(images/android-create.svg) no-repeat center
+            mask-size: 80%
+            background-color: $colorFont
             &:hover
               opacity: 1
             &.fc-plus
-              background-image: url(images/android-add.svg?fill=#{$colorFont})
+              mask-image: url(images/android-add.svg)
             &.fc-trash
-              background-image: url(images/ios-trash-outline.svg?fill=#{$colorFont})
+              mask-image: url(images/ios-trash-outline.svg)
 
       &.fc-folded
         > div

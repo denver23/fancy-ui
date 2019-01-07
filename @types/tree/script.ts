@@ -35,9 +35,9 @@ const options: ITree = {
 })
 export default class App extends Vue {
   @Prop() private cfg: ITree
-  private tree: any
-  private treelevel: number | undefined
-  private treeMaxLevel: number
+  @Prop() private tree: any
+  @Prop() private treelevel: number | undefined
+  @Prop() private treeMaxLevel: number
 
   private data: any = ''
   protected maxLevel: number = 0
