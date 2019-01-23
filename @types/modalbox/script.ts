@@ -15,11 +15,16 @@ export interface IModalBox {
   onCancel?: () => void
 }
 
+enum ModalBoxClick {
+  submit,
+  cancel,
+}
+
 const options: IModalBox = {
   title: '',
   content: '',
-  confirm: 'confirm',
-  cancel: 'cancel',
+  confirm: '',
+  cancel: '',
   component: '', // component组件
   tips: '',
   overlay: true,
@@ -58,29 +63,33 @@ export default class App extends Vue {
     if (this.cfg.confirm && [13, 100, 32].includes(e.keyCode)) {
       e.preventDefault()
       e.stopPropagation()
-      return this.onClick(1)
+      return this.onClick(ModalBoxClick.submit)
     }
     // esc
     if (e.keyCode === 27) {
-      this.onClick(0)
+      this.onClick(ModalBoxClick.cancel)
     }
   }
 
-  protected async onClick(type: number) {
+  protected async onClick(type: ModalBoxClick) {
     if (this.sending) {
       return
     }
     this.sending = !!type
     try {
-      if (type) {
+      if (ModalBoxClick.submit) {
         await this.cfg.onConfirm(this.$el)
       } else {
-        await this.cfg.onCancel()
+        this.cfg.onCancel && (await this.cfg.onCancel())
         // this.cfg.__name && (this.$parent[this.cfg.__name] = false)
       }
     } catch (e) {
       console.log(e)
     }
     this.sending = false
+  }
+
+  protected onDragStart() {
+    console.log('on drag start')
   }
 }
