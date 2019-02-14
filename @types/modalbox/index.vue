@@ -80,8 +80,9 @@
         bottom: 0
         left: 0
         right: 0
-        background: url(images/spinner.svg?fill=#{$colorTheme}) no-repeat center
-        background-size: auto 25%
+        background: $colorTheme
+        mask: url(images/spinner.svg) no-repeat center
+        mask-size: auto 25%
         animation: fancy-modalbox-loading 1s infinite steps(8)
 
     .fc-content

@@ -16,6 +16,7 @@ function getQueryAll() {
 export const enum EFormsCategory {
   forms = 'forms',
   search = 'search',
+  column = 'column',
 }
 export const enum EFormsType {
   button = 'button',

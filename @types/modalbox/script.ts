@@ -16,8 +16,8 @@ export interface IModalBox {
 }
 
 enum ModalBoxClick {
-  submit,
   cancel,
+  submit,
 }
 
 const options: IModalBox = {
@@ -35,6 +35,7 @@ const options: IModalBox = {
 export default class App extends Vue {
   @Prop() private cfg: IModalBox
 
+  protected name: string = 'modalbox'
   private sending: boolean = false
 
   @Watch('cfg.content')
@@ -77,11 +78,13 @@ export default class App extends Vue {
     }
     this.sending = !!type
     try {
-      if (ModalBoxClick.submit) {
+      if (type === ModalBoxClick.submit) {
         await this.cfg.onConfirm(this.$el)
       } else {
         this.cfg.onCancel && (await this.cfg.onCancel())
-        // this.cfg.__name && (this.$parent[this.cfg.__name] = false)
+        const p = this.$parent as any
+        const k = Object.entries(p).find(v => v[1] === this.cfg)[0]
+        p[k] = null
       }
     } catch (e) {
       console.log(e)
